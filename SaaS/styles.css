@@ -1,0 +1,100 @@
+:root {
+  --accent: #66cccc;
+  --accent-hover: #54b8b8;
+  --accent-soft: rgba(102, 204, 204, 0.16);
+  --accent-strong: rgba(102, 204, 204, 0.94);
+  --shadow-soft: 0 18px 48px rgba(15, 23, 42, 0.12);
+  --shadow-ring: 0 0 0 1px rgba(148, 163, 184, 0.12);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  outline: none;
+}
+
+button,
+.primary-btn,
+.secondary-btn,
+.mini-btn,
+.logout-btn,
+.theme-btn,
+.simple-btn {
+  cursor: pointer;
+}
+
+button:hover,
+.primary-btn:hover,
+.secondary-btn:hover,
+.mini-btn:hover,
+.logout-btn:hover,
+.theme-btn:hover,
+.simple-btn:hover {
+  transform: translateY(-1px);
+}
+
+.card,
+.slider-card,
+.accent-panel,
+.profile-preview,
+.activity-item,
+.tab-panel,
+.upgrade-card {
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.card:hover,
+.slider-card:hover,
+.accent-panel:hover,
+.activity-item:hover,
+.upgrade-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+.accent-chip {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: inline-block;
+  vertical-align: middle;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+button,
+input,
+select,
+textarea {
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: 0 0 0 3px rgba(102, 204, 204, 0.16);
+}
+
+.toast {
+  animation: fadeIn 260ms ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

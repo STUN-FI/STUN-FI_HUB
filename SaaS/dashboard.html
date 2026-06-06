@@ -1,0 +1,4580 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="img/Favicon.png" type="image/x-icon">
+  <title>School Dashboard</title>
+
+  <link rel='stylesheet' href='styles.css'>
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+  <style>
+  :root {
+    --accent: #66cccc;
+    --accent-hover: #54b8b8;
+    --bg: #f4f7fb;
+    --sidebar: #0f172a;
+    --card: #ffffff;
+    --card-2: #f8fafc;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --danger: #ef4444;
+    --success: #22c55e;
+    --info: var(--accent);
+    --warning: #f59e0b;
+    --shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
+  }
+
+  body.dark {
+    --bg: #0b1120;
+    --sidebar: #020617;
+    --card: #111827;
+    --card-2: #0f172a;
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --line: rgba(255,255,255,0.08);
+    --shadow: 0 14px 35px rgba(0,0,0,0.28);
+  }
+
+  * {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  body {
+    overflow: hidden;
+  }
+
+  .layout {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  .layout.closed {
+    grid-template-columns: 0 minmax(0, 1fr);
+  }
+
+  .sidebar {
+    background: var(--sidebar);
+    color: white;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 22px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    transition: margin-left 0.25s ease;
+    z-index: 50;
+  }
+
+  .layout.closed .sidebar {
+    margin-left: -300px;
+  }
+
+  .sidebar-close {
+    display: none;
+    width: 44px;
+    height: 44px;
+    margin-left: auto;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.08);
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .brand {
+    text-align: center;
+  }
+
+  .main-brand-logo {
+    width: 170px;
+    max-width: 100%;
+    display: block;
+    margin: 0 auto 12px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeLogo 0.8s ease forwards;
+    transition: transform 0.25s ease, filter 0.25s ease;
+  }
+
+  .main-brand-logo:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 10px rgba(102, 204, 204, 0.55));
+  }
+
+  @keyframes fadeLogo {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .brand p,
+  .school-mini-id,
+  .school-mini-motto,
+  .nav-box p {
+    margin: 0;
+    color: #cbd5e1;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  .school-mini-card,
+  .nav-box {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 18px;
+  }
+
+  .school-mini-card {
+    text-align: center;
+  }
+
+  .school-mini-logo {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 12px;
+    background: rgba(255,255,255,0.08);
+    border: 3px solid rgba(255,255,255,0.12);
+  }
+
+  .school-mini-name {
+    font-weight: 800;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+  }
+
+  .nav-box h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    color: white;
+  }
+
+  .sidebar-actions {
+    margin-top: auto;
+    display: grid;
+    gap: 10px;
+  }
+
+  button,
+  .primary-btn,
+  .secondary-btn,
+  .mini-btn,
+  .danger-btn,
+  .upload-btn,
+  .tab-btn {
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    font-weight: 800;
+    transition: 0.2s ease;
+  }
+
+  button:hover,
+  .primary-btn:hover,
+  .secondary-btn:hover,
+  .upload-btn:hover,
+  .mini-btn:hover,
+  .danger-btn:hover,
+  .tab-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .sidebar-actions button,
+  .primary-btn,
+  .secondary-btn,
+  .upload-btn,
+  .danger-btn,
+  .tab-btn,
+  .theme-btn,
+  .logout-btn {
+    padding: 12px 14px;
+  }
+
+  .primary-btn,
+  .secondary-btn,
+  .upload-btn,
+  .mini-btn:not(.mini-danger) {
+    background: var(--accent);
+    color: white;
+  }
+
+  .primary-btn:hover,
+  .secondary-btn:hover,
+  .upload-btn:hover,
+  .mini-btn:not(.mini-danger):hover {
+    background: var(--accent-hover);
+  }
+
+  .danger-btn,
+  .mini-danger,
+  .logout-btn {
+    background: var(--danger) !important;
+    color: white;
+  }
+
+  .theme-btn {
+    background: #334155 !important;
+    color: white;
+  }
+
+  .main {
+    height: 100vh;
+    overflow-y: auto;
+    padding: 26px;
+    min-width: 0;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: linear-gradient(to bottom, var(--bg) 75%, transparent);
+    padding-bottom: 18px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .topbar h2 {
+    margin: 0;
+    font-size: clamp(1.65rem, 3vw, 2.35rem);
+    line-height: 1.1;
+  }
+
+  .topbar p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  .topbar-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .sidebar-toggle {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: var(--accent) !important;
+    color: white !important;
+    font-size: 24px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+
+  .school-pill {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    padding: 13px 16px;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-size: 14px;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin: 22px 0;
+  }
+
+  .stat-card,
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    border-radius: 22px;
+  }
+
+  .stat-card {
+    padding: 20px;
+  }
+
+  .stat-card h4 {
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .stat-card p {
+    margin: 0;
+    font-size: 1.65rem;
+    font-weight: 900;
+    color: var(--text);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+
+  .tab-btn {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--line);
+    padding: 12px 16px;
+  }
+
+  .tab-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: transparent;
+  }
+
+  .tab-panel {
+    display: none;
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  .grid,
+  .settings-grid {
+    display: grid;
+    grid-template-columns: minmax(320px, 0.8fr) minmax(0, 1.2fr);
+    gap: 22px;
+    align-items: start;
+  }
+
+  .card {
+    padding: 22px;
+    min-width: 0;
+  }
+
+  .card h3 {
+    margin: 0 0 16px;
+    color: var(--text);
+    font-size: 1.3rem;
+  }
+
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  input,
+  textarea,
+  select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    outline: none;
+    font-size: 15px;
+    background: white;
+    color: #111827;
+  }
+
+  body.dark input,
+  body.dark textarea,
+  body.dark select {
+    background: #0f172a;
+    color: var(--text);
+    border-color: var(--line);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 90px;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .search-box {
+    max-width: 300px;
+    width: 100%;
+  }
+
+  .section-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-weight: 900;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 0;
+  }
+
+  .arrow {
+    transition: transform 0.2s ease;
+    display: inline-block;
+  }
+
+  .section-toggle.collapsed .arrow {
+    transform: rotate(-90deg);
+  }
+
+  .collapsible-content {
+    display: block;
+  }
+
+  ul.data-list,
+  ul.item-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  ul.data-list li,
+  ul.item-list li {
+    background: var(--card-2);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 14px;
+  }
+
+  .item-row {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+  }
+
+  .avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-weight: 900;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .item-title {
+    font-weight: 900;
+    margin-bottom: 6px;
+    font-size: 16px;
+    color: var(--text);
+  }
+
+  .item-meta {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .item-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .mini-btn {
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+
+  .assign-btn {
+    background: var(--success) !important;
+    color: white !important;
+  }
+
+  .profile-preview {
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    gap: 18px;
+    align-items: center;
+  }
+
+  .profile-logo {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    background: rgba(0,0,0,0.06);
+    border: 3px solid var(--line);
+  }
+
+  .hidden-file {
+    display: none;
+  }
+
+  .profile-details h4 {
+    margin: 0 0 10px;
+    font-size: 1.3rem;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .profile-details p {
+    margin: 0 0 8px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .profile-badge,
+  .status-badge,
+  .result-status-badge,
+  .payment-status-badge,
+  .component-chip {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    margin-top: 6px;
+  }
+
+  .profile-badge,
+  .component-chip {
+    background: var(--card-2);
+    border: 1px solid var(--line);
+    color: var(--text);
+  }
+
+  .color-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .color-row input[type="color"] {
+    width: 60px;
+    height: 44px;
+    padding: 4px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    padding: 28px 12px;
+    background: var(--card-2);
+    border-radius: 18px;
+    border: 1px dashed var(--line);
+  }
+
+  .activity-item,
+  .score-card,
+  .post-card,
+  .score-summary-item {
+    background: var(--card-2);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+
+  .activity-title {
+    font-weight: 900;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .activity-meta,
+  .score-card p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .score-toolbar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .class-summary-panel {
+    margin-bottom: 18px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--card-2);
+    padding: 14px;
+  }
+
+  .class-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .class-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .class-summary-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .class-summary-card .summary-card-title {
+    font-weight: 900;
+    font-size: 0.98rem;
+  }
+
+  .class-summary-card .summary-card-meta {
+    display: grid;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .class-summary-card .summary-card-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .class-summary-card .summary-card-actions .mini-btn,
+  .class-summary-card .summary-card-actions .secondary-btn {
+    flex: 1 1 auto;
+    min-width: 112px;
+  }
+
+  .scroll-card-body {
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+
+  .scroll-card-body.short {
+    max-height: 300px;
+  }
+
+  .post-form-grid {
+    display: grid;
+    gap: 10px;
+  }
+
+  .post-output {
+    font-size: 14px;
+    margin-top: 10px;
+    min-height: 20px;
+  }
+
+  .post-card small {
+    color: var(--muted);
+  }
+
+  .post-card a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 900;
+  }
+
+  .post-media-preview {
+    margin-top: 10px;
+  }
+
+  .post-media-preview img,
+  .post-media-preview video {
+    max-width: 100%;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+  }
+
+  .toast-wrap {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 9999;
+    display: grid;
+    gap: 10px;
+    max-width: 320px;
+  }
+
+  .toast {
+    padding: 14px 16px;
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    color: white;
+    font-weight: 900;
+    animation: toastIn 0.25s ease;
+  }
+
+  .toast.success { background: #22c55e; }
+  .toast.error { background: #ef4444; }
+  .toast.info { background: var(--accent); }
+
+  @keyframes toastIn {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    z-index: 9998;
+  }
+
+  .modal-overlay.active {
+    display: flex;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 760px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal h3 {
+    margin-top: 0;
+    color: var(--text);
+  }
+
+  .modal p {
+    color: var(--muted);
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .modal-actions button {
+    min-width: 140px;
+  }
+
+  .mobile-overlay {
+    display: none;
+  }
+
+  .status-submitted {
+    background: rgba(59,130,246,0.15);
+    color: #60a5fa;
+  }
+
+  .status-assigned,
+  .result-status-unlocked,
+  .payment-paid {
+    background: rgba(34,197,94,0.15);
+    color: #22c55e;
+  }
+
+  .result-status-not-assigned {
+    background: rgba(107,114,128,0.15);
+    color: #6b7280;
+  }
+
+  .result-status-locked,
+  .payment-pending {
+    background: rgba(245,158,11,0.15);
+    color: #f59e0b;
+  }
+
+  .payment-unpaid {
+    background: rgba(239,68,68,0.15);
+    color: #ef4444;
+  }
+
+  #preloader {
+    position: fixed;
+    inset: 0;
+    background: var(--bg, #081224);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    transition: opacity 0.45s ease, visibility 0.45s ease;
+  }
+
+  #preloader.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .loader-wrap {
+    text-align: center;
+    padding: 20px;
+  }
+
+  .preloader-logo {
+    width: 120px;
+    max-width: 100%;
+    animation: pulseLogo 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulseLogo {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.92;
+    }
+    50% {
+      transform: scale(1.06);
+      opacity: 1;
+    }
+  }
+
+  /* VIEW SUBJECT MODAL */
+
+    .modal-overlay{
+      position:fixed;
+      inset:0;
+
+      background:rgba(0,0,0,.55);
+
+      display:none;
+
+      justify-content:center;
+      align-items:center;
+
+      z-index:99999;
+
+      backdrop-filter:blur(8px);
+
+      padding:20px;
+    }
+
+    .modal-overlay.show{
+      display:flex;
+    }
+
+    .modal-card{
+
+      width:min(700px,95vw);
+
+      max-height:80vh;
+
+      overflow:auto;
+
+      background:var(--card);
+
+      border:1px solid var(--line);
+
+      border-radius:24px;
+
+      padding:28px;
+
+      box-shadow:
+      0 30px 60px rgba(0,0,0,.45);
+    }
+
+    .modal-header{
+      display:flex;
+
+      justify-content:space-between;
+
+      align-items:center;
+
+      margin-bottom:24px;
+    }
+
+    .modal-header h2{
+      margin:0;
+    }
+
+    .modal-header button{
+
+      width:42px;
+
+      height:42px;
+
+      border:none;
+
+      border-radius:12px;
+
+      cursor:pointer;
+
+      background:#ef4444;
+
+      color:white;
+
+      font-size:18px;
+    }
+
+    .teacher-subject-item{
+
+      display:flex;
+
+      justify-content:space-between;
+
+      align-items:center;
+
+      gap:16px;
+
+      padding:16px;
+
+      border:1px solid var(--line);
+
+      border-radius:16px;
+
+      margin-bottom:14px;
+    }
+
+    .teacher-subject-meta{
+
+      display:flex;
+
+      gap:8px;
+
+      flex-wrap:wrap;
+    }
+
+    .teacher-subject-meta span{
+
+      background:rgba(255,255,255,.05);
+
+      padding:8px 12px;
+
+      border-radius:999px;
+    }
+
+    .remove-subject-btn{
+
+      background:#ef4444;
+
+      color:white;
+
+      border:none;
+
+      padding:10px 14px;
+
+      border-radius:12px;
+
+      cursor:pointer;
+    }
+
+  @media (max-width: 1050px) {
+    .layout {
+      grid-template-columns: 1fr;
+      height: 100vh;
+    }
+
+    .layout.closed {
+      grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: 300px;
+      max-width: 86vw;
+      margin-left: -300px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+    }
+
+    .sidebar.open {
+      margin-left: 0;
+    }
+
+    .sidebar.closed {
+      margin-left: -300px;
+    }
+
+    .sidebar-close {
+      display: grid;
+      place-items: center;
+    }
+
+    .main {
+      padding: 18px;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .stats,
+    .grid,
+    .settings-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .topbar-actions {
+      justify-content: flex-start;
+    }
+
+    .mobile-overlay.show {
+      display: block;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 40;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .main {
+      padding: 14px;
+    }
+
+    .stats {
+      grid-template-columns: 1fr;
+    }
+
+    .profile-preview,
+    .item-row {
+      grid-template-columns: 1fr;
+    }
+
+    .topbar h2 {
+      font-size: 1.55rem;
+    }
+
+    .topbar-actions {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 52px 1fr;
+    }
+
+    .topbar-actions .school-pill {
+      text-align: center;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .score-toolbar,
+    .score-summary-grid,
+    .modal-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .modal-actions button {
+      width: 100%;
+    }
+  }
+
+  #studentList,
+  #teacherList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  #studentList li,
+  #teacherList li {
+    background: var(--card-2);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 14px;
+  }
+</style>
+</head>
+<body>
+  <div id="preloader">
+    <div class="loader-wrap">
+      <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo" class="preloader-logo">
+      <!-- <div class="spinner"></div> -->
+      <!-- <p>Loading portal...</p> -->
+    </div>
+  </div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+
+<div class="modal-overlay" id="studentEditModal">
+  <div class="modal" style="max-width:520px;">
+    <h3>Edit Student</h3>
+    <div class="form-group">
+      <label for="editStudentName">Student Name</label>
+      <input id="editStudentName" placeholder="Student Name">
+    </div>
+    <div class="form-group">
+      <label for="editStudentReg">Reg Number</label>
+      <input id="editStudentReg" placeholder="Reg Number">
+    </div>
+    <div class="form-group">
+      <label for="editStudentClass">Class</label>
+      <input id="editStudentClass" placeholder="Class">
+    </div>
+    <div class="form-group">
+      <label for="editStudentArm">Arm</label>
+      <input id="editStudentArm" placeholder="Arm">
+    </div>
+    <div class="modal-actions">
+      <button class="primary-btn" onclick="saveStudentEdit()">Save Changes</button>
+      <button class="danger-btn" onclick="closeStudentEdit()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="teacherEditModal">
+  <div class="modal">
+    <h3>Edit Teacher</h3>
+
+    <div class="form-group">
+      <label>Teacher Name</label>
+      <input type="text" id="editTeacherName">
+    </div>
+
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="editTeacherEmail" autocomplete="email">
+    </div>
+
+    <div class="modal-actions">
+      <button class="primary-btn" onclick="saveTeacherEdit()">Save Changes</button>
+      <button class="danger-btn" onclick="closeTeacherEdit()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="teacherSubjectModal" class="modal-overlay">
+
+  <div class="modal-card">
+
+    <div class="modal-header">
+      <h2>Teacher Subjects</h2>
+
+      <button onclick="closeTeacherSubjects()">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+
+    <div id="teacherSubjectList">
+      Loading...
+    </div>
+
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="assignModal">
+  <div class="modal" style="max-width:500px;">
+    <h3>Add Assignment</h3>
+
+    <div class="form-group">
+      <label>Subject</label>
+      <input id="assignSubject">
+    </div>
+
+    <div class="form-group">
+      <label>Class</label>
+      <input id="assignClass">
+    </div>
+
+    <div class="form-group">
+      <label>Arm</label>
+      <input id="assignArm">
+    </div>
+
+    <div class="modal-actions">
+      <button class="primary-btn" onclick="addAssignment()">Add</button>
+      <button class="danger-btn" onclick="closeAssignModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="teacherDeleteModal">
+  <div class="modal" style="max-width:520px;">
+    <h3>Delete Teacher</h3>
+    <p id="teacherDeleteText">Are you sure?</p>
+    <div class="modal-actions">
+      <button class="danger-btn" onclick="confirmTeacherDelete()">Delete</button>
+      <button class="secondary-btn" onclick="closeTeacherDelete()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="studentDeleteModal">
+  <div class="modal" style="max-width:520px;">
+    <h3>Delete Student</h3>
+    <p id="studentDeleteText">Are you sure?</p>
+    <div class="modal-actions">
+      <button class="danger-btn" onclick="confirmStudentDelete()">Delete</button>
+      <button class="secondary-btn" onclick="closeStudentDelete()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="subjectModal">
+  <div class="modal" style="max-width:520px;">
+    <h3 id="subjectModalTitle">Assign Subjects</h3>
+
+    <div class="form-group">
+      <label>Subjects</label>
+      <textarea id="subjectListInput" placeholder="English, Mathematics, Physics"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="primary-btn" onclick="saveStudentSubjects()">Save Subjects</button>
+      <button class="danger-btn" onclick="closeSubjectModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="viewSubjectModal">
+  <div class="modal" style="max-width:560px;">
+    <h3 id="viewSubjectModalTitle">Student Subjects</h3>
+
+    <div id="viewSubjectList" style="display:grid; gap:10px; margin-bottom:14px;"></div>
+
+    <div class="modal-actions">
+      <button class="danger-btn" onclick="closeViewSubjectModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="scoreModal">
+  <div class="modal">
+    <h3 id="scoreModalTitle">Student Scores</h3>
+
+    <div class="score-toolbar">
+      <select id="scoreSessionSelect" onchange="refreshScoreModal()">
+        <option value="2025/2026">2025/2026</option>
+        <option value="2026/2027">2026/2027</option>
+        <option value="2027/2028">2027/2028</option>
+      </select>
+
+      <select id="scoreTermSelect" onchange="refreshScoreModal()">
+        <option value="1st Term">1st Term</option>
+        <option value="2nd Term">2nd Term</option>
+        <option value="3rd Term">3rd Term</option>
+      </select>
+    </div>
+
+    <div id="scoreModalSummary" class="empty-state" style="padding:14px; margin-bottom:12px;">
+      Select a student to view submitted scores.
+    </div>
+
+    <div id="scoreModalBody"></div>
+
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="refreshScoreModal()">Refresh Scores</button>
+      <button class="assign-btn" id="assignResultBtn" onclick="assignCurrentStudentResult()">Confirm Promotion</button>
+      <button class="danger-btn" onclick="closeScoreModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="startSessionModal">
+  <div class="modal" style="max-width:520px;">
+    <h3>Start New Academic Session</h3>
+    <p>Activate a new session and carry over settings or promotion decisions as needed.</p>
+    <div class="form-group">
+      <label for="newSessionInput">New Session</label>
+      <input id="newSessionInput" type="text" placeholder="2026/2027" />
+    </div>
+    <div class="form-group">
+      <label><input type="checkbox" id="copySubjectsCheckbox" checked /> Copy subject enrollments from last session</label>
+    </div>
+    <div class="form-group">
+      <label><input type="checkbox" id="usePromotionDecisionsCheckbox" checked /> Apply prior promotion decisions</label>
+    </div>
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="submitStartSession()">Start Session</button>
+      <button class="danger-btn" onclick="closeStartSessionModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="sessionsModal">
+  <div class="modal" style="max-width:620px;">
+    <h3>Load Academic Session</h3>
+    <p>Select a saved session to view or promote students for that session.</p>
+    <div id="sessionsModalContent" style="margin-top:12px; max-height:440px; overflow:auto;">
+      <div class="empty-state">Loading sessions...</div>
+    </div>
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeSessionsModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="bulkPromotionModal">
+  <div class="modal" style="max-width:820px;">
+    <h3 id="bulkPromotionTitle">Bulk Promotion Review</h3>
+    <p id="bulkPromotionSubtitle">Review suggested promotion decisions before confirming.</p>
+    <div id="bulkPromotionBody" style="margin-top:12px; max-height:420px; overflow:auto;"></div>
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="submitBulkPromotion()">Confirm Bulk Promotion</button>
+      <button class="danger-btn" onclick="closeBulkPromotionModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="upgradeModal">
+  <div class="modal" style="max-width:520px;">
+    <h3>Upgrade Subscription Plan</h3>
+    <p>Choose a plan that fits your school's needs. All plans include access to all features.</p>
+    
+    <div id="plansList" style="margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+      <div class="plan-card" onclick="selectPlan('small', event)" style="padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; text-align: center;">
+        <h4 style="margin: 0 0 8px 0;">Small School</h4>
+        <p style="margin: 0; font-size: 0.9rem; color: #6b7280;">300 Students</p>
+        <p style="margin: 8px 0 0 0; font-weight: 600; font-size: 1.1rem;">₦15,000</p>
+      </div>
+      <div class="plan-card" onclick="selectPlan('medium', event)" style="padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; text-align: center;">
+        <h4 style="margin: 0 0 8px 0;">Medium School</h4>
+        <p style="margin: 0; font-size: 0.9rem; color: #6b7280;">1,000 Students</p>
+        <p style="margin: 8px 0 0 0; font-weight: 600; font-size: 1.1rem;">₦35,000</p>
+      </div>
+      <div class="plan-card" onclick="selectPlan('large', event)" style="padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; text-align: center;">
+        <h4 style="margin: 0 0 8px 0;">Large School</h4>
+        <p style="margin: 0; font-size: 0.9rem; color: #6b7280;">3,000 Students</p>
+        <p style="margin: 8px 0 0 0; font-weight: 600; font-size: 1.1rem;">₦75,000</p>
+      </div>
+      <div class="plan-card" onclick="selectPlan('enterprise', event)" style="padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; text-align: center;">
+        <h4 style="margin: 0 0 8px 0;">Enterprise</h4>
+        <p style="margin: 0; font-size: 0.9rem; color: #6b7280;">Unlimited</p>
+        <p style="margin: 8px 0 0 0; font-weight: 600; font-size: 1.1rem;">Custom</p>
+      </div>
+    </div>
+
+    <input type="hidden" id="selectedPlanName">
+    <p id="selectedPlanDisplay" style="text-align: center; margin-bottom: 16px; color: #6b7280;">Select a plan above</p>
+
+    <div class="modal-actions">
+      <button class="primary-btn" onclick="confirmUpgrade()">Upgrade to Selected Plan</button>
+      <button class="secondary-btn" onclick="closeUpgradeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="renewModal">
+  <div class="modal" style="max-width:520px;">
+    <h3>Renew Subscription</h3>
+    <p>Extend your subscription for another year with your current plan.</p>
+    
+    <div style="margin-top: 16px; padding: 12px; background: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 4px;">
+      <p style="margin: 0; color: #22c55e; font-weight: 600;" id="renewCurrentPlan">Current Plan: Loading...</p>
+    </div>
+
+    <div class="form-group" style="margin-top: 16px;">
+      <label>Renewal Duration</label>
+      <select id="renewalDuration" style="width: 100%; padding: 8px; border: 1px solid #e5e7eb; border-radius: 4px;">
+        <option value="1">1 Year</option>
+        <option value="2">2 Years</option>
+        <option value="3">3 Years</option>
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button class="primary-btn" onclick="confirmRenewal()">Renew Subscription</button>
+      <button class="secondary-btn" onclick="closeRenewModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <button class="sidebar-close" onclick="closeSidebar()"><ion-icon name="close-outline"></ion-icon></button>
+    <div class="brand">
+      <img src="img/WHITE PNG STUNFI.png" alt="STUNFI Logo" class="main-brand-logo">
+      <p>School management dashboard for students, teachers, and branding.</p>
+    </div>
+
+    <div class="school-mini-card">
+      <img id="sidebarSchoolLogo" class="school-mini-logo" src="" alt="School Logo">
+      <div class="school-mini-name" id="sidebarSchoolName">Your School</div>
+      <div class="school-mini-id" id="sidebarSchoolId">ID: --</div>
+      <div class="school-mini-motto" id="sidebarSchoolMotto">Update your school profile in settings.</div>
+    </div>
+
+    <div class="nav-box">
+      <h3>Overview</h3>
+      <p>Add students, add teachers, review teacher scores, and assign final results to students.</p>
+    </div>
+
+    <div class="nav-box">
+      <h3>Quick Note</h3>
+      <p>Teachers now submit scores to you first. You review them, then assign the final result to the student.</p>
+    </div>
+
+    <div class="sidebar-actions">
+      <button class="secondary-btn" onclick="openStartSessionModal()"><ion-icon name="add-outline"></ion-icon> Start New Session</button>
+      <button class="theme-btn" onclick="openSessionsModal()"><ion-icon name="calendar-outline"></ion-icon> Sessions</button>
+      <button class="theme-btn" onclick="toggleTheme()" id="themeToggle"><ion-icon name="moon-outline"></ion-icon> Dark Mode</button>
+      <button class="logout-btn" onclick="logout()"><ion-icon name="log-out-outline"></ion-icon> Logout</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h2 id="welcomeHeading">School Dashboard</h2>
+        <p id="welcomeSubtext">Manage students, teachers, and school profile.</p>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()"><ion-icon name="menu-outline"></ion-icon></button>
+        <div class="school-pill" id="schoolInfo">School ID: --</div>
+      </div>
+    </div>
+
+    <section class="stats">
+      <div class="stat-card">
+        <h4>Total Students</h4>
+        <p id="totalStudents">0</p>
+      </div>
+      <div class="stat-card">
+        <h4>Total Teachers</h4>
+        <p id="totalTeachers">0</p>
+      </div>
+      <div class="stat-card">
+        <h4>School Classes</h4>
+        <p id="totalClasses">0</p>
+      </div>
+      <div class="stat-card">
+        <h4>School Arms</h4>
+        <p id="totalArms">0</p>
+      </div>
+    </section>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('students', this)">Students</button>
+      <button class="tab-btn" onclick="showTab('teachers', this)">Teachers</button>
+      <button class="tab-btn" onclick="showTab('announcements', this)">Announcements</button>
+      <button class="tab-btn" onclick="showTab('settings', this)">Settings</button>
+    </div>
+
+    <section id="studentsTab" class="tab-panel active">
+      <div class="grid">
+        <div class="card">
+          <h3>Add Student</h3>
+
+          <div class="form-group">
+            <label for="studentName">Student Name</label>
+            <input id="studentName" placeholder="Student Name">
+          </div>
+
+          <div class="form-group">
+            <label for="regNumber">Reg Number</label>
+            <input id="regNumber" placeholder="Reg Number">
+          </div>
+
+          <div class="form-group">
+            <label for="className">Class</label>
+            <input id="className" placeholder="Class (e.g JSS1)">
+          </div>
+
+          <div class="form-group">
+            <label for="arm">Arm</label>
+            <input id="arm" placeholder="Arm (e.g A)">
+          </div>
+
+          <button class="primary-btn" onclick="addStudent()"><ion-icon name="add-outline"></ion-icon> Add Student</button>
+        </div>
+
+        <div class="card">
+          <div class="section-header">
+            <button class="section-toggle" id="studentSectionToggle" onclick="toggleSection('studentSectionToggle', 'studentSectionContent')">
+              <span class="arrow"><ion-icon name="chevron-down-outline"></ion-icon></span> Students
+            </button>
+            <div class="search-box">
+              <input id="studentSearch" placeholder="Search students" oninput="renderStudents()">
+            </div>
+          </div>
+
+          <div class="score-toolbar">
+            <select id="mainSessionSelect" onchange="reloadStudentStatuses()"></select>
+
+            <select id="mainTermSelect" onchange="reloadStudentStatuses()">
+              <option value="1st Term">1st Term</option>
+              <option value="2nd Term">2nd Term</option>
+              <option value="3rd Term">3rd Term</option>
+            </select>
+          </div>
+
+          <div class="class-summary-panel">
+            <div class="class-summary-header">
+              <div><strong>Class groups</strong> — bulk promote by class</div>
+              <button id="clearStudentGroupFilter" class="secondary-btn" onclick="clearSelectedStudentGroup()" style="display:none;">Show all</button>
+            </div>
+            <div id="classGroupSummary" class="class-summary-grid"></div>
+          </div>
+
+          <div class="collapsible-content" id="studentSectionContent">
+            <div class="scroll-card-body tall">
+              <ul class="data-list" id="studentList"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="teachersTab" class="tab-panel">
+      <div class="grid">
+        <div class="card">
+          <h3>Add Teacher</h3>
+
+          <div class="form-group">
+            <label for="teacherName">Teacher Name</label>
+            <input id="teacherName" placeholder="Teacher Name">
+          </div>
+
+          <div class="form-group">
+            <label for="teacherEmail">Teacher Email</label>
+            <input id="teacherEmail" type="email" autocomplete="email" placeholder="Teacher Email">
+          </div>
+
+          <button class="primary-btn" onclick="addTeacher()"><ion-icon name="add-outline"></ion-icon> Add Teacher</button>
+        </div>
+
+        <div class="card">
+          <div class="section-header">
+            <button class="section-toggle" id="teacherSectionToggle" onclick="toggleSection('teacherSectionToggle', 'teacherSectionContent')">
+              <span class="arrow"><ion-icon name="chevron-down-outline"></ion-icon></span> Teachers
+            </button>
+            <div class="search-box">
+              <input id="teacherSearch" placeholder="Search teachers" oninput="renderTeachers()">
+            </div>
+          </div>
+
+         <div class="collapsible-content" id="teacherSectionContent">
+           <div class="scroll-card-body tall">
+              <ul id="teacherList" class="item-list"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="announcementsTab" class="tab-panel">
+      <div class="grid">
+        <div class="card">
+          <h3>Post Announcement</h3>
+
+          <div class="post-form-grid">
+            <select id="postAudience">
+              <option value="students">Post to Students</option>
+              <option value="teachers">Post to Teachers</option>
+            </select>
+
+            <textarea id="postText" placeholder="Write announcement..." rows="4"></textarea>
+
+            <select id="postMediaType" onchange="toggleFileNameField()">
+              <option value="">No media</option>
+              <option value="image">Image</option>
+              <option value="video">Video</option>
+              <option value="file">File</option>
+            </select>
+
+            <input type="file" id="postFile" onchange="uploadPostFile()" />
+
+            <input type="text" id="mediaUrl" placeholder="Uploaded file URL will appear here" readonly />
+
+            <input type="text" id="fileName" placeholder="Uploaded file name" readonly style="display:none;" />
+
+            <button class="primary-btn" onclick="createPost()"><ion-icon name="create-outline"></ion-icon> Post Announcement</button>
+          </div>
+
+          <div id="postOutput" class="post-output"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-header">
+            <button class="section-toggle" id="postSectionToggle" onclick="toggleSection('postSectionToggle', 'postSectionContent')">
+              <span class="arrow"><ion-icon name="chevron-down-outline"></ion-icon></span> Recent Posts
+            </button>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button onclick="loadPosts('students')" class="secondary-btn"><ion-icon name="person-outline"></ion-icon> Students</button>
+              <button onclick="loadPosts('teachers')" class="secondary-btn"><ion-icon name="people-outline"></ion-icon> Teachers</button>
+            </div>
+          </div>
+
+          <div class="collapsible-content" id="postSectionContent">
+            <div class="scroll-card-body">
+              <div id="postList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="settingsTab" class="tab-panel">
+      <div class="settings-grid">
+        <div class="card">
+          <h3>School Profile</h3>
+
+          <div class="form-group">
+            <label for="schoolNameInput">School Name</label>
+            <input id="schoolNameInput" placeholder="School Name">
+          </div>
+
+          <div class="form-group">
+            <label for="schoolEmailInput">School Email</label>
+            <input id="schoolEmailInput" type="email" autocomplete="email" placeholder="School Email">
+          </div>
+
+          <div class="form-group">
+            <label for="schoolMottoInput">Motto / Description</label>
+            <textarea id="schoolMottoInput" placeholder="School motto or short description"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>School Badge / Logo</label>
+            <input type="file" id="schoolLogoInput" class="hidden-file" accept="image/*" onchange="handleLogoUpload(event)">
+            <button class="upload-btn" onclick="document.getElementById('schoolLogoInput').click()"><ion-icon name="cloud-upload-outline"></ion-icon> Upload School Badge</button>
+          </div>
+
+          <div class="form-group">
+            <label for="accentColorInput">Accent Color</label>
+            <div class="color-row">
+              <input type="color" id="accentColorInput" value="#66cccc">
+              <button class="secondary-btn" onclick="applyAccentColor()"><ion-icon name="checkmark-outline"></ion-icon> Apply Accent</button>
+            </div>
+          </div>
+
+          <button class="primary-btn" onclick="saveSchoolProfile()"><ion-icon name="save-outline"></ion-icon> Save Profile</button>
+        </div>
+
+        <div class="card">
+          <h3>Promotion Settings</h3>
+
+          <div class="form-group">
+            <label for="promotionCutoffInput">Promotion cutoff (average)</label>
+            <input id="promotionCutoffInput" type="number" min="0" max="100" step="1" placeholder="50">
+          </div>
+
+          <div class="form-group">
+            <label for="ss3GraduationCutoffInput">SS3 promotion cutoff (average)</label>
+            <input id="ss3GraduationCutoffInput" type="number" min="0" max="100" step="1" placeholder="50">
+          </div>
+
+          <p style="margin-top:8px; color:#475569; font-size:0.95rem; line-height:1.4;">Students are promoted if their average meets the promotion cutoff. Otherwise, they are marked not promoted and exit active enrollment.</p>
+          <button class="primary-btn" onclick="savePromotionSettings()"><ion-icon name="save-outline"></ion-icon> Save Promotion Settings</button>
+        </div>
+
+        <div class="card">
+          <h3>Subscription & Plan</h3>
+
+          <div id="subscriptionStatus" style="margin-bottom: 16px;">
+            <div style="padding: 12px; background: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 4px;">
+              <p style="margin: 0; color: #22c55e; font-weight: 600; font-size: 0.95rem;">Loading subscription...</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Plan Name</label>
+            <p style="margin: 0; font-weight: 600;" id="subscriptionPlanName">--</p>
+          </div>
+
+          <div class="form-group">
+            <label>Student Count</label>
+            <p style="margin: 0;" id="subscriptionStudentCount">0 / -- students</p>
+            <div style="background: #e5e7eb; height: 6px; border-radius: 3px; margin-top: 4px; overflow: hidden;">
+              <div id="subscriptionProgressBar" style="background: #22c55e; height: 100%; width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Subscription Status</label>
+            <p style="margin: 0;" id="subscriptionStatusText">--</p>
+          </div>
+
+          <div class="form-group">
+            <label>Expires</label>
+            <p style="margin: 0;" id="subscriptionExpiryText">--</p>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-top: 16px;">
+            <button class="primary-btn" onclick="openUpgradeModal()" style="flex: 1;">Upgrade Plan</button>
+            <button class="secondary-btn" onclick="openRenewModal()" style="flex: 1;">Renew</button>
+          </div>
+
+          <p style="margin-top:8px; color:#475569; font-size:0.85rem; line-height:1.4;">All schools have access to all platform features. Your plan only limits the maximum number of students you can add.</p>
+        </div>
+
+        <div class="card">
+          <h3>Profile Preview</h3>
+
+          <div class="profile-preview">
+            <div>
+              <img id="profilePreviewLogo" class="profile-logo" src="" alt="School Logo">
+            </div>
+
+            <div class="profile-details">
+              <h4 id="profilePreviewName">Your School</h4>
+              <p><strong>School ID:</strong> <span id="settingsSchoolId">--</span></p>
+              <p><strong>Email:</strong> <span id="profilePreviewEmail">Not set</span></p>
+              <p><strong>Motto:</strong> <span id="profilePreviewMotto">No motto yet.</span></p>
+              <div class="profile-badge">School Profile</div>
+            </div>
+          </div>
+
+          <div style="margin-top:20px;">
+            <div class="section-header">
+              <button class="section-toggle" id="activitySectionToggle" onclick="toggleSection('activitySectionToggle', 'activitySectionContent')">
+                <span class="arrow"><ion-icon name="chevron-down-outline"></ion-icon></span> Recent Activities
+              </button>
+            </div>
+
+            <div class="collapsible-content" id="activitySectionContent">
+              <div class="scroll-card-body short">
+                <div id="activityList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+      <div id="postList"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+const token = localStorage.getItem("token");
+
+if (!token) {
+  window.location.href = "login.html";
+}
+
+const school = JSON.parse(localStorage.getItem("school") || "null");
+const currentSchoolId = school?.schoolId || school?.id || "";
+let students = [];
+let selectedStudentGroup = "";
+let currentViewSubjectStudentId = "";
+let currentSubjectStudentId = "";
+let teachers = [];
+let uploadedLogoData = "";
+let editingStudentOldReg = "";
+let deletingStudentReg = "";
+let deletingTeacherId = "";
+let editingTeacherId = "";
+let showingAllActivities = false;
+let currentScoreStudent = null;
+let currentBulkPromotion = null;
+let currentSessionHistory = [];
+let currentActiveSession = "";
+let resultStatusMap = {};
+let paymentStatusMap = {};
+
+if (!school || !currentSchoolId) {
+  window.location.href = "login.html";
+}
+
+   let currentAssignTeacherId = "";
+
+function openAssignModal(teacherId) {
+  currentAssignTeacherId = teacherId;
+  document.getElementById("assignModal").classList.add("active");
+}
+
+function closeAssignModal() {
+  document.getElementById("assignModal").classList.remove("active");
+  currentAssignTeacherId = "";
+}
+
+async function addAssignment() {
+  const subject = document.getElementById("assignSubject").value.trim();
+  const className = document.getElementById("assignClass").value.trim();
+  const arm = document.getElementById("assignArm").value.trim();
+
+  if (!subject || !className) {
+    toast("Subject and class required", "error");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:3000/add-teacher-assignment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        teacherId: currentAssignTeacherId,
+        subject,
+        className,
+        arm
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      closeAssignModal();
+      await loadTeachers();
+      toast("Assignment added", "success");
+    } else {
+      toast(data.message || "Error adding assignment", "error");
+    }
+
+  } catch (err) {
+    console.log(err);
+    toast("Server error", "error");
+  }
+}
+
+function toast(message, type = "info") {
+  const wrap = document.getElementById("toastWrap");
+  const div = document.createElement("div");
+  div.className = `toast ${type}`;
+  div.innerText = message;
+  wrap.appendChild(div);
+  setTimeout(() => div.remove(), 2800);
+}
+
+function getInitials(name) {
+  return (name || "School")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0].toUpperCase())
+    .join("");
+}
+
+function adjustColor(hex, amount) {
+  let col = (hex || "#66cccc").replace("#", "");
+  let num = parseInt(col, 16);
+
+  let r = (num >> 16) + amount;
+  let g = ((num >> 8) & 0x00FF) + amount;
+  let b = (num & 0x0000FF) + amount;
+
+  r = Math.max(0, Math.min(255, r));
+  g = Math.max(0, Math.min(255, g));
+  b = Math.max(0, Math.min(255, b));
+
+  return "#" + (r << 16 | g << 8 | b).toString(16).padStart(6, "0");
+}
+
+function createFallbackLogo(name, color) {
+  const initials = getInitials(name);
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+      <rect width="100%" height="100%" fill="${color || "#66cccc"}"/>
+      <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="62" fill="white" font-weight="bold">${initials}</text>
+    </svg>
+  `;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
+function showTab(tabName, btn) {
+  document.querySelectorAll(".tab-panel").forEach(panel => {
+    panel.classList.remove("active");
+  });
+
+  document.querySelectorAll(".tab-btn").forEach(button => {
+    button.classList.remove("active");
+  });
+
+  document.getElementById(tabName + "Tab").classList.add("active");
+  btn.classList.add("active");
+}
+
+function toggleSection(buttonId, contentId) {
+  const button = document.getElementById(buttonId);
+  const content = document.getElementById(contentId);
+
+  if (button.classList.contains("collapsed")) {
+    button.classList.remove("collapsed");
+    content.style.display = "block";
+  } else {
+    button.classList.add("collapsed");
+    content.style.display = "none";
+  }
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const layout = document.querySelector(".layout");
+  const overlay = document.getElementById("mobileOverlay");
+
+  const isMobile = window.innerWidth <= 1050;
+
+  if (isMobile) {
+    sidebar.classList.toggle("open");
+    overlay.classList.toggle("show");
+  } else {
+    sidebar.classList.toggle("closed");
+    layout.classList.toggle("closed");
+  }
+  localStorage.setItem("sidebarClosed", sidebar.classList.contains("closed"));
+}
+
+function closeSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const layout = document.querySelector(".layout");
+  const overlay = document.getElementById("mobileOverlay");
+
+  sidebar.classList.remove("open");
+  overlay.classList.remove("show");
+
+  sidebar.classList.add("closed");
+  layout.classList.add("closed");
+}
+
+window.addEventListener("load", () => {
+  const isClosed = localStorage.getItem("sidebarClosed") === "true";
+
+  if (isClosed && window.innerWidth > 1050) {
+    document.getElementById("sidebar").classList.add("closed");
+    document.querySelector(".layout").classList.add("closed");
+  }
+});
+
+function logout() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("school");
+  window.location.href = "login.html";
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("dashboardTheme", document.body.classList.contains("dark") ? "dark" : "light");
+  updateThemeButton();
+  toast(document.body.classList.contains("dark") ? "Dark mode enabled" : "Light mode enabled", "success");
+}
+
+function updateThemeButton() {
+  const btn = document.getElementById("themeToggle");
+  btn.innerHTML = document.body.classList.contains("dark") ? '<ion-icon name="sunny-outline"></ion-icon> Light Mode' : '<ion-icon name="moon-outline"></ion-icon> Dark Mode';
+}
+
+function applyAccentColor() {
+  const color = document.getElementById("accentColorInput").value || "#66cccc";
+  document.documentElement.style.setProperty("--accent", color);
+  document.documentElement.style.setProperty("--accent-hover", adjustColor(color, -18));
+  toast("Accent color applied", "success");
+}
+
+function handleLogoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    uploadedLogoData = e.target.result;
+    document.getElementById("profilePreviewLogo").src = uploadedLogoData;
+    document.getElementById("sidebarSchoolLogo").src = uploadedLogoData;
+    toast("School logo selected", "info");
+  };
+  reader.readAsDataURL(file);
+}
+
+function addActivity(title, message) {
+  const key = `school_activity_${currentSchoolId}`;
+  const list = JSON.parse(localStorage.getItem(key) || "[]");
+
+  list.unshift({
+    title,
+    message,
+    time: new Date().toLocaleString()
+  });
+
+  localStorage.setItem(key, JSON.stringify(list.slice(0, 12)));
+  showingAllActivities = false;
+  renderActivities();
+}
+
+function renderActivities() {
+  const key = `school_activity_${currentSchoolId}`;
+  const activities = JSON.parse(localStorage.getItem(key) || "[]");
+  const wrap = document.getElementById("activityList");
+  wrap.innerHTML = "";
+
+  if (!activities.length) {
+    wrap.innerHTML = `<div class="empty-state">No recent activities yet.</div>`;
+    return;
+  }
+
+  const toShow = showingAllActivities ? activities : activities.slice(0, 1);
+
+  toShow.forEach((item) => {
+    const div = document.createElement("div");
+    div.className = "activity-item";
+    div.innerHTML = `
+      <div class="activity-title">${item.title}</div>
+      <div class="activity-meta">${item.message}<br>${item.time}</div>
+    `;
+    wrap.appendChild(div);
+  });
+
+  if (activities.length > 1 && !showingAllActivities) {
+    const btn = document.createElement("button");
+    btn.className = "secondary-btn show-more-btn";
+    btn.innerHTML = `Show More <ion-icon name="chevron-down-outline"></ion-icon>`;
+    btn.onclick = () => {
+      showingAllActivities = true;
+      renderActivities();
+    };
+    wrap.appendChild(btn);
+  }
+}
+
+function applySchoolProfile(profile) {
+  const color = profile.accentColor || "#66cccc";
+  const logo = profile.logo || profile.schoolLogo || createFallbackLogo(profile.name || profile.schoolName || "School", color);
+  const name = profile.name || profile.schoolName || "Your School";
+  const email = profile.email || profile.schoolEmail || "Not set";
+  const motto = profile.motto || profile.schoolMotto || "No motto yet.";
+  const schoolId = profile.id || profile.schoolId || currentSchoolId;
+
+  document.getElementById("welcomeHeading").innerText = "Welcome, " + name;
+  document.getElementById("welcomeSubtext").innerText = motto || "Manage students, teachers, and school profile.";
+  document.getElementById("schoolInfo").innerText = "School ID: " + schoolId;
+
+  document.getElementById("sidebarSchoolLogo").src = logo;
+  document.getElementById("sidebarSchoolName").innerText = name;
+  document.getElementById("sidebarSchoolId").innerText = "ID: " + schoolId;
+  document.getElementById("sidebarSchoolMotto").innerText = motto;
+
+  document.getElementById("profilePreviewLogo").src = logo;
+  document.getElementById("profilePreviewName").innerText = name;
+  document.getElementById("profilePreviewEmail").innerText = email;
+  document.getElementById("profilePreviewMotto").innerText = motto;
+  document.getElementById("settingsSchoolId").innerText = schoolId;
+
+  document.getElementById("schoolNameInput").value = name;
+  document.getElementById("schoolEmailInput").value = email === "Not set" ? "" : email;
+  document.getElementById("schoolMottoInput").value = motto === "No motto yet." ? "" : motto;
+  document.getElementById("accentColorInput").value = color;
+
+  applyAccentColor();
+}
+
+async function loadSchoolProfile() {
+  try {
+    const response = await fetch(
+      "http://localhost:3000/school-profile/" + encodeURIComponent(currentSchoolId),
+      {
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("token")
+        }
+      }
+    );
+
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("school");
+      window.location.href = "login.html";
+      return;
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) return;
+
+    uploadedLogoData = data.logo || "";
+    applySchoolProfile(data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function saveSchoolProfile() {
+  const name = document.getElementById("schoolNameInput").value.trim();
+  const email = document.getElementById("schoolEmailInput").value.trim();
+  const motto = document.getElementById("schoolMottoInput").value.trim();
+  const accentColor = document.getElementById("accentColorInput").value;
+
+  if (!name || !email) {
+    toast("School name and email are required", "error");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:3000/update-school-profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        schoolId: currentSchoolId,
+        name,
+        email,
+        motto,
+        logo: uploadedLogoData || "",
+        accentColor
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem("school", JSON.stringify({
+        schoolId: data.school.id,
+        id: data.school.id,
+        name: data.school.name,
+        motto: data.school.motto,
+        logo: data.school.logo,
+        accentColor: data.school.accentColor
+      }));
+
+      applySchoolProfile(data.school);
+      addActivity("Profile Updated", "School profile details were updated.");
+      toast("Profile saved successfully", "success");
+    } else {
+      toast(data.message || "Could not save profile", "error");
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error saving profile", "error");
+  }
+}
+
+async function addStudent() {
+  const name = document.getElementById("studentName").value.trim();
+  const regNumber = document.getElementById("regNumber").value.trim();
+  const className = document.getElementById("className").value.trim();
+  const arm = document.getElementById("arm").value.trim();
+
+  if (!name || !regNumber || !className || !arm) {
+    toast("Please fill all student fields", "error");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:3000/add-student", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        regNumber,
+        className,
+        arm,
+        schoolId: currentSchoolId
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      document.getElementById("studentName").value = "";
+      document.getElementById("regNumber").value = "";
+      document.getElementById("className").value = "";
+      document.getElementById("arm").value = "";
+      await loadStudents();
+      addActivity("Student Added", `${name} (${regNumber}) was added.`);
+      toast("Student added successfully", "success");
+    } else {
+      toast(data.message || "Could not add student", "error");
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error adding student", "error");
+  }
+}
+
+async function loadStudents() {
+  const studentList = document.getElementById("studentList");
+
+  if (studentList) {
+    studentList.innerHTML = `<div class="empty-state">Loading students...</div>`;
+  }
+
+  try {
+    const response = await fetch(
+      "http://localhost:3000/school/" + encodeURIComponent(currentSchoolId),
+      {
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("token")
+        }
+      }
+    );
+
+    console.log("Response status:", response.status);
+
+    const data = await response.json();
+    console.log(data);
+
+    if (!response.ok) {
+      toast(data.message || "Could not load students", "error");
+      studentList.innerHTML = `<div class="empty-state">Could not load students.</div>`;
+      return;
+    }
+
+    students = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.students)
+      ? data.students
+      : Array.isArray(data?.data?.students)
+      ? data.data.students
+      : Array.isArray(data?.school?.students)
+      ? data.school.students
+      : Array.isArray(data?.studentList)
+      ? data.studentList
+      : [];
+
+    renderStudents();
+    updateStats();
+
+    try {
+      await loadResultStatuses();
+      renderStudents();
+      updateStats();
+    } catch (statusError) {
+      console.log("Status loading failed:", statusError);
+    }
+
+  } catch (error) {
+    console.log(error);
+    toast("Error loading students", "error");
+
+    if (studentList) {
+      studentList.innerHTML = `<div class="empty-state">Error loading students.</div>`;
+    }
+  }
+}
+
+function selectStudentGroup(key) {
+  selectedStudentGroup = key;
+  renderStudents();
+}
+
+function clearSelectedStudentGroup() {
+  selectedStudentGroup = "";
+  document.getElementById("clearStudentGroupFilter").style.display = "none";
+  renderStudents();
+}
+
+function renderClassGroupSummary(groups) {
+  const summary = document.getElementById("classGroupSummary");
+  const clearButton = document.getElementById("clearStudentGroupFilter");
+  if (!summary) return;
+
+  summary.innerHTML = "";
+
+  const keys = Object.keys(groups);
+  if (!keys.length) {
+    summary.innerHTML = `<div class="empty-state">No class groups available.</div>`;
+    if (clearButton) clearButton.style.display = "none";
+    return;
+  }
+
+  keys.forEach((key) => {
+    const group = groups[key];
+    const { assigned, pending, locked } = getClassStatusCounts(group.students);
+    const classLabel = `${group.displayName}${group.arm ? ` ${group.arm}` : ""}`;
+
+    const card = document.createElement("div");
+    card.className = "class-summary-card";
+    card.innerHTML = `
+      <div class="summary-card-title">${classLabel}</div>
+      <div class="summary-card-meta">
+        <span>${group.students.length} students</span>
+        <span>Assigned: ${assigned}</span>
+        <span>Pending: ${pending}</span>
+        <span>Locked: ${locked}</span>
+      </div>
+    `;
+
+    const actions = document.createElement("div");
+    actions.className = "summary-card-actions";
+
+    const viewBtn = document.createElement("button");
+    viewBtn.className = "secondary-btn";
+    viewBtn.type = "button";
+    viewBtn.innerText = "View students";
+    viewBtn.addEventListener("click", () => selectStudentGroup(key));
+
+    const assignBtn = document.createElement("button");
+    assignBtn.className = "mini-btn assign-btn";
+    assignBtn.type = "button";
+    assignBtn.innerText = "Bulk Promote";
+    assignBtn.addEventListener("click", () => openBulkPromotionModal(group.className, group.arm));
+
+    actions.appendChild(viewBtn);
+    actions.appendChild(assignBtn);
+    card.appendChild(actions);
+    summary.appendChild(card);
+  });
+
+  if (clearButton) {
+    clearButton.style.display = selectedStudentGroup ? "inline-flex" : "none";
+  }
+}
+
+function renderStudents() {
+  const studentList = document.getElementById("studentList");
+  const search = document.getElementById("studentSearch").value.trim().toLowerCase();
+
+  const filtered = students.filter((student) => (
+    student.name.toLowerCase().includes(search) ||
+    student.regNumber.toLowerCase().includes(search) ||
+    (student.className || "").toLowerCase().includes(search) ||
+    (student.arm || "").toLowerCase().includes(search)
+  ));
+
+  const grouped = filtered.reduce((map, student) => {
+    const className = student.className || "";
+    const arm = student.arm || "";
+    const key = `${className}\u0000${arm}`;
+
+    if (!map[key]) {
+      map[key] = {
+        className,
+        displayName: className || "Unassigned",
+        arm,
+        students: []
+      };
+    }
+
+    map[key].students.push(student);
+    return map;
+  }, {});
+
+  renderClassGroupSummary(grouped);
+
+  const displayKeys = selectedStudentGroup && grouped[selectedStudentGroup]
+    ? [selectedStudentGroup]
+    : Object.keys(grouped);
+
+  studentList.innerHTML = "";
+
+  if (!displayKeys.length) {
+    studentList.innerHTML = `<div class="empty-state">No students found.</div>`;
+    return;
+  }
+
+  displayKeys.forEach((groupKey) => {
+    const group = grouped[groupKey];
+    const header = document.createElement("li");
+    header.className = "class-group";
+    header.innerHTML = `
+      <div class="class-group-header">
+        <div>
+          <div class="item-title">${group.displayName}${group.arm ? ` ${group.arm}` : ""}</div>
+          <div class="class-group-summary">
+            <span class="class-pill">${group.students.length} students</span>
+          </div>
+        </div>
+      </div>
+    `;
+    studentList.appendChild(header);
+
+    group.students.forEach((student) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="item-row">
+          <div class="avatar">${getInitials(student.name)}</div>
+          <div>
+            <div class="item-title">${student.name}</div>
+            <div class="item-meta">
+              Reg Number: ${student.regNumber}<br>
+              Class: ${student.className || "-"} ${student.arm || ""}<br>
+              Email: ${student.email || "Not activated yet"}
+            </div>
+            ${getResultStatusBadge(student.studentId)}
+            ${getPaymentBadge(student.studentId)}
+            <div class="item-actions">
+              <button class="mini-btn" onclick="openStudentEdit('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}', '${(student.className || "").replace(/'/g, "\\'")}', '${(student.arm || "").replace(/'/g, "\\'")}')">Edit</button>
+              <button class="mini-btn" onclick="openScoreModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Scores</button>
+              <button class="mini-btn assign-btn" onclick="quickAssignResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Assign Result</button>
+              <button class="mini-btn" style="background:var(--accent);color:white;" onclick="quickUnlockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Unlock Result</button>
+              <button class="mini-btn" style="background:#f59e0b;color:white;" onclick="quickLockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Lock Again</button>
+              <button class="mini-btn mini-danger" onclick="openStudentDelete('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}')">Delete</button>
+              <button class="mini-btn" style="background:#8b5cf6;color:white;" onclick="openSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Assign Subjects</button>
+              <button class="mini-btn" style="background:var(--accent);color:white;" onclick="openViewSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Subjects</button>
+            </div>
+          </div>
+        </div>
+      `;
+      studentList.appendChild(li);
+    });
+  });
+}
+
+function openStudentEdit(reg, name, className, arm) {
+  editingStudentOldReg = reg;
+  document.getElementById("editStudentName").value = name;
+  document.getElementById("editStudentReg").value = reg;
+  document.getElementById("editStudentClass").value = className;
+  document.getElementById("editStudentArm").value = arm;
+  document.getElementById("studentEditModal").classList.add("active");
+}
+
+function closeStudentEdit() {
+  document.getElementById("studentEditModal").classList.remove("active");
+  editingStudentOldReg = "";
+}
+
+function openSubjectModal(studentId, studentName) {
+  currentSubjectStudentId = studentId;
+  document.getElementById("subjectModalTitle").innerText = "Assign Subjects - " + studentName;
+  document.getElementById("subjectListInput").value = "";
+  document.getElementById("subjectModal").classList.add("active");
+}
+
+function closeSubjectModal() {
+  document.getElementById("subjectModal").classList.remove("active");
+  currentSubjectStudentId = "";
+}
+
+async function openViewSubjectModal(studentId, studentName) {
+  currentViewSubjectStudentId = studentId;
+  document.getElementById("viewSubjectModalTitle").innerText = "Subjects Offered - " + studentName;
+  document.getElementById("viewSubjectModal").classList.add("active");
+
+  await loadStudentSubjects();
+}
+
+function closeViewSubjectModal() {
+  document.getElementById("viewSubjectModal").classList.remove("active");
+  currentViewSubjectStudentId = "";
+}
+
+async function loadStudentSubjects() {
+  const list = document.getElementById("viewSubjectList");
+
+  list.innerHTML = `<div class="empty-state">Loading subjects...</div>`;
+
+  try {
+    const response = await fetch(
+      "http://localhost:3000/student-subjects/" +
+      encodeURIComponent(currentViewSubjectStudentId) +
+      "?schoolId=" +
+      encodeURIComponent(currentSchoolId) +
+      "&session=" +
+      encodeURIComponent(document.getElementById("mainSessionSelect").value) +
+      "&term=" +
+      encodeURIComponent(document.getElementById("mainTermSelect").value)
+    );
+
+    const subjects = await response.json();
+
+    if (!response.ok) {
+      list.innerHTML = `<div class="empty-state">Could not load subjects.</div>`;
+      return;
+    }
+
+    if (!subjects.length) {
+      list.innerHTML = `<div class="empty-state">No subjects assigned yet.</div>`;
+      return;
+    }
+
+    list.innerHTML = "";
+
+    subjects.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "score-card";
+      div.innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap;">
+          <strong>${item.subject}</strong>
+          <button class="mini-btn mini-danger" onclick="deleteStudentSubject('${item.subject.replace(/'/g, "\\'")}')">Delete</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+
+  } catch (error) {
+    console.log(error);
+    list.innerHTML = `<div class="empty-state">Error loading subjects.</div>`;
+  }
+}
+
+async function deleteStudentSubject(subject) {
+  if (!confirm("Remove " + subject + " from this student?")) return;
+
+  try {
+    const response = await fetch("http://localhost:3000/delete-student-subject", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        studentId: currentViewSubjectStudentId,
+        schoolId: currentSchoolId,
+        subject,
+        session: document.getElementById("mainSessionSelect").value,
+        term: document.getElementById("mainTermSelect").value
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      toast("Subject removed", "success");
+      await loadStudentSubjects();
+    } else {
+      toast(data.message || "Could not remove subject", "error");
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error removing subject", "error");
+  }
+}
+
+async function saveStudentSubjects() {
+  const subjectsText = document.getElementById("subjectListInput").value.trim();
+
+  const subjects = subjectsText
+    .split(",")
+    .map(item => item.trim())
+    .filter(Boolean);
+
+  if (!subjects.length) {
+    toast("Enter at least one subject", "error");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:3000/assign-subjects-to-student", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        studentId: currentSubjectStudentId,
+        schoolId: currentSchoolId,
+        subjects,
+        session: document.getElementById("mainSessionSelect").value,
+        term: document.getElementById("mainTermSelect").value
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      closeSubjectModal();
+      toast("Subjects assigned successfully", "success");
+    } else {
+      toast(data.message || "Could not assign subjects", "error");
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error assigning subjects", "error");
+  }
+}
+
+async function saveStudentEdit() {
+  const newName = document.getElementById("editStudentName").value.trim();
+  const newRegNumber = document.getElementById("editStudentReg").value.trim();
+  const className = document.getElementById("editStudentClass").value.trim();
+  const arm = document.getElementById("editStudentArm").value.trim();
+
+  if (!newName || !newRegNumber || !className || !arm) {
+    toast("Please fill all edit fields", "error");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:3000/edit-student", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        oldRegNumber: editingStudentOldReg,
+        newName,
+        newRegNumber,
+        className,
+        arm,
+        schoolId: currentSchoolId
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      closeStudentEdit();
+      await loadStudents();
+      addActivity("Student Updated", `${newName} (${newRegNumber}) was updated.`);
+      toast("Student updated successfully", "success");
+    } else {
+      toast(data.message || "Could not update student", "error");
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error updating student", "error");
+  }
+}
+
+async function loadPaymentStatuses() {
+  // Payment-related functions removed - all results now accessible immediately
+  paymentStatusMap = {};
+}
+
+function getPaymentBadge(studentId) {
+  // Payment status removed - results are always accessible now
+  return ``;
+}
+
+function openStudentDelete(reg, name) {
+  deletingStudentReg = reg;
+  document.getElementById("studentDeleteText").innerText = `Delete ${name} (${reg})?`;
+  document.getElementById("studentDeleteModal").classList.add("active");
+}
+
+function closeStudentDelete() {
+  document.getElementById("studentDeleteModal").classList.remove("active");
+  deletingStudentReg = "";
+}
+
+async function confirmStudentDelete() {
+  try {
+    const response = await fetch("http://localhost:3000/delete-student", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        regNumber: deletingStudentReg,
+        schoolId: currentSchoolId
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      closeStudentDelete();
+      await loadStudents();
+      addActivity("Student Deleted", `${deletingStudentReg} was removed.`);
+      toast("Student deleted successfully", "success");
+    } else {
+      toast(data.message || "Could not delete student", "error");
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error deleting student", "error");
+  }
+}
+
+async function addTeacher() {
+  const name = document.getElementById("teacherName").value.trim();
+  const email = document.getElementById("teacherEmail").value.trim();
+
+  if (!name || !email) {
+    toast("Please fill all teacher fields", "error");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "http://localhost:3000/add-teacher",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          schoolId: currentSchoolId
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+
+      document.getElementById("teacherName").value = "";
+      document.getElementById("teacherEmail").value = "";
+
+      await loadTeachers();
+
+      toast(
+        "Teacher added successfully",
+        "success"
+      );
+
+    } else {
+      toast(data.message, "error");
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function loadTeachers() {
+  try {
+    const response = await fetch("http://localhost:3000/teachers/" + encodeURIComponent(currentSchoolId));
+    const data = await response.json();
+    if (!response.ok) return;
+
+    teachers = data;
+    renderTeachers();
+    updateStats();
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function renderTeachers() {
+  const teacherList = document.getElementById("teacherList");
+  const search = document.getElementById("teacherSearch").value.trim().toLowerCase();
+
+  const filtered = teachers.filter((teacher) => (
+    teacher.name.toLowerCase().includes(search) ||
+    teacher.email.toLowerCase().includes(search)
+  ));
+
+  teacherList.innerHTML = "";
+
+  if (!filtered.length) {
+    teacherList.innerHTML = `<div class="empty-state">No teachers found.</div>`;
+    return;
+  }
+
+  filtered.forEach((teacher) => {
+
+    let assignmentsHTML = "";
+
+    if (teacher.assignments && teacher.assignments.length) {
+      assignmentsHTML = teacher.assignments.map(a => `
+        <div class="component-chip">
+          ${a.subject} â€” ${a.className} ${a.arm || ""}
+        </div>
+      `).join("");
+    } else {
+      assignmentsHTML = `<div class="component-chip">No assignments</div>`;
+    }
+
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <div class="item-row">
+        <div class="avatar">${getInitials(teacher.name)}</div>
+        <div>
+          <div class="item-title">${teacher.name}</div>
+
+          <div class="item-meta">
+            Email: ${teacher.email}
+          </div>
+
+          <div style="margin-top:8px;">
+            ${assignmentsHTML}
+          </div>
+
+          <div class="item-actions">
+
+            <button class="mini-btn assign-btn"
+              onclick="openAssignModal('${teacher.teacherId}')">
+              Add Assignment
+            </button>
+
+            <button class="mini-btn"
+              onclick="openTeacherEdit(
+                '${teacher.teacherId}',
+                '${teacher.name.replace(/'/g, "\\'")}',
+                '${(teacher.email || "").replace(/'/g, "\\'")}',
+                '',
+                '',
+                ''
+              )">
+              Edit
+            </button>
+
+            <button
+              onclick="
+              viewTeacherSubjects(
+              '${teacher.teacherId}'
+              )
+              ">
+              View Subjects
+            </button>
+
+            <button class="mini-btn mini-danger"
+              onclick="openTeacherDelete('${teacher.teacherId}', '${teacher.name.replace(/'/g, "\\'")}')">
+              Delete
+            </button>
+
+          </div>
+        </div>
+      </div>
+    `;
+
+    teacherList.appendChild(li);
+  });
+}
+
+function openTeacherEdit(
+  teacherId,
+  name,
+  email
+) {
+
+  editingTeacherId = teacherId;
+
+  document.getElementById(
+    "editTeacherName"
+  ).value = name;
+
+  document.getElementById(
+    "editTeacherEmail"
+  ).value = email;
+
+  document
+    .getElementById(
+      "teacherEditModal"
+    )
+    .classList
+    .add("active");
+}
+
+function closeTeacherEdit() {
+  document.getElementById("teacherEditModal").classList.remove("active");
+  editingTeacherId = "";
+}
+
+async function saveTeacherEdit() {
+
+  const name =
+    document
+      .getElementById(
+        "editTeacherName"
+      )
+      .value
+      .trim();
+
+  const email =
+    document
+      .getElementById(
+        "editTeacherEmail"
+      )
+      .value
+      .trim();
+
+  if (!name || !email) {
+    toast(
+      "Fill all fields",
+      "error"
+    );
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        "http://localhost:3000/edit-teacher",
+        {
+          method: "PUT",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              teacherId:
+                editingTeacherId,
+
+              name,
+              email
+            })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (response.ok) {
+
+      closeTeacherEdit();
+
+      await loadTeachers();
+
+      toast(
+        "Teacher updated",
+        "success"
+      );
+
+    } else {
+
+      toast(
+        data.message,
+        "error"
+      );
+
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
+
+}
+
+function openTeacherDelete(id, name) {
+  deletingTeacherId = id;
+  document.getElementById("teacherDeleteText").innerText = `Delete teacher ${name}?`;
+  document.getElementById("teacherDeleteModal").classList.add("active");
+}
+
+function closeTeacherDelete() {
+  document.getElementById("teacherDeleteModal").classList.remove("active");
+  deletingTeacherId = "";
+}
+
+async function confirmTeacherDelete() {
+  try {
+    const response = await fetch("http://localhost:3000/delete-teacher", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ teacherId: deletingTeacherId })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      closeTeacherDelete();
+      await loadTeachers();
+      addActivity("Teacher Deleted", `${deletingTeacherId} was removed.`);
+      toast("Teacher deleted successfully", "success");
+    } else {
+      toast(data.message || "Could not delete teacher", "error");
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error deleting teacher", "error");
+  }
+}
+
+function updateStats() {
+  document.getElementById("totalStudents").innerText = students.length;
+  document.getElementById("totalTeachers").innerText = teachers.length;
+
+  const uniqueClasses = new Set(students.map(s => (s.className || "").trim()).filter(Boolean));
+  const uniqueArms = new Set(students.map(s => (s.arm || "").trim()).filter(Boolean));
+
+  document.getElementById("totalClasses").innerText = uniqueClasses.size;
+  document.getElementById("totalArms").innerText = uniqueArms.size;
+}
+
+function closeScoreModal() {
+  document.getElementById("scoreModal").classList.remove("active");
+  currentScoreStudent = null;
+  document.getElementById("scoreModalBody").innerHTML = "";
+  document.getElementById("scoreModalSummary").innerHTML =
+    `Select a student to view submitted scores.`;
+}
+
+function openStartSessionModal() {
+  const currentSession = document.getElementById("mainSessionSelect")?.value || "2025/2026";
+  document.getElementById("newSessionInput").value = guessNextSession(currentSession);
+  document.getElementById("copySubjectsCheckbox").checked = true;
+  document.getElementById("usePromotionDecisionsCheckbox").checked = true;
+  document.getElementById("startSessionModal").classList.add("active");
+}
+
+function closeStartSessionModal() {
+  document.getElementById("startSessionModal").classList.remove("active");
+}
+
+function guessNextSession(session) {
+  const parts = (session || "").split("/").map((part) => Number(part));
+  if (parts.length === 2 && !Number.isNaN(parts[0]) && !Number.isNaN(parts[1])) {
+    return `${parts[0] + 1}/${parts[1] + 1}`;
+  }
+  return session;
+}
+
+async function submitStartSession() {
+  const newSession = document.getElementById("newSessionInput").value.trim();
+  const copySubjects = document.getElementById("copySubjectsCheckbox").checked;
+  const usePromotionDecisions = document.getElementById("usePromotionDecisionsCheckbox").checked;
+
+  if (!newSession) {
+    toast("Please enter a valid session year.", "error");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:3000/create-academic-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        schoolId: currentSchoolId,
+        newSession,
+        copySubjects,
+        keepTeachers: false,
+        usePromotionDecisions,
+        createdBy: "admin-ui"
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      toast(data.message || "Could not start new session", "error");
+      return;
+    }
+
+    toast(data.message || "New session started successfully", "success");
+    closeStartSessionModal();
+    document.getElementById("mainSessionSelect").value = newSession;
+    await loadStudents();
+    await loadResultStatuses();
+    renderStudents();
+  } catch (error) {
+    console.log(error);
+    toast("Error starting new session", "error");
+  }
+}
+
+async function openScoreModal(studentId, studentName) {
+  const selectedStudent = students.find((s) => s.studentId === studentId) || {};
+  currentScoreStudent = {
+    studentId,
+    studentName,
+    className: selectedStudent.className || "",
+    regNumber: selectedStudent.regNumber || ""
+  };
+
+  const mainSession = document.getElementById("mainSessionSelect")?.value || "2025/2026";
+  const mainTerm = document.getElementById("mainTermSelect")?.value || "1st Term";
+
+  document.getElementById("scoreSessionSelect").value = mainSession;
+  document.getElementById("scoreTermSelect").value = mainTerm;
+
+  document.getElementById("scoreModalTitle").innerText = `${studentName} - Result & Promotion Confirmation`;
+  document.getElementById("scoreModal").classList.add("active");
+
+  await refreshScoreModal();
+}
+
+async function refreshScoreModal() {
+  if (!currentScoreStudent) return;
+
+  const session = document.getElementById("scoreSessionSelect").value;
+  const term = document.getElementById("scoreTermSelect").value;
+  const body = document.getElementById("scoreModalBody");
+  const summary = document.getElementById("scoreModalSummary");
+
+  body.innerHTML = `<div class="empty-state">Loading submitted scores...</div>`;
+  summary.innerHTML = `Loading summary...`;
+
+  try {
+    const response = await fetch(
+      "http://localhost:3000/school-student-scores/" +
+      encodeURIComponent(currentScoreStudent.studentId) +
+      "?schoolId=" + encodeURIComponent(currentSchoolId) +
+      "&session=" + encodeURIComponent(session) +
+      "&term=" + encodeURIComponent(term)
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      summary.innerHTML = `Error loading summary.`;
+      body.innerHTML = `<div class="empty-state">${data.message || "Could not load scores."}</div>`;
+      return;
+    }
+
+    const submittedCount = Array.isArray(data) ? data.length : 0;
+    const totalScore = Array.isArray(data)
+      ? data.reduce((sum, item) => sum + Number(item.total || 0), 0)
+      : 0;
+    const averageScore = submittedCount ? (totalScore / submittedCount).toFixed(2) : 0;
+
+    let suggestion = null;
+    try {
+      const settingsResp = await fetch(
+        "http://localhost:3000/promotion-settings/" +
+        encodeURIComponent(currentSchoolId) + "/" +
+        encodeURIComponent(session)
+      );
+      if (settingsResp.ok) {
+        const settings = await settingsResp.json();
+        suggestion = computePromotionSuggestionFromSettings(Number(averageScore), currentScoreStudent.className, settings);
+      }
+    } catch (err) {
+      console.log("Error loading promotion settings", err);
+    }
+
+    const defaultStatus = suggestion?.suggestedPromotionStatus || "promoted";
+    const defaultNextClass = suggestion?.suggestedNextClass || getNextClass(currentScoreStudent.className) || currentScoreStudent.className;
+
+    summary.innerHTML = `
+      <div class="score-summary-grid">
+        <div class="score-summary-item">
+          <h5>Student</h5>
+          <p>${currentScoreStudent.studentName}</p>
+        </div>
+        <div class="score-summary-item">
+          <h5>Session / Term</h5>
+          <p>${session} • ${term}</p>
+        </div>
+        <div class="score-summary-item">
+          <h5>Submitted Subjects</h5>
+          <p>${submittedCount}</p>
+        </div>
+        <div class="score-summary-item">
+          <h5>Average</h5>
+          <p>${averageScore}</p>
+        </div>
+      </div>
+      <div class="score-summary-grid" style="margin-top:12px; gap:12px;">
+        <div class="score-summary-item">
+          <h5>Suggested Promotion</h5>
+          <p>${suggestion ? suggestion.suggestedPromotionStatus : "-"}${suggestion && suggestion.suggestedNextClass ? ` to ${suggestion.suggestedNextClass}` : ""}</p>
+        </div>
+      </div>
+      <div id="scoreModalPromotionArea" style="margin-top:16px; padding:12px; border:1px solid #d1d5db; border-radius:10px; background:#f8fafc;">
+        <div class="form-group">
+          <label for="promotionStatusSelect">Promotion Status</label>
+          <select id="promotionStatusSelect">
+            <option value="promoted" ${defaultStatus === "promoted" ? "selected" : ""}>Promoted</option>
+            <option value="not-promoted" ${defaultStatus === "not-promoted" ? "selected" : ""}>Not Promoted</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="nextClassSelect">Next Class</label>
+          <select id="nextClassSelect">
+            <option value="">-- Select next class --</option>
+            <option value="JSS1" ${defaultNextClass === "JSS1" ? "selected" : ""}>JSS1</option>
+            <option value="JSS2" ${defaultNextClass === "JSS2" ? "selected" : ""}>JSS2</option>
+            <option value="JSS3" ${defaultNextClass === "JSS3" ? "selected" : ""}>JSS3</option>
+            <option value="SS1" ${defaultNextClass === "SS1" ? "selected" : ""}>SS1</option>
+            <option value="SS2" ${defaultNextClass === "SS2" ? "selected" : ""}>SS2</option>
+            <option value="SS3" ${defaultNextClass === "SS3" ? "selected" : ""}>SS3</option>
+          </select>
+        </div>
+        <p style="margin:8px 0 0 0; color:#475569; font-size:0.95rem;">You can override the suggested promotion status. For promoted students, select the target class. Not promoted students exit the active enrollment.</p>
+      </div>
+    `;
+
+    const promotionSelect = document.getElementById("promotionStatusSelect");
+    const nextClassSelect = document.getElementById("nextClassSelect");
+    if (promotionSelect && nextClassSelect) {
+      promotionSelect.addEventListener("change", () => {
+        const target = getDefaultNextClassForStatus(promotionSelect.value, currentScoreStudent.className);
+        nextClassSelect.value = target;
+        nextClassSelect.disabled = promotionSelect.value === "not-promoted";
+      });
+      nextClassSelect.disabled = promotionSelect?.value === "not-promoted";
+    }
+
+    if (!data.length) {
+      body.innerHTML = `<div class="empty-state">No teacher-submitted scores found for this student in this term.</div>`;
+      return;
+    }
+
+    body.innerHTML = "";
+
+    data.forEach((item) => {
+      const div = document.createElement("div");
+      div.className = "score-card";
+
+      const components = Array.isArray(item.components) ? item.components : [];
+      const componentHtml = components.length
+        ? components.map(c => `<span class="component-chip">${c.name}: ${c.score}</span>`).join("")
+        : `<span class="component-chip">No components</span>`;
+
+      div.innerHTML = `
+        <h4>${item.subject}</h4>
+        <p><strong>Status:</strong> ${item.status}</p>
+        <p><strong>Total:</strong> ${item.total} &nbsp; | &nbsp; <strong>Grade:</strong> ${item.grade}</p>
+        <p>${componentHtml}</p>
+      `;
+
+      body.appendChild(div);
+    });
+  } catch (error) {
+    console.log(error);
+    summary.innerHTML = `Error loading summary.`;
+    body.innerHTML = `<div class="empty-state">Error loading submitted scores.</div>`;
+  }
+}
+
+function getPromotionSuggestionFromSettings(average, className, settings) {
+  const avg = Number(average || 0);
+  if (!className) return null;
+
+  if (className === "SS3") {
+    if (avg >= (settings.ss3GraduationAverage || 50)) return { suggestedPromotionStatus: "promoted", suggestedNextClass: null };
+    return { suggestedPromotionStatus: "not-promoted", suggestedNextClass: null };
+  }
+
+  if (avg >= (settings.promoteAverage || 50)) return { suggestedPromotionStatus: "promoted", suggestedNextClass: getNextClass(className) };
+  return { suggestedPromotionStatus: "not-promoted", suggestedNextClass: null };
+}
+
+function computePromotionSuggestionFromSettings(average, className, settings) {
+  return getPromotionSuggestionFromSettings(average, className, settings);
+}
+
+function getDefaultNextClassForStatus(status, className) {
+  if (status === "promoted") return getNextClass(className) || className;
+  if (status === "not-promoted") return "";
+  return "";
+}
+
+function getNextClass(currentClass) {
+  const map = {
+    JSS1: "JSS2",
+    JSS2: "JSS3",
+    JSS3: "SS1",
+    SS1: "SS2",
+    SS2: "SS3"
+  };
+  return map[currentClass] || "";
+}
+
+async function assignCurrentStudentResult() {
+  if (!currentScoreStudent) return;
+
+  const session = document.getElementById("scoreSessionSelect").value;
+  const term = document.getElementById("scoreTermSelect").value;
+  const assignBtn = document.getElementById("assignResultBtn");
+
+  if (assignBtn.disabled) return;
+
+  const proceed = confirm(
+    `Confirm final result and promotion status for ${currentScoreStudent.studentName} (${session}, ${term})?`
+  );
+
+  if (!proceed) return;
+
+  assignBtn.disabled = true;
+  assignBtn.style.opacity = "0.65";
+
+  try {
+    const promotionStatus = document.getElementById("promotionStatusSelect")?.value || "pending";
+    let nextClass = document.getElementById("nextClassSelect")?.value || "";
+    if (!nextClass) {
+      nextClass = getDefaultNextClassForStatus(promotionStatus, currentScoreStudent.className);
+    }
+
+    const response = await fetch("http://localhost:3000/assign-student-result", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        studentId: currentScoreStudent.studentId,
+        schoolId: currentSchoolId,
+        session,
+        term,
+        promotionStatus,
+        nextClass
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      addActivity("Result Assigned", `Final result assigned for ${currentScoreStudent.studentName}.`);
+      toast("Result assigned successfully", "success");
+      await refreshScoreModal();
+      await loadResultStatuses();
+      renderStudents();
+    } else {
+      toast(data.message || "Could not assign result", "error");
+      assignBtn.disabled = false;
+      assignBtn.style.opacity = "1";
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error assigning result", "error");
+    assignBtn.disabled = false;
+    assignBtn.style.opacity = "1";
+  }
+}
+
+async function quickAssignResult(studentId, studentName) {
+  openScoreModal(studentId, studentName);
+}
+
+function getClassStatusCounts(studentList) {
+  const counts = { assigned: 0, pending: 0, locked: 0 };
+
+  studentList.forEach((student) => {
+    const status = resultStatusMap[student.studentId];
+
+    if (!status || status.label === "Unknown") {
+      counts.pending += 1;
+    } else if (!status.assigned) {
+      counts.pending += 1;
+    } else if (status.assigned && status.unlocked) {
+      counts.assigned += 1;
+    } else if (status.assigned && !status.unlocked) {
+      counts.locked += 1;
+    }
+  });
+
+  return counts;
+}
+
+async function openBulkPromotionModal(className, arm) {
+  const session = document.getElementById("mainSessionSelect")?.value || "2025/2026";
+  const term = document.getElementById("mainTermSelect")?.value || "1st Term";
+
+  const studentGroup = students.filter((student) => {
+    return (student.className || "") === className && (student.arm || "") === arm;
+  });
+
+  if (!studentGroup.length) {
+    toast("No students found in this class group.", "error");
+    return;
+  }
+
+  currentBulkPromotion = {
+    className,
+    arm,
+    session,
+    term,
+    students: studentGroup
+  };
+
+  document.getElementById("bulkPromotionTitle").innerText = `Bulk Promote ${className || "Unassigned"}${arm ? ` ${arm}` : ""}`;
+  document.getElementById("bulkPromotionSubtitle").innerText = `Review suggested promotion decisions for ${studentGroup.length} students in ${session} • ${term}.`;
+  document.getElementById("bulkPromotionBody").innerHTML = `<div class="empty-state">Loading suggested promotions...</div>`;
+  document.getElementById("bulkPromotionModal").classList.add("active");
+
+  try {
+    const response = await fetch("http://localhost:3000/generate-promotion-suggestions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        schoolId: currentSchoolId,
+        session,
+        term,
+        className
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      document.getElementById("bulkPromotionBody").innerHTML = `<div class="empty-state">${data.message || "Could not load promotions."}</div>`;
+      return;
+    }
+
+    const filtered = Array.isArray(data)
+      ? data.filter((item) => (item.arm || "") === arm)
+      : [];
+
+    if (!filtered.length) {
+      document.getElementById("bulkPromotionBody").innerHTML = `<div class="empty-state">No promotion suggestions available for this group yet.</div>`;
+      return;
+    }
+
+    document.getElementById("bulkPromotionBody").innerHTML = `
+      <table class="data-table" style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="text-align:left; padding:8px;">Student</th>
+            <th style="padding:8px;">Average</th>
+            <th style="padding:8px;">Suggested Status</th>
+            <th style="padding:8px;">Next Class</th>
+            <th style="padding:8px;">Override</th>
+          </tr>
+        </thead>
+        <tbody id="bulkPromotionTableBody"></tbody>
+      </table>
+    `;
+
+    const body = document.getElementById("bulkPromotionTableBody");
+    body.innerHTML = "";
+
+    filtered.forEach((item) => {
+      const row = document.createElement("tr");
+      const nextClass = item.suggestedNextClass || (item.suggestedPromotionStatus === "promoted" ? getNextClass(item.className) || item.className : "") || "";
+      row.innerHTML = `
+        <td style="padding:8px; border-top:1px solid #e5e7eb;">${item.name}</td>
+        <td style="padding:8px; border-top:1px solid #e5e7eb; text-align:center;">${item.average ?? "-"}</td>
+        <td style="padding:8px; border-top:1px solid #e5e7eb; text-align:center;">${item.suggestedPromotionStatus || "pending"}</td>
+        <td style="padding:8px; border-top:1px solid #e5e7eb; text-align:center;">${nextClass || "-"}</td>
+        <td style="padding:8px; border-top:1px solid #e5e7eb; text-align:center;">
+          <select data-student-id="${item.studentId}" class="bulk-promotion-status">
+            <option value="promoted" ${item.suggestedPromotionStatus === "promoted" ? "selected" : ""}>Promoted</option>
+            <option value="not-promoted" ${item.suggestedPromotionStatus === "not-promoted" ? "selected" : ""}>Not Promoted</option>
+          </select>
+          <br />
+          <select data-student-id="${item.studentId}" class="bulk-promotion-next-class" style="margin-top:6px; width:100%;">
+            <option value="">-- Next class --</option>
+            <option value="JSS1" ${nextClass === "JSS1" ? "selected" : ""}>JSS1</option>
+            <option value="JSS2" ${nextClass === "JSS2" ? "selected" : ""}>JSS2</option>
+            <option value="JSS3" ${nextClass === "JSS3" ? "selected" : ""}>JSS3</option>
+            <option value="SS1" ${nextClass === "SS1" ? "selected" : ""}>SS1</option>
+            <option value="SS2" ${nextClass === "SS2" ? "selected" : ""}>SS2</option>
+            <option value="SS3" ${nextClass === "SS3" ? "selected" : ""}>SS3</option>
+          </select>
+        </td>
+      `;
+      body.appendChild(row);
+    });
+
+    document.querySelectorAll(".bulk-promotion-status").forEach((select) => {
+      select.addEventListener("change", (event) => {
+        const studentId = event.target.dataset.studentId;
+        const nextClassSelect = document.querySelector(`.bulk-promotion-next-class[data-student-id='${studentId}']`);
+        if (!nextClassSelect) return;
+        const status = event.target.value;
+        if (status === "promoted") {
+          nextClassSelect.value = getNextClass(className) || className;
+          nextClassSelect.disabled = false;
+        } else if (status === "not-promoted") {
+          nextClassSelect.value = "";
+          nextClassSelect.disabled = true;
+        }
+      });
+    });
+  } catch (error) {
+    console.log(error);
+    document.getElementById("bulkPromotionBody").innerHTML = `<div class="empty-state">Error loading suggested promotions.</div>`;
+  }
+}
+
+function closeBulkPromotionModal() {
+  document.getElementById("bulkPromotionModal").classList.remove("active");
+  currentBulkPromotion = null;
+}
+
+async function submitBulkPromotion() {
+  if (!currentBulkPromotion) return;
+
+  const promotionSelects = Array.from(document.querySelectorAll(".bulk-promotion-status"));
+  const nextClassSelects = Array.from(document.querySelectorAll(".bulk-promotion-next-class"));
+
+  const payloads = promotionSelects.map((select) => {
+    const studentId = select.dataset.studentId;
+    const status = select.value;
+    const nextClassSelect = nextClassSelects.find((item) => item.dataset.studentId === studentId);
+    let nextClass = nextClassSelect ? nextClassSelect.value : "";
+    if (!nextClass) {
+      nextClass = status === "promoted" ? getNextClass(currentBulkPromotion.className) || currentBulkPromotion.className : "";
+    }
+    return { studentId, promotionStatus: status, nextClass };
+  });
+
+  try {
+    const results = await Promise.allSettled(payloads.map((item) =>
+      fetch("http://localhost:3000/assign-student-result", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studentId: item.studentId,
+          schoolId: currentSchoolId,
+          session: currentBulkPromotion.session,
+          term: currentBulkPromotion.term,
+          promotionStatus: item.promotionStatus,
+          nextClass: item.nextClass
+        })
+      }).then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to update promotion");
+        return data;
+      })
+    ));
+
+    const failed = results.filter((item) => item.status === "rejected");
+    if (failed.length) {
+      toast(`Bulk promotion completed with ${failed.length} errors`, "error");
+      console.log(failed.map((item) => item.reason));
+    } else {
+      toast("Bulk promotion completed successfully", "success");
+    }
+
+    addActivity("Bulk Promotion", `Processed promotion decisions for ${currentBulkPromotion.className || "class"} ${currentBulkPromotion.arm || ""}.`);
+    closeBulkPromotionModal();
+    await loadResultStatuses();
+    await loadPaymentStatuses();
+    renderStudents();
+  } catch (error) {
+    console.log(error);
+    toast("Error processing bulk promotion", "error");
+  }
+}
+
+function toggleFileNameField() {
+  const mediaType = document.getElementById("postMediaType").value;
+  const fileNameInput = document.getElementById("fileName");
+  fileNameInput.style.display = mediaType === "file" ? "block" : "none";
+}
+
+async function uploadPostFile() {
+  const fileInput = document.getElementById("postFile");
+  const mediaTypeSelect = document.getElementById("postMediaType");
+  const output = document.getElementById("postOutput");
+
+  output.innerText = "";
+  output.style.color = "";
+
+  if (!fileInput.files.length) return;
+
+  const file = fileInput.files[0];
+  const formData = new FormData();
+  formData.append("media", file);
+  
+  try {
+    output.style.color = "inherit";
+    output.innerText = "Uploading file...";
+
+    const response = await fetch("http://localhost:3000/upload-post-media", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      document.getElementById("mediaUrl").value = data.mediaUrl || "";
+      document.getElementById("fileName").value = data.fileName || "";
+      mediaTypeSelect.value = data.mediaType || "";
+
+      toggleFileNameField();
+
+      output.style.color = "green";
+      output.innerText = "File uploaded successfully.";
+    } else {
+      output.style.color = "red";
+      output.innerText = data.message || "Upload failed.";
+    }
+  } catch (error) {
+    console.log(error);
+    output.style.color = "red";
+    output.innerText = "Error uploading file.";
+  }
+}
+
+async function createPost() {
+  const output = document.getElementById("postOutput");
+  output.innerText = "";
+  output.style.color = "";
+
+  const audience = document.getElementById("postAudience").value;
+  const text = document.getElementById("postText").value.trim();
+  const mediaType = document.getElementById("postMediaType").value;
+  const mediaUrl = document.getElementById("mediaUrl").value.trim();
+  const fileName = document.getElementById("fileName").value.trim();
+  
+  if (!text && !mediaUrl) {
+    output.style.color = "red";
+    output.innerText = "Write something or upload media.";
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost:3000/create-post", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        schoolId: currentSchoolId,
+        audience,
+        text,
+        mediaUrl,
+        mediaType,
+        fileName
+      })
+    });
+    
+    const data = await res.json();
+
+    if (res.ok) {
+      output.style.color = "green";
+      output.innerText = "Post created successfully.";
+
+      document.getElementById("postText").value = "";
+      document.getElementById("postMediaType").value = "";
+      document.getElementById("postFile").value = "";
+      document.getElementById("mediaUrl").value = "";
+      document.getElementById("fileName").value = "";
+      toggleFileNameField();
+
+      loadPosts(audience);
+    } else {
+      output.style.color = "red";
+      output.innerText = data.message || "Could not create post.";
+    }
+  } catch (err) {
+    console.log(err);
+    output.style.color = "red";
+    output.innerText = "Server error.";
+  }
+}
+
+async function loadPosts(audience) {
+  const container = document.getElementById("postList");
+  container.innerHTML = "Loading...";
+
+  try {
+    const res = await fetch(
+      `http://localhost:3000/posts/${currentSchoolId}?audience=${audience}`
+    );
+
+    const posts = await res.json();
+
+    if (!res.ok) {
+      container.innerHTML = posts.message || "Error loading posts";
+      return;
+    }
+
+    if (!posts.length) {
+      container.innerHTML = "No posts yet.";
+      return;
+    }
+    
+    container.innerHTML = "";
+
+    posts.forEach(post => {
+      const div = document.createElement("div");
+      div.className = "post-card";
+
+      let mediaHtml = "";
+      
+      if (post.mediaUrl) {
+        if (post.mediaType === "image") {
+          mediaHtml = `
+          <div style="margin-top:10px;">
+            <img src="${post.mediaUrl}" alt="Post image" style="max-width:100%; border-radius:12px; border:1px solid var(--line);" />
+            </div>
+            `;
+          } else if (post.mediaType === "video") {
+          mediaHtml = `
+            <div style="margin-top:10px;">
+              <video controls style="max-width:100%; border-radius:12px; border:1px solid var(--line);">
+                <source src="${post.mediaUrl}">
+                </video>
+            </div>
+          `;
+        } else if (post.mediaType === "file") {
+          mediaHtml = `
+            <div style="margin-top:10px;">
+              <a href="${post.mediaUrl}" target="_blank">Download ${post.fileName || "file"}</a>
+              </div>
+          `;
+        } else {
+          mediaHtml = `
+            <div style="margin-top:10px;">
+              <a href="${post.mediaUrl}" target="_blank">View attachment</a>
+            </div>
+          `;
+        }
+      }
+
+      div.innerHTML = `
+        <strong>${post.audience.toUpperCase()}</strong>
+        <p style="margin:8px 0;">${post.text || ""}</p>
+        ${mediaHtml}
+        <br>
+        <small>${new Date(post.createdAt).toLocaleString()}</small>
+        <br><br>
+        <button class="danger-btn" onclick="deletePost('${post.postId}', '${audience}')">Delete</button>
+      `;
+      
+      container.appendChild(div);
+    });
+  } catch (err) {
+    console.log(err);
+    container.innerHTML = "Error loading posts";
+  }
+}
+
+async function deletePost(postId, audience) {
+  if (!confirm("Delete this post?")) return;
+
+  try {
+    const res = await fetch("http://localhost:3000/delete-post", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        postId,
+        schoolId: currentSchoolId
+      })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      loadPosts(audience);
+    } else {
+      alert(data.message || "Error deleting post");
+    }
+  } catch (err) {
+    console.log(err);
+    alert("Error deleting post");
+  }
+}
+
+async function unlockCurrentStudentResult() {
+  if (!currentScoreStudent) return;
+
+  const session = document.getElementById("scoreSessionSelect").value;
+  const term = document.getElementById("scoreTermSelect").value;
+  const unlockBtn = document.getElementById("unlockResultBtn");
+
+  const proceed = confirm(
+    `Unlock result access for ${currentScoreStudent.studentName} (${session}, ${term})?`
+  );
+
+  if (!proceed) return;
+
+  unlockBtn.disabled = true;
+  unlockBtn.style.opacity = "0.65";
+
+  try {
+    const response = await fetch("http://localhost:3000/unlock-student-result", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        studentId: currentScoreStudent.studentId,
+        schoolId: currentSchoolId,
+        session,
+        term
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      addActivity("Result Unlocked", `Result access unlocked for ${currentScoreStudent.studentName}.`);
+      toast("Result unlocked successfully", "success");
+      await refreshScoreModal();
+      await loadResultStatuses();
+      renderStudents();
+    } else {
+      toast(data.message || "Could not unlock result", "error");
+      unlockBtn.disabled = false;
+      unlockBtn.style.opacity = "1";
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error unlocking result", "error");
+    unlockBtn.disabled = false;
+    unlockBtn.style.opacity = "1";
+  }
+}
+
+async function quickUnlockResult(studentId, studentName) {
+  const session = document.getElementById("mainSessionSelect")?.value || "2025/2026";
+  const term = document.getElementById("mainTermSelect")?.value || "1st Term";
+
+  const proceed = confirm(
+    `Unlock result access for ${studentName} (${session}, ${term})?`
+  );
+
+  if (!proceed) return;
+
+  try {
+    const response = await fetch("http://localhost:3000/unlock-student-result", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        studentId,
+        schoolId: currentSchoolId,
+        session,
+        term
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      addActivity("Result Unlocked", `Result access unlocked for ${studentName}.`);
+      toast(`Result unlocked for ${studentName}`, "success");
+      await loadResultStatuses();
+      renderStudents();
+    } else {
+      toast(data.message || "Could not unlock result", "error");
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error unlocking result", "error");
+  }
+}
+
+async function loadResultStatuses() {
+  const session = document.getElementById("mainSessionSelect")?.value || "2025/2026";
+  const term = document.getElementById("mainTermSelect")?.value || "1st Term";
+
+  resultStatusMap = {};
+
+  await Promise.all(
+    students.map(async (student) => {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/student-result-status/" +
+          encodeURIComponent(student.studentId) +
+          "?schoolId=" + encodeURIComponent(currentSchoolId) +
+          "&session=" + encodeURIComponent(session) +
+          "&term=" + encodeURIComponent(term)
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+          resultStatusMap[student.studentId] = data;
+        } else {
+          resultStatusMap[student.studentId] = {
+            assigned: false,
+            unlocked: false,
+            label: "Unknown"
+          };
+        }
+      } catch (error) {
+        console.log(error);
+        resultStatusMap[student.studentId] = {
+          assigned: false,
+          unlocked: false,
+          label: "Unknown"
+        };
+      }
+    })
+  );
+}
+
+function getResultStatusBadge(studentId) {
+  const status = resultStatusMap[studentId];
+
+  if (!status || status.label === "Unknown") {
+    return `<span class="result-status-badge result-status-not-assigned">Checking...</span>`;
+  }
+
+  if (!status.assigned) {
+    return `<span class="result-status-badge result-status-not-assigned">Not Assigned</span>`;
+  }
+
+  if (status.unlocked) {
+    return `<span class="result-status-badge result-status-unlocked">Unlocked</span>`;
+  }
+
+  return `<span class="result-status-badge result-status-locked">Locked</span>`;
+}
+
+async function reloadStudentStatuses() {
+  await loadResultStatuses();
+  await loadPaymentStatuses();
+  renderStudents();
+  await loadPromotionSettings();
+}
+
+function openSessionsModal() {
+  document.getElementById("sessionsModalContent").innerHTML = `<div class="empty-state">Loading sessions...</div>`;
+  document.getElementById("sessionsModal").classList.add("active");
+  loadSessionHistory();
+}
+
+function closeSessionsModal() {
+  document.getElementById("sessionsModal").classList.remove("active");
+}
+
+async function loadSessionHistory() {
+  try {
+    const [activeResp, historyResp] = await Promise.all([
+      fetch("http://localhost:3000/active-session/" + encodeURIComponent(currentSchoolId)),
+      fetch("http://localhost:3000/session-history/" + encodeURIComponent(currentSchoolId) + "?limit=20")
+    ]);
+
+    const activeData = activeResp.ok ? await activeResp.json() : null;
+    const historyData = historyResp.ok ? await historyResp.json() : [];
+
+    currentActiveSession = activeData?.session || "";
+    currentSessionHistory = Array.isArray(historyData) ? historyData : [];
+
+    populateSessionSelect(currentSessionHistory, currentActiveSession);
+
+    const content = document.getElementById("sessionsModalContent");
+    if (!currentSessionHistory.length) {
+      content.innerHTML = `<div class="empty-state">No saved sessions found.</div>`;
+      return;
+    }
+
+    content.innerHTML = currentSessionHistory.map((session) => {
+      const isActive = session.session === currentActiveSession;
+      return `
+        <div class="session-row" style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #e5e7eb;">
+          <div>
+            <strong>${session.session}</strong><br />
+            <small>${isActive ? "Current active session" : new Date(session.createdAt).toLocaleDateString()}</small>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="secondary-btn" onclick="loadSession('${session.session}')">Load</button>
+            ${isActive ? "<span style='padding:4px 10px;border-radius:999px;background:#d1fae5;color:#166534;font-size:0.85rem;'>Active</span>" : ""}
+          </div>
+        </div>
+      `;
+    }).join("");
+  } catch (error) {
+    console.log(error);
+    document.getElementById("sessionsModalContent").innerHTML = `<div class="empty-state">Error loading sessions.</div>`;
+  }
+}
+
+function populateSessionSelect(sessions, activeSession) {
+  const mainSessionSelect = document.getElementById("mainSessionSelect");
+  const scoreSessionSelect = document.getElementById("scoreSessionSelect");
+  if (!mainSessionSelect) return;
+
+  const existing = new Set();
+  const options = [];
+
+  sessions.forEach((session) => {
+    if (!existing.has(session.session)) {
+      existing.add(session.session);
+      options.push(`<option value="${session.session}">${session.session}${session.session === activeSession ? " (active)" : ""}</option>`);
+    }
+  });
+
+  if (!existing.has("2025/2026")) {
+    options.push("<option value='2025/2026'>2025/2026</option>");
+  }
+
+  mainSessionSelect.innerHTML = options.join("");
+  if (scoreSessionSelect) scoreSessionSelect.innerHTML = options.join("");
+  if (activeSession && existing.has(activeSession)) {
+    mainSessionSelect.value = activeSession;
+  } else if (!mainSessionSelect.value) {
+    mainSessionSelect.value = "2025/2026";
+  }
+}
+
+function loadSession(session) {
+  const sessionSelect = document.getElementById("mainSessionSelect");
+  if (!sessionSelect) return;
+  sessionSelect.value = session;
+  closeSessionsModal();
+  reloadStudentStatuses();
+}
+
+async function loadPromotionSettings() {
+  const session = document.getElementById("mainSessionSelect")?.value || "2025/2026";
+  try {
+    const response = await fetch("http://localhost:3000/promotion-settings/" + encodeURIComponent(currentSchoolId) + "/" + encodeURIComponent(session));
+    if (!response.ok) return;
+    const settings = await response.json();
+    document.getElementById("promotionCutoffInput").value = settings.promoteAverage ?? 50;
+    document.getElementById("ss3GraduationCutoffInput").value = settings.ss3GraduationAverage ?? 50;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function savePromotionSettings() {
+  const session = document.getElementById("mainSessionSelect")?.value || "2025/2026";
+  const promoteAverage = Number(document.getElementById("promotionCutoffInput").value || 50);
+  const ss3GraduationAverage = Number(document.getElementById("ss3GraduationCutoffInput").value || 50);
+
+  try {
+    const response = await fetch("http://localhost:3000/promotion-settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        schoolId: currentSchoolId,
+        session,
+        promoteAverage,
+        ss3GraduationAverage,
+        updatedBy: "admin-ui"
+      })
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      toast("Promotion settings saved", "success");
+      await loadPromotionSettings();
+    } else {
+      toast(data.message || "Could not save promotion settings", "error");
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error saving promotion settings", "error");
+  }
+}
+
+async function loadSessionList() {
+  await loadSessionHistory();
+}
+
+async function lockCurrentStudentResult() {
+  if (!currentScoreStudent) return;
+
+  const session = document.getElementById("scoreSessionSelect").value;
+  const term = document.getElementById("scoreTermSelect").value;
+  const lockBtn = document.getElementById("lockResultBtn");
+
+  const proceed = confirm(
+    `Lock result access again for ${currentScoreStudent.studentName} (${session}, ${term})?`
+  );
+
+  if (!proceed) return;
+
+  lockBtn.disabled = true;
+  lockBtn.style.opacity = "0.65";
+
+  try {
+    const response = await fetch("http://localhost:3000/lock-student-result", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        studentId: currentScoreStudent.studentId,
+        schoolId: currentSchoolId,
+        session,
+        term
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      addActivity("Result Locked", `Result access locked again for ${currentScoreStudent.studentName}.`);
+      toast("Result locked successfully", "success");
+      await refreshScoreModal();
+      await loadResultStatuses();
+      renderStudents();
+    } else {
+      toast(data.message || "Could not lock result", "error");
+      lockBtn.disabled = false;
+      lockBtn.style.opacity = "1";
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error locking result", "error");
+    lockBtn.disabled = false;
+    lockBtn.style.opacity = "1";
+  }
+}
+
+async function quickLockResult(studentId, studentName) {
+  const session = document.getElementById("mainSessionSelect")?.value || "2025/2026";
+  const term = document.getElementById("mainTermSelect")?.value || "1st Term";
+
+  const proceed = confirm(
+    `Lock result access again for ${studentName} (${session}, ${term})?`
+  );
+
+  if (!proceed) return;
+
+  try {
+    const response = await fetch("http://localhost:3000/lock-student-result", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        studentId,
+        schoolId: currentSchoolId,
+        session,
+        term
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      addActivity("Result Locked", `Result access locked again for ${studentName}.`);
+      toast(`Result locked for ${studentName}`, "success");
+      await loadResultStatuses();
+      renderStudents();
+    } else {
+      toast(data.message || "Could not lock result", "error");
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error locking result", "error");
+  }
+}
+
+// ==================== SUBSCRIPTION FUNCTIONS ====================
+
+let selectedPlan = "";
+
+function openUpgradeModal() {
+  selectedPlan = "";
+  document.getElementById("selectedPlanName").value = "";
+  document.getElementById("selectedPlanDisplay").innerText = "Select a plan above";
+  document.getElementById("upgradeModal").classList.add("active");
+}
+
+function closeUpgradeModal() {
+  document.getElementById("upgradeModal").classList.remove("active");
+  selectedPlan = "";
+}
+
+function selectPlan(planName, event = window.event) {
+  selectedPlan = planName;
+  document.getElementById("selectedPlanName").value = planName;
+  
+  const planNames = {
+    "small": "Small School (300 Students) - ₦15,000",
+    "medium": "Medium School (1,000 Students) - ₦35,000",
+    "large": "Large School (3,000 Students) - ₦75,000",
+    "enterprise": "Enterprise (Unlimited) - Custom Pricing"
+  };
+  
+  document.getElementById("selectedPlanDisplay").innerText = planNames[planName] || "Plan selected";
+  
+  document.querySelectorAll(".plan-card").forEach(card => {
+    card.style.borderColor = "#e5e7eb";
+  });
+  if (event && event.target) {
+    const card = event.target.closest(".plan-card");
+    if (card) card.style.borderColor = "#66cccc";
+  }
+}
+
+async function confirmUpgrade() {
+  const planName = document.getElementById("selectedPlanName").value;
+  
+  if (!planName) {
+    toast("Please select a plan first", "error");
+    return;
+  }
+  
+  try {
+    const response = await fetch("http://localhost:3000/upgrade-plan", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        schoolId: currentSchoolId,
+        planName: planName
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      addActivity("Plan Upgrade", `School upgraded to ${planName} plan.`);
+      toast("Plan upgraded successfully", "success");
+      closeUpgradeModal();
+      await loadSubscription();
+    } else {
+      toast(data.message || "Error upgrading plan", "error");
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error upgrading plan", "error");
+  }
+}
+
+function openRenewModal() {
+  document.getElementById("renewModal").classList.add("active");
+}
+
+function closeRenewModal() {
+  document.getElementById("renewModal").classList.remove("active");
+}
+
+async function confirmRenewal() {
+  try {
+    const response = await fetch("http://localhost:3000/renew-subscription", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        schoolId: currentSchoolId
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      addActivity("Subscription Renewal", "Subscription renewed for one year.");
+      toast("Subscription renewed successfully", "success");
+      closeRenewModal();
+      await loadSubscription();
+    } else {
+      toast(data.message || "Error renewing subscription", "error");
+    }
+  } catch (error) {
+    console.log(error);
+    toast("Error renewing subscription", "error");
+  }
+}
+
+async function loadSubscription() {
+  try {
+    const response = await fetch(`http://localhost:3000/subscription-status/${currentSchoolId}`);
+    const data = await response.json();
+    
+    if (!response.ok) {
+      toast("Error loading subscription data", "error");
+      return;
+    }
+    
+    // Format dates
+    const formatDate = (date) => {
+      if (!date) return "N/A";
+      return new Date(date).toLocaleDateString("en-US", { 
+        year: "numeric", 
+        month: "short", 
+        day: "numeric" 
+      });
+    };
+    
+    // Update subscription card
+    const statusEl = document.getElementById("subscriptionStatus");
+    const planNameEl = document.getElementById("subscriptionPlanName");
+    const countEl = document.getElementById("subscriptionStudentCount");
+    const progressEl = document.getElementById("subscriptionProgressBar");
+    const statusTextEl = document.getElementById("subscriptionStatusText");
+    const expiryEl = document.getElementById("subscriptionExpiryText");
+    
+    const sub = data.subscription;
+    const statusBadge = data.status;
+    const current = data.currentCount || 0;
+    const limit = data.limit || 300;
+    const percentage = Math.min((current / limit) * 100, 100);
+    
+    // Status badge color
+    let badgeColor = "#22c55e"; // green for active/trial
+    let statusLabel = "Active";
+    
+    if (statusBadge === "expired") {
+      badgeColor = "#ef4444"; // red
+      statusLabel = "Expired";
+    } else if (statusBadge === "cancelled") {
+      badgeColor = "#f59e0b"; // orange
+      statusLabel = "Cancelled";
+    } else if (statusBadge === "trial") {
+      badgeColor = "#3b82f6"; // blue
+      statusLabel = "Trial";
+    }
+    
+    statusEl.innerHTML = `<p style="margin: 0; color: ${badgeColor}; font-weight: 600; font-size: 0.95rem;">${statusLabel}</p>`;
+    planNameEl.innerText = (sub?.planName || "trial").toUpperCase();
+    countEl.innerText = `${current} / ${limit === Infinity ? "∞" : limit} students`;
+    progressEl.style.width = percentage + "%";
+    statusTextEl.innerText = statusLabel;
+    
+    if (sub?.endDate) {
+      expiryEl.innerText = `Expires: ${formatDate(sub.endDate)}`;
+    } else {
+      expiryEl.innerText = "No expiry date";
+    }
+    
+  } catch (error) {
+    console.log(error);
+    toast("Error loading subscription", "error");
+  }
+}
+
+  window.addEventListener("load", () => {
+      const preloader = document.getElementById("preloader");
+      if (!preloader) return;
+
+      setTimeout(() => {
+        preloader.classList.add("hide");
+        setTimeout(() => preloader.remove(), 500);
+      }, 700);
+    });
+
+async function init() {
+  document.getElementById("schoolInfo").innerText = "School ID: " + currentSchoolId;
+  document.getElementById("settingsSchoolId").innerText = currentSchoolId;
+
+  const savedTheme = localStorage.getItem("dashboardTheme");
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark");
+  }
+  updateThemeButton();
+
+  await loadSchoolProfile();
+  await loadSubscription();
+  await loadSessionHistory();
+  await loadStudents();
+  await loadTeachers();
+  renderActivities();
+  loadPosts("students");
+}
+
+let viewingTeacher=null;
+
+
+async function
+viewTeacherSubjects(
+teacherId
+){
+
+viewingTeacher=
+teacherId;
+
+document
+.getElementById(
+"teacherSubjectList"
+)
+.innerHTML=
+"Loading...";
+
+document
+.getElementById(
+"teacherSubjectModal"
+)
+.classList
+.add(
+"active"
+);
+
+try{
+
+const response=
+await fetch(
+`http://localhost:3000/teacher-subjects/${teacherId}`
+);
+
+const data=
+await response.json();
+
+renderTeacherSubjects(
+data
+);
+
+}
+
+catch(err){
+
+console.log(
+err
+);
+
+}
+
+}
+
+
+
+function
+renderTeacherSubjects(
+list
+){
+
+const wrap=
+document
+.getElementById(
+"teacherSubjectList"
+);
+
+if(
+!list.length
+){
+
+wrap.innerHTML=
+`
+No subjects assigned
+`;
+
+return;
+
+}
+
+wrap.innerHTML=
+list
+.map(
+x=>`
+
+<div
+class="subject-row"
+>
+
+<div>
+
+<b>
+${x.subject}
+</b>
+
+<br>
+
+${x.className}
+
+${x.arm}
+
+</div>
+
+<button
+onclick="
+deleteTeacherSubject(
+'${x.subject}',
+'${x.className}',
+'${x.arm}'
+)
+">
+
+Delete
+
+</button>
+
+</div>
+
+`
+)
+.join("");
+
+}
+
+
+
+async function
+deleteTeacherSubject(
+subject,
+className,
+arm
+){
+
+if(
+!confirm(
+"Delete subject?"
+)
+)
+return;
+
+await fetch(
+
+`http://localhost:3000/teacher-subject/${viewingTeacher}`,
+
+{
+
+method:
+"DELETE",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:
+JSON.stringify({
+
+subject,
+className,
+arm
+
+})
+
+}
+
+);
+
+viewTeacherSubjects(
+viewingTeacher
+);
+
+}
+
+
+
+function
+closeTeacherSubjects(){
+
+document
+.getElementById(
+"teacherSubjectModal"
+)
+.classList
+.remove(
+"active"
+);
+
+}
+
+function renderTeacherSubjects(list){
+
+const wrap=
+document.getElementById(
+"teacherSubjectList"
+);
+
+if(!list.length){
+
+wrap.innerHTML=
+`
+<div class="empty-state">
+No subjects assigned
+</div>
+`;
+
+return;
+
+}
+
+wrap.innerHTML=
+list.map(x=>`
+
+<div class="teacher-subject-item">
+
+<div>
+
+<b>${x.subject}</b>
+
+<div class="teacher-subject-meta">
+
+<span>
+${x.className}
+</span>
+
+<span>
+${x.arm||"-"}
+</span>
+
+</div>
+
+</div>
+
+<button
+class="remove-subject-btn"
+
+onclick="
+deleteTeacherSubject(
+'${x.subject}',
+'${x.className}',
+'${x.arm}'
+)
+">
+
+Delete
+
+</button>
+
+</div>
+
+`).join("");
+
+}
+
+init();
+</script>
+  <script src="ai-widget.js"></script>
+  <script src="common.js"></script>
+</body>
+</html>
+

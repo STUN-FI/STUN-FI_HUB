@@ -1,0 +1,745 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STUN-FI HUB | School Portal</title>
+
+    <link rel="shortcut icon" href="img/Favicon.png" type="image/x-icon">
+<link rel='stylesheet' href='styles.css'>
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+  <style>
+    :root {
+      --accent: #66cccc;
+      --accent-hover: #54b8b8;
+      --bg: #081224;
+      --bg2: #0f172a;
+      --card: rgba(255,255,255,0.06);
+      --line: rgba(255,255,255,0.10);
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+      --shadow: 0 14px 40px rgba(0,0,0,0.28);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(102,204,204,0.12), transparent 30%),
+        linear-gradient(180deg, #07101f 0%, #0b1120 100%);
+      color: var(--text);
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 28px;
+      background: rgba(8,18,36,0.82);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand img {
+      width: 54px;
+      height: 54px;
+      object-fit: contain;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      padding: 6px;
+    }
+
+    .brand-text h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      line-height: 1.1;
+    }
+
+    .brand-text p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn,
+    .primary-btn,
+    .secondary-btn,
+    .role-link {
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-btn,
+    .primary-btn {
+      background: var(--accent);
+      color: white;
+      padding: 12px 16px;
+    }
+
+    .nav-btn:hover,
+    .primary-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .secondary-btn {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+      padding: 12px 16px;
+    }
+
+    .secondary-btn:hover {
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-1px);
+    }
+
+    .hero {
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 44px 28px 24px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 26px;
+      align-items: center;
+    }
+
+    .hero-copy h2 {
+      margin: 0 0 12px;
+      font-size: 3rem;
+      line-height: 1.06;
+    }
+
+    .hero-copy p {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      max-width: 700px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-card h3 {
+      margin: 0 0 10px;
+      font-size: 1.2rem;
+    }
+
+    .hero-card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .hero-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .hero-list-item {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .hero-list-item strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .hero-list-item span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .roles-section {
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 10px 28px 40px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: end;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .section-head h3 {
+      margin: 0;
+      font-size: 1.7rem;
+    }
+
+    .section-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .role-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .role-card h4 {
+      margin: 0 0 10px;
+      font-size: 1.25rem;
+    }
+
+    .role-card p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      min-height: 74px;
+    }
+
+    .role-links {
+      display: grid;
+      gap: 10px;
+    }
+
+    .role-link {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border: 1px solid var(--line);
+      justify-content: space-between;
+    }
+
+    .role-link:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-1px);
+    }
+
+    .admin-link-wrap {
+      margin-top: 18px;
+      text-align: center;
+    }
+
+    .admin-link {
+      color: var(--muted);
+      font-size: 13px;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(255,255,255,0.18);
+      padding-bottom: 2px;
+    }
+
+    .admin-link:hover {
+      color: var(--text);
+    }
+
+    .footer {
+      margin-top: auto;
+      padding: 18px 28px 30px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.48);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 100;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 720px;
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.4);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-head h3 {
+      margin: 0;
+      font-size: 1.45rem;
+    }
+
+    .close-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: white;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .close-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .login-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .login-option {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .login-option h4 {
+      margin: 0 0 8px;
+      font-size: 1.15rem;
+    }
+
+    .login-option p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      min-height: 68px;
+    }
+
+    .login-option .role-links {
+      gap: 8px;
+    }
+
+    #preloader {
+      position: fixed;
+      inset: 0;
+      background: #081224;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    #preloader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-wrap {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .preloader-logo {
+      width: 120px;
+      max-width: 100%;
+      margin-bottom: 18px;
+      animation: pulseLogo 1.4s ease-in-out infinite;
+    }
+
+    .spinner {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.15);
+      border-top: 4px solid var(--accent);
+      animation: spin 0.9s linear infinite;
+    }
+
+    .loader-wrap p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 15px;
+      letter-spacing: 0.3px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulseLogo {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.92;
+      }
+      50% {
+        transform: scale(1.06);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 1050px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .roles-grid,
+      .login-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .nav {
+        padding: 16px;
+      }
+
+      .hero,
+      .roles-section {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .hero-copy h2 {
+        font-size: 2.25rem;
+      }
+
+      .brand img {
+        width: 46px;
+        height: 46px;
+      }
+
+      .brand-text h1 {
+        font-size: 1.05rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="preloader">
+    <div class="loader-wrap">
+      <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo" class="preloader-logo">
+      <!-- <div class="spinner"></div> -->
+      <!-- <p>Loading portal...</p> -->
+    </div>
+  </div>
+  <div class="page">
+    <nav class="nav">
+      <div class="brand">
+        <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo">
+        <div class="brand-text">
+          <h1>STUN-FI HUB</h1>
+          <p>School portal for students, teachers, schools, and admin.</p>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <button class="secondary-btn" onclick="scrollToRoles()">Explore Roles</button>
+        <button class="secondary-btn" id="aiBtn" onclick="openAiModal()">Ask AI</button>
+        <button class="nav-btn" onclick="openLoginModal()">Login</button>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <h2>One portal. Different users. Clear access paths.</h2>
+        <p>
+          This platform lets schools register and manage their portal, teachers confirm and activate their accounts, and students confirm admission before accessing their dashboard and result services.
+        </p>
+
+        <div class="hero-actions">
+          <a class="primary-btn" href="school-register.html">Register School</a>
+          <button class="secondary-btn" onclick="openLoginModal()">Choose Login Path</button>
+        </div>
+      </div>
+
+      <div class="hero-card">
+        <h3>How the platform flows</h3>
+        <p>
+          Each user type starts from the correct entry point so authentication and dashboard access stay clean and secure.
+        </p>
+
+        <div class="hero-list">
+          <div class="hero-list-item">
+            <strong>Schools</strong>
+            <span>Register or login, then manage teachers, students, announcements, and result access.</span>
+          </div>
+          <div class="hero-list-item">
+            <strong>Teachers</strong>
+            <span>Confirm account first, then login to enter draft scores, submit subject scores, and view school posts.</span>
+          </div>
+          <div class="hero-list-item">
+            <strong>Students</strong>
+            <span>Confirm admission first, then login to see announcements, dashboard updates, and result access status.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="roles-section" id="rolesSection">
+      <div class="section-head">
+        <div>
+          <h3>Choose your access path</h3>
+          <p>Each role below leads to the pages already created in your system.</p>
+        </div>
+      </div>
+
+      <div class="roles-grid">
+        <div class="role-card">
+          <h4>School</h4>
+          <p>For schools that want to register under STUN-FI HUB or login to manage their portal.</p>
+          <div class="role-links">
+            <a class="role-link" href="school-register.html">Register School <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+            <a class="role-link" href="login.html">School Login <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+            <a class="role-link" href="school-forgot-password.html">Forgot Password <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+          </div>
+        </div>
+
+        <div class="role-card">
+          <h4>Teacher</h4>
+          <p>For teachers who need to confirm their account, login, or recover access to their account.</p>
+          <div class="role-links">
+            <a class="role-link" href="teacher-confirm-account.html">Confirm Account <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+            <a class="role-link" href="teacher-login.html">Teacher Login <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+            <a class="role-link" href="teacher-forgot-password.html">Forgot Password <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+          </div>
+        </div>
+
+        <div class="role-card">
+          <h4>Student</h4>
+          <p>For students who need to confirm admission, login, or recover access after activation.</p>
+          <div class="role-links">
+            <a class="role-link" href="student-confirm-admission.html">Confirm Admission <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+            <a class="role-link" href="student-login.html">Student Login <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+            <a class="role-link" href="student-forgot-password.html">Forgot Password <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      STUN-FI HUB • Unified access point for school, teacher, student, and admin workflows.
+    </footer>
+  </div>
+
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Select Login Role</h3>
+        <button class="close-btn" onclick="closeLoginModal()"><ion-icon name="close-outline"></ion-icon></button>
+      </div>
+
+      <div class="login-grid">
+        <div class="login-option">
+          <h4>School</h4>
+          <p>School owners and admins can register or login to manage their school portal.</p>
+          <div class="role-links">
+            <a class="role-link" href="login.html">School Login <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+            <a class="role-link" href="school-register.html">Register School <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+          </div>
+        </div>
+
+        <div class="login-option">
+          <h4>Teacher</h4>
+          <p>Teachers should confirm account first before logging in for score entry and updates.</p>
+          <div class="role-links">
+            <a class="role-link" href="teacher-confirm-account.html">Confirm Account <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+            <a class="role-link" href="teacher-login.html">Teacher Login <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+          </div>
+        </div>
+
+        <div class="login-option">
+          <h4>Student</h4>
+          <p>Students should confirm admission first before logging in to the student portal.</p>
+          <div class="role-links">
+            <a class="role-link" href="student-confirm-admission.html">Confirm Admission <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+            <a class="role-link" href="student-login.html">Student Login <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="aiModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Ask the AI (Gemini)</h3>
+        <button class="close-btn" onclick="closeAiModal()"><ion-icon name="close-outline"></ion-icon></button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <textarea id="aiPrompt" rows="6" placeholder="Ask a question about the portal, features, or get help..." style="width:100%;padding:12px;border-radius:12px;background:#061020;border:1px solid rgba(255,255,255,0.06);color:var(--text);"></textarea>
+
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button class="primary-btn" id="aiSendBtn">Send</button>
+          <select id="aiModel" style="padding:10px;border-radius:10px;background:#0f172a;color:var(--text);border:1px solid rgba(255,255,255,0.06);">
+            <option value="text-bison-001">text-bison-001</option>
+            <option value="chat-bison-001">chat-bison-001</option>
+          </select>
+        </div>
+
+        <div class="hero-card" id="aiResponse" style="min-height:120px;white-space:pre-wrap;">AI responses will appear here.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openLoginModal() {
+      document.getElementById("loginModal").classList.add("active");
+    }
+
+    function closeLoginModal() {
+      document.getElementById("loginModal").classList.remove("active");
+    }
+
+    function scrollToRoles() {
+      document.getElementById("rolesSection").scrollIntoView({ behavior: "smooth" });
+    }
+
+    window.addEventListener("load", () => {
+      const preloader = document.getElementById("preloader");
+      if (!preloader) return;
+
+      setTimeout(() => {
+        preloader.classList.add("hide");
+        setTimeout(() => preloader.remove(), 500);
+      }, 700);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeLoginModal();
+        closeAiModal();
+      }
+    });
+
+    // AI modal handlers
+    function openAiModal(){
+      document.getElementById('aiModal').classList.add('active');
+      document.getElementById('aiPrompt').focus();
+    }
+
+    function closeAiModal(){
+      document.getElementById('aiModal').classList.remove('active');
+    }
+
+    async function sendAi(){
+      const prompt = document.getElementById('aiPrompt').value.trim();
+      const model = document.getElementById('aiModel').value;
+      const respEl = document.getElementById('aiResponse');
+      if(!prompt){
+        respEl.textContent = 'Please enter a question.';
+        return;
+      }
+      respEl.textContent = 'Thinking...';
+
+      try{
+        const r = await fetch('/ai/chat',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ prompt, model })
+        });
+        const data = await r.json();
+        if(data.text){
+          respEl.textContent = data.text;
+        } else if(data.raw){
+          respEl.textContent = JSON.stringify(data.raw, null, 2);
+        } else {
+          respEl.textContent = 'No response from AI.';
+        }
+      }catch(err){
+        respEl.textContent = 'Error calling AI: '+err.message;
+      }
+    }
+
+    document.getElementById('aiSendBtn').addEventListener('click', sendAi);
+
+    // also send on Ctrl+Enter inside textarea
+    document.getElementById('aiPrompt').addEventListener('keydown',(e)=>{
+      if((e.ctrlKey||e.metaKey) && e.key === 'Enter'){
+        sendAi();
+      }
+    });
+  </script>
+  <script src="ai-widget.js"></script>
+  <script src="common.js"></script>
+</body>
+</html>
+

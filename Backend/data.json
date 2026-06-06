@@ -1,0 +1,9 @@
+{
+  "students": [],
+  "schools": [],
+  "admin": {
+    "email": "admin@stunfi.com",
+    "password": "Admin123",
+    "name": "STUN-FI Admin"
+  }
+}

@@ -1,0 +1,12 @@
+import re, pathlib, subprocess
+path = pathlib.Path('dashboard.html')
+text = path.read_text(encoding='utf-8')
+scripts = re.findall(r'<script[^>]*>(.*?)</script>', text, re.S)
+code = '\n'.join(scripts)
+code = re.sub(r'<!--|-->', '', code)
+tmp = pathlib.Path('tmp_dashboard_script.js')
+tmp.write_text(code, encoding='utf-8')
+print('scripts extracted', len(scripts))
+res = subprocess.run(['node', '--check', str(tmp)], capture_output=True, text=True)
+print('returncode', res.returncode)
+print(res.stderr)

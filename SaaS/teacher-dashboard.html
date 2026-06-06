@@ -1,0 +1,1576 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher Dashboard | STUN-FI HUB</title>
+
+    <link rel="shortcut icon" href="img/Favicon.png" type="image/x-icon">
+<link rel='stylesheet' href='styles.css'>
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+  <style>
+    :root {
+      --accent: #66cccc;
+      --accent-hover: #54b8b8;
+      --bg: #f4f7fb;
+      --sidebar: #0f172a;
+      --card: #ffffff;
+      --card-2: #f8fafc;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --save: var(--accent);
+      --shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    body.dark {
+      --bg: #0b1120;
+      --sidebar: #020617;
+      --card: #111827;
+      --card-2: #0f172a;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --line: rgba(255,255,255,0.08);
+      --shadow: 0 10px 30px rgba(0,0,0,0.28);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      color: white;
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      height: 100vh;
+      overflow-y: auto;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: transform 0.25s ease;
+    }
+
+    .brand {
+      text-align: center;
+    }
+
+    .main-brand-logo {
+      width: 180px;
+      max-width: 100%;
+      display: block;
+      margin: 0 auto 12px;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeLogo 0.8s ease forwards;
+      transition: transform 0.25s ease, filter 0.25s ease;
+    }
+
+    .main-brand-logo:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 10px rgba(102, 204, 204, 0.55));
+    }
+
+    @keyframes fadeLogo {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .brand p {
+      margin: 0;
+      font-size: 14px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .teacher-mini-card,
+    .nav-box {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .teacher-mini-card {
+      text-align: center;
+    }
+
+    .teacher-mini-logo {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto 12px;
+      background: rgba(255,255,255,0.1);
+      border: 3px solid rgba(255,255,255,0.1);
+    }
+
+    .teacher-mini-name {
+      font-weight: bold;
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    .teacher-mini-meta,
+    .nav-box p {
+      color: #cbd5e1;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .nav-box h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: white;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-size: 13px;
+      margin: 4px 6px 0 0;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar-actions {
+      margin-top: auto;
+      display: grid;
+      gap: 10px;
+    }
+
+    .sidebar-actions button,
+    button {
+      border: none;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .theme-btn {
+      background: #334155 !important;
+      color: white;
+    }
+
+    .theme-btn:hover {
+      background: #475569 !important;
+    }
+
+    .refresh-btn,
+    .secondary-btn {
+      background: var(--accent);
+      color: white;
+    }
+
+    .refresh-btn:hover,
+    .secondary-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .danger-btn {
+      background: var(--danger);
+    }
+
+    .danger-btn:hover {
+      filter: brightness(0.95);
+    }
+
+    .save-btn {
+      background: var(--save);
+    }
+
+    .save-btn:hover {
+      filter: brightness(0.95);
+    }
+
+    .submit-btn {
+      background: var(--success);
+    }
+
+    .submit-btn:hover {
+      background: #16a34a;
+    }
+
+    .main{
+      padding:24px;
+      width:100%;
+      min-width:0;
+      overflow-y:auto;
+      overflow-x:hidden;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--bg);
+      padding-bottom: 14px;
+    }
+
+    .topbar h2 {
+      margin: 0 0 4px;
+      font-size: 2rem;
+      line-height: 1.15;
+    }
+
+    .topbar p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .school-pill {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 10px 14px;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      font-size: 14px;
+      color: var(--text);
+    }
+
+   .sidebar-toggle {
+      display: inline-flex;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      background: var(--accent) !important;
+      color: white !important;
+      font-size: 22px;
+      font-weight: bold;
+      flex-shrink: 0;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .grid-main{
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+      width:100%;
+    }
+
+   .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:22px;
+      box-shadow:var(--shadow);
+      width:100%;
+      overflow:hidden;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 1.2rem;
+      color: var(--text);
+    }
+
+    .meta-line {
+      margin-bottom: 10px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .toolbar select,
+    .toolbar input,
+    .component-tools input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      outline: none;
+      background: white;
+      color: #111827;
+    }
+
+    body.dark .toolbar select,
+    body.dark .toolbar input,
+    body.dark .component-tools input {
+      background: #fff;
+      color: #111827;
+    }
+
+    .readonly-subject {
+      background: #dbeafe !important;
+      font-weight: bold;
+    }
+
+    .top-controls {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .component-tools {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .small-btn {
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+
+    .status {
+      min-height: 20px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .scroll-card-body {
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .scroll-card-body.tall {
+      max-height: 520px;
+    }
+
+    .table-wrap{
+      width:100%;
+      overflow-x:auto;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:var(--card-2);
+    }
+
+   table{
+      width:100%;
+      min-width:950px;
+      border-collapse:collapse;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+      white-space: nowrap;
+      color: var(--text);
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    td input {
+      width: 90px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      outline: none;
+      background: #fff;
+      color: #111827;
+      text-align: center;
+    }
+
+    .grade-pill {
+      display: inline-block;
+      min-width: 48px;
+      text-align: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      font-weight: bold;
+    }
+
+    .good {
+      color: #22c55e;
+    }
+
+    .bad {
+      color: #ef4444;
+    }
+
+    .empty,
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 24px 12px;
+      background: var(--card-2);
+      border-radius: 16px;
+      border: 1px dashed var(--line);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 9998;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 460px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+
+    .modal h3 {
+      margin-top: 0;
+      color: var(--text);
+    }
+
+    .modal p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .announcement-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .announcement-card {
+      background: var(--card-2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .announcement-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .announcement-title {
+      font-weight: bold;
+      color: var(--text);
+    }
+
+    .announcement-time {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .announcement-body {
+      color: var(--muted);
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .announcement-media {
+      margin-top: 12px;
+    }
+
+    .announcement-media img,
+    .announcement-media video {
+      max-width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+
+    .announcement-media a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .announcement-media a:hover {
+      text-decoration: underline;
+    }
+
+    .mobile-overlay {
+      display: none;
+    }
+
+    #preloader {
+      position: fixed;
+      inset: 0;
+      background: var(--bg, #081224);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    #preloader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-wrap {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .preloader-logo {
+      width: 120px;
+      max-width: 100%;
+      margin-bottom: 18px;
+      animation: pulseLogo 1.4s ease-in-out infinite;
+    }
+
+    .spinner {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.15);
+      border-top: 4px solid var(--accent);
+      animation: spin 0.9s linear infinite;
+    }
+
+    .loader-wrap p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 15px;
+      letter-spacing: 0.3px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulseLogo {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.92;
+      }
+      50% {
+        transform: scale(1.06);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 1080px) {
+      .layout {
+        grid-template-columns: 1fr;
+        height: auto;
+        overflow: visible;
+      }
+
+      .grid-main {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .main {
+        padding: 16px;
+        height: auto;
+        overflow: visible;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 290px;
+        height: 100vh;
+        transform: translateX(-100%);
+        overflow-y: auto;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+      }
+
+      .sidebar-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .mobile-overlay.show {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 999;
+      }
+    }
+
+   @media (min-width: 1081px) {
+
+      .sidebar.closed{
+        transform:translateX(-100%);
+      }
+
+      .layout.sidebar-hidden{
+        grid-template-columns:0 1fr;
+      }
+
+    }
+
+    @media (max-width: 768px){
+
+      .main{
+        padding:14px;
+      }
+
+      .topbar{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .topbar h2{
+        font-size:1.9rem;
+      }
+
+      .topbar-actions{
+        width:100%;
+        justify-content:space-between;
+      }
+
+      .card{
+        padding:16px;
+        border-radius:20px;
+      }
+
+      .toolbar{
+        grid-template-columns:1fr;
+      }
+
+      .top-controls{
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .component-tools{
+        width:100%;
+        flex-direction:column;
+      }
+
+      .component-tools input,
+      .component-tools button{
+        width:100%;
+      }
+
+      .table-wrap{
+        overflow-x:auto;
+      }
+
+      table{
+        min-width:850px;
+      }
+
+      td input{
+        width:75px;
+      }
+
+      .school-pill{
+        width:100%;
+        text-align:center;
+      }
+
+      .refresh-btn{
+        width:100%;
+      }
+
+    }
+
+    @media (max-width: 640px) {
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .component-tools {
+        width: 100%;
+      }
+
+      .component-tools input {
+        width: 100%;
+      }
+
+      .topbar h2 {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="preloader">
+    <div class="loader-wrap">
+      <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo" class="preloader-logo">
+      <!-- <div class="spinner"></div> -->
+      <!-- <p>Loading portal...</p> -->
+    </div>
+  </div>
+
+  <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+
+  <div class="modal-overlay" id="submitModal">
+    <div class="modal">
+      <h3>Submit Scores</h3>
+      <p>Are you sure you want to submit these scores to the school dashboard? After submission, the school admin will review them before assigning results to students.</p>
+      <div class="modal-actions">
+        <button class="submit-btn" onclick="confirmSubmitScores()">Yes, Submit</button>
+        <button class="danger-btn" onclick="closeSubmitModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo" class="main-brand-logo">
+        <p>Teacher portal for score entry, draft saving, result submission, and school announcements.</p>
+      </div>
+
+      <div class="teacher-mini-card">
+        <img id="schoolLogoSide" class="teacher-mini-logo" src="" alt="School Logo">
+        <div class="teacher-mini-name" id="teacherNameSide">Teacher Name</div>
+        <div class="teacher-mini-meta" id="teacherSchoolSide">School: --</div>
+        <div class="teacher-mini-meta" id="teacherSubjectSide">Subject: --</div>
+        <div class="teacher-mini-meta" id="teacherClassSide">Class: --</div>
+      </div>
+
+      <div class="nav-box">
+        <h3>Teaching Scope</h3>
+        <p>Enter and manage subject scores only for the class and arm assigned to you by the school.</p>
+      </div>
+
+      <div class="nav-box">
+        <h3>Quick Tip</h3>
+        <p>Use Save to keep drafts and Submit Scores only when you’re sure the records are ready for school review.</p>
+      </div>
+
+      <div>
+        <span class="pill" id="pillSubject">Subject</span>
+        <span class="pill" id="pillClass">Class</span>
+        <span class="pill" id="pillArm">Arm</span>
+      </div>
+
+      <div class="sidebar-actions">
+        <button class="theme-btn" onclick="toggleTheme()" id="themeToggle"><ion-icon name="moon-outline"></ion-icon> Dark Mode</button>
+        <button class="danger-btn" onclick="logout()">Logout</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h2 id="pageTitle">Teacher Dashboard</h2>
+          <p id="pageSub">Enter and manage student subject scores.</p>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="school-pill" id="teacherSchoolPill">School: --</div>
+          <button class="sidebar-toggle" onclick="toggleSidebar()"><ion-icon name="menu-outline"></ion-icon></button>
+          <button class="refresh-btn" onclick="loadStudents()">Refresh</button>
+        </div>
+      </div>
+
+      <div class="grid-main">
+        <div>
+          <div class="card">
+            <h3>Score Sheet</h3>
+
+            <div class="toolbar">
+              <select id="sessionInput" onchange="loadStudents()">
+                <option value="2025/2026">2025/2026</option>
+                <option value="2026/2027">2026/2027</option>
+                <option value="2027/2028">2027/2028</option>
+              </select>
+
+              <select id="termInput" onchange="loadStudents()">
+                <option value="1st Term">1st Term</option>
+                <option value="2nd Term">2nd Term</option>
+                <option value="3rd Term">3rd Term</option>
+              </select>
+
+              <input type="text" id="searchInput" placeholder="Search student" oninput="renderRows()">
+
+              <select id="assignmentSelect" onchange="changeAssignment()"></select>
+
+              <input type="text" id="subjectInput" class="readonly-subject" readonly>
+            </div>
+
+            <div class="top-controls">
+              <div class="component-tools">
+                <input type="text" id="newComponentName" placeholder="New score column name">
+                <button class="small-btn refresh-btn" onclick="addComponentColumn()">Add Column</button>
+                <button class="small-btn danger-btn" onclick="resetDefaultColumns()">Reset Default</button>
+              </div>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="save-btn" onclick="saveAllDrafts()">Save</button>
+                <button class="submit-btn" onclick="openSubmitModal()">Submit Scores</button>
+              </div>
+            </div>
+
+            <div class="status" id="status"></div>
+
+            <div class="scroll-card-body tall">
+              <div class="table-wrap">
+                <table id="scoreTable">
+                  <thead id="tableHead"></thead>
+                  <tbody id="tableBody">
+                    <tr>
+                      <td colspan="20" class="empty">Loading students...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h3 style="margin:0;">News / Announcements</h3>
+                <p style="margin:6px 0 0; color: var(--muted);">
+                  Updates posted by your school for teachers only.
+                </p>
+              </div>
+
+              <button class="refresh-btn" onclick="loadTeacherPosts()">Refresh</button>
+            </div>
+
+            <div class="scroll-card-body">
+              <div id="teacherAnnouncementList" class="announcement-list">
+                <div class="empty-state">Loading announcements...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const teacher = JSON.parse(localStorage.getItem("teacher") || "null");
+    let selectedAssignment = null;
+    let teacherClass = "";
+    let students = [];
+    let draftRows = [];
+    let componentColumns = ["Classwork", "Assignment", "Test", "Exam"];
+
+    function getGrade(total) {
+      if (total >= 80) return "A1";
+      if (total >= 70) return "B2";
+      if (total >= 60) return "B3";
+      if (total >= 50) return "C4";
+      if (total >= 45) return "C5";
+      if (total >= 40) return "C6";
+      if (total >= 35) return "D7";
+      if (total >= 30) return "E8";
+      return "F9";
+    }
+
+    function getInitials(name) {
+      return (name || "School")
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(part => part[0].toUpperCase())
+        .join("");
+    }
+
+    function adjustColor(hex, amount) {
+      let col = (hex || "#66cccc").replace("#", "");
+      let num = parseInt(col, 16);
+
+      let r = (num >> 16) + amount;
+      let g = ((num >> 8) & 0x00FF) + amount;
+      let b = (num & 0x0000FF) + amount;
+
+      r = Math.max(0, Math.min(255, r));
+      g = Math.max(0, Math.min(255, g));
+      b = Math.max(0, Math.min(255, b));
+
+      return "#" + (r << 16 | g << 8 | b).toString(16).padStart(6, "0");
+    }
+
+    function createFallbackLogo(name, color) {
+      const initials = getInitials(name);
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+          <rect width="100%" height="100%" fill="${color}"/>
+          <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="62" fill="white" font-weight="bold">${initials}</text>
+        </svg>
+      `;
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
+
+   function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("mobileOverlay");
+      const layout = document.querySelector(".layout");
+
+      if (window.innerWidth <= 1080) {
+        sidebar.classList.toggle("open");
+        overlay.classList.toggle("show");
+      } else {
+        sidebar.classList.toggle("closed");
+        layout.classList.toggle("sidebar-hidden");
+      }
+    }
+
+   function closeSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("mobileOverlay");
+
+      sidebar.classList.remove("open");
+      overlay.classList.remove("show");
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("teacherDashboardTheme", document.body.classList.contains("dark") ? "dark" : "light");
+      updateThemeButton();
+    }
+
+    function updateThemeButton() {
+      const btn = document.getElementById("themeToggle");
+      btn.innerHTML = document.body.classList.contains("dark") ? '<ion-icon name="sunny-outline"></ion-icon> Light Mode' : '<ion-icon name="moon-outline"></ion-icon> Dark Mode';
+    }
+
+    function logout() {
+      localStorage.removeItem("teacher");
+      window.location.href = "teacher-login.html";
+    }
+
+    function getTeacherAssignments() {
+  if (teacher.assignments && teacher.assignments.length) {
+    return teacher.assignments;
+  }
+
+  return [
+    {
+      subject: teacher.subject || "",
+      className: teacher.className || teacher.class || "",
+      arm: teacher.arm || ""
+    }
+  ];
+}
+
+function loadAssignmentOptions() {
+  const select = document.getElementById("assignmentSelect");
+  const assignments = getTeacherAssignments();
+
+  select.innerHTML = "";
+
+  assignments.forEach((item, index) => {
+    const option = document.createElement("option");
+    option.value = index;
+    option.textContent = `${item.subject} - ${item.className} ${item.arm || ""}`;
+    select.appendChild(option);
+  });
+
+  selectedAssignment = assignments[0] || null;
+  teacherClass = selectedAssignment?.className || "";
+}
+
+function changeAssignment() {
+  const index = Number(document.getElementById("assignmentSelect").value);
+  const assignments = getTeacherAssignments();
+
+  selectedAssignment = assignments[index] || null;
+  teacherClass = selectedAssignment?.className || "";
+
+  setTeacherInfo();
+  loadComponentColumns();
+  loadStudents();
+}
+
+function setTeacherInfo() {
+  const assignment = selectedAssignment || getTeacherAssignments()[0];
+
+  if (!assignment) return;
+
+  const classText = (assignment.className || "-") + " " + (assignment.arm || "");
+
+  document.getElementById("teacherNameSide").innerText = teacher.name || "-";
+  document.getElementById("teacherSchoolSide").innerText = "School: " + (teacher.schoolId || "-");
+  document.getElementById("teacherSubjectSide").innerText = "Subject: " + (assignment.subject || "-");
+  document.getElementById("teacherClassSide").innerText = "Class: " + classText;
+
+  document.getElementById("pillSubject").innerText = assignment.subject || "Subject";
+  document.getElementById("pillClass").innerText = assignment.className || "Class";
+  document.getElementById("pillArm").innerText = assignment.arm || "Arm";
+  document.getElementById("subjectInput").value = assignment.subject || "";
+
+  document.getElementById("pageTitle").innerText = (assignment.subject || "Teacher") + " Dashboard";
+}
+
+    async function loadSchoolBranding() {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/school-lookup?schoolId=" + encodeURIComponent(teacher.schoolId)
+        );
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const color = data.accentColor || "#66cccc";
+
+        document.documentElement.style.setProperty("--accent", color);
+        document.documentElement.style.setProperty("--accent-hover", adjustColor(color, -18));
+
+        const logo = data.logo || createFallbackLogo(data.name || "School", color);
+
+        document.getElementById("schoolLogoSide").src = logo;
+        document.getElementById("teacherSchoolSide").innerText = "School: " + (data.name || teacher.schoolId);
+        document.getElementById("teacherSchoolPill").innerText = "School: " + (data.name || teacher.schoolId);
+        document.getElementById("pageSub").innerText = data.motto || "Enter and manage student subject scores.";
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    function componentStorageKey() {
+      const assignment = selectedAssignment || getTeacherAssignments()[0];
+
+      return `teacher_columns_${teacher.teacherId}_${assignment.subject}_${assignment.className}_${assignment.arm || ""}`;
+    }
+
+    function loadComponentColumns() {
+      const saved = JSON.parse(localStorage.getItem(componentStorageKey()) || "null");
+      if (Array.isArray(saved) && saved.length) {
+        componentColumns = saved;
+      }
+    }
+
+    function saveComponentColumns() {
+      localStorage.setItem(componentStorageKey(), JSON.stringify(componentColumns));
+    }
+
+    function addComponentColumn() {
+      const input = document.getElementById("newComponentName");
+      const value = input.value.trim();
+
+      if (!value) return;
+
+      if (componentColumns.some(col => col.toLowerCase() === value.toLowerCase())) {
+        document.getElementById("status").innerText = "That column already exists.";
+        return;
+      }
+
+      componentColumns.push(value);
+      saveComponentColumns();
+      input.value = "";
+      renderRows();
+      document.getElementById("status").innerText = "Column added.";
+    }
+
+    function resetDefaultColumns() {
+      componentColumns = ["Classwork", "Assignment", "Test", "Exam"];
+      saveComponentColumns();
+      renderRows();
+      document.getElementById("status").innerText = "Columns reset to default.";
+    }
+
+    function renderHead() {
+      const head = document.getElementById("tableHead");
+      let ths = `<tr><th>Student Name</th><th>Reg Number</th>`;
+
+      componentColumns.forEach((column, index) => {
+        ths += `<th>
+          <input
+            style="width:140px; padding:8px; border-radius:8px; border:none; outline:none;"
+            value="${column}"
+            onchange="renameColumn(${index}, this.value)"
+          >
+        </th>`;
+      });
+
+      ths += `<th>Total</th><th>Grade</th><th>State</th></tr>`;
+      head.innerHTML = ths;
+    }
+
+    function renameColumn(index, value) {
+      const clean = value.trim();
+      if (!clean) return;
+      componentColumns[index] = clean;
+      saveComponentColumns();
+      renderRows();
+    }
+
+    async function loadStudents() {
+  const status = document.getElementById("status");
+  const tableBody = document.getElementById("tableBody");
+  const session = document.getElementById("sessionInput").value;
+  const term = document.getElementById("termInput").value;
+
+  const assignment = selectedAssignment || getTeacherAssignments()[0];
+
+  if (!assignment) {
+    status.innerText = "No class assigned to this teacher yet.";
+    tableBody.innerHTML = `<tr><td colspan="20" class="empty">No assignment selected.</td></tr>`;
+    return;
+  }
+
+  const teacherClass = assignment.className || "";
+  const teacherSubject = assignment.subject || "";
+  const teacherArm = assignment.arm || "";
+
+  status.innerText = "Loading students...";
+  tableBody.innerHTML = `<tr><td colspan="20" class="empty">Loading students...</td></tr>`;
+
+  try {
+    const studentRes = await fetch(
+      "http://localhost:3000/students-by-assignment?schoolId=" +
+      encodeURIComponent(teacher.schoolId) +
+      "&className=" +
+      encodeURIComponent(teacherClass) +
+      "&arm=" +
+      encodeURIComponent(teacherArm) +
+      "&subject=" +
+      encodeURIComponent(teacherSubject)
+    );
+
+    const studentData = await studentRes.json();
+
+    if (!studentRes.ok) {
+      status.innerText = studentData.message || "Error loading students";
+      tableBody.innerHTML = `<tr><td colspan="20" class="empty">Could not load students.</td></tr>`;
+      return;
+    }
+
+    students = studentData;
+
+    try {
+      const draftRes = await fetch(
+        "http://localhost:3000/teacher-score-sheet?teacherId=" +
+        encodeURIComponent(teacher.teacherId) +
+        "&schoolId=" +
+        encodeURIComponent(teacher.schoolId) +
+        "&subject=" +
+        encodeURIComponent(teacherSubject) +
+        "&className=" +
+        encodeURIComponent(teacherClass) +
+        "&arm=" +
+        encodeURIComponent(teacherArm) +
+        "&session=" +
+        encodeURIComponent(session) +
+        "&term=" +
+        encodeURIComponent(term)
+      );
+
+      draftRows = draftRes.ok ? await draftRes.json() : [];
+    } catch (err) {
+      console.log("Draft load failed:", err);
+      draftRows = [];
+    }
+
+    renderRows();
+
+    status.innerText = students.length
+      ? `${students.length} student(s) offering ${teacherSubject} loaded`
+      : `No students enrolled for ${teacherSubject} in ${teacherClass} ${teacherArm}`;
+  } catch (error) {
+    console.log(error);
+    status.innerText = "Error loading students";
+    tableBody.innerHTML = `<tr><td colspan="20" class="empty">Could not load students.</td></tr>`;
+  }
+}
+
+    function getDraftForStudent(studentId) {
+      return draftRows.find(row => row.studentId === studentId) || null;
+    }
+
+    function getComponentScore(studentId, componentName) {
+      const row = getDraftForStudent(studentId);
+      if (!row || !Array.isArray(row.components)) return "";
+      const found = row.components.find(c => c.name === componentName);
+      return found ? found.score : "";
+    }
+
+    function getDraftState(studentId) {
+      const row = getDraftForStudent(studentId);
+      if (!row) return "New";
+      if (row.status === "submitted") return "Submitted";
+      if (row.status === "assigned") return "Assigned";
+      return "Draft";
+    }
+
+    function renderRows() {
+      renderHead();
+
+      const tableBody = document.getElementById("tableBody");
+      const search = document.getElementById("searchInput").value.trim().toLowerCase();
+
+      const filtered = students.filter((student) => {
+        return (
+          student.name.toLowerCase().includes(search) ||
+          student.regNumber.toLowerCase().includes(search)
+        );
+      });
+
+      tableBody.innerHTML = "";
+
+      if (!filtered.length) {
+        tableBody.innerHTML = `<tr><td colspan="${componentColumns.length + 5}" class="empty">No matching students found.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach((student) => {
+        const rowState = getDraftState(student.studentId);
+        const tr = document.createElement("tr");
+
+        let html = `
+          <td>${student.name}</td>
+          <td>${student.regNumber}</td>
+        `;
+
+        componentColumns.forEach((componentName) => {
+          html += `
+            <td>
+              <input
+                type="number"
+                min="0"
+                value="${getComponentScore(student.studentId, componentName)}"
+                id="score_${student.studentId}_${safeId(componentName)}"
+                oninput="calculate('${student.studentId}')"
+              >
+            </td>
+          `;
+        });
+
+        html += `
+          <td id="total_${student.studentId}">0</td>
+          <td id="grade_${student.studentId}"><span class="grade-pill">F9</span></td>
+          <td id="state_${student.studentId}">${rowState}</td>
+        `;
+
+        tr.innerHTML = html;
+        tableBody.appendChild(tr);
+
+        calculate(student.studentId);
+      });
+    }
+
+    function safeId(value) {
+      return value.replace(/[^a-zA-Z0-9]/g, "_");
+    }
+
+    function collectComponents(studentId) {
+      return componentColumns.map((name) => ({
+        name,
+        score: Number(document.getElementById(`score_${studentId}_${safeId(name)}`)?.value || 0)
+      }));
+    }
+
+    function calculate(studentId) {
+      const components = collectComponents(studentId);
+      const total = components.reduce((sum, item) => sum + Number(item.score || 0), 0);
+      const grade = getGrade(total);
+
+      document.getElementById(`total_${studentId}`).innerText = total;
+      document.getElementById(`grade_${studentId}`).innerHTML =
+        `<span class="grade-pill ${total >= 50 ? "good" : "bad"}">${grade}</span>`;
+    }
+
+    async function saveAllDrafts() {
+      const session = document.getElementById("sessionInput").value;
+      const term = document.getElementById("termInput").value;
+      const status = document.getElementById("status");
+      const assignment = selectedAssignment || getTeacherAssignments()[0];
+      const teacherSubject = assignment.subject || "";
+      const teacherClass = assignment.className || "";
+      const teacherArm = assignment.arm || "";
+
+      if (!students.length) {
+        status.innerText = "No students to save.";
+        return;
+      }
+
+      status.innerText = "Saving drafts...";
+
+      try {
+        for (const student of students) {
+          const components = collectComponents(student.studentId);
+
+          await fetch("http://localhost:3000/teacher-save-draft", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              studentId: student.studentId,
+              schoolId: teacher.schoolId,
+              teacherId: teacher.teacherId,
+              subject: teacherSubject,
+              className: teacherClass,
+              arm: teacherArm,
+              session,
+              term,
+              components
+            })
+          });
+        }
+
+        status.innerText = "Draft scores saved successfully.";
+        await loadStudents();
+      } catch (error) {
+        console.log(error);
+        status.innerText = "Error saving draft scores.";
+      }
+    }
+
+    function openSubmitModal() {
+      document.getElementById("submitModal").classList.add("active");
+    }
+
+    function closeSubmitModal() {
+      document.getElementById("submitModal").classList.remove("active");
+    }
+
+    async function confirmSubmitScores() {
+      const session = document.getElementById("sessionInput").value;
+      const term = document.getElementById("termInput").value;
+      const status = document.getElementById("status");
+      const assignment = selectedAssignment || getTeacherAssignments()[0];
+      const teacherSubject = assignment.subject || "";
+      const teacherClass = assignment.className || "";
+      const teacherArm = assignment.arm || "";
+
+      closeSubmitModal();
+
+      if (!students.length) {
+        status.innerText = "No students to submit.";
+        return;
+      }
+
+      status.innerText = "Submitting scores to school dashboard...";
+
+      try {
+        for (const student of students) {
+          const components = collectComponents(student.studentId);
+
+          await fetch("http://localhost:3000/teacher-submit-score", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              studentId: student.studentId,
+              schoolId: teacher.schoolId,
+              teacherId: teacher.teacherId,
+              subject: teacherSubject,
+              className: teacherClass,
+              arm: teacherArm,
+              session,
+              term,
+              components
+            })
+          });
+        }
+
+        status.innerText = "Scores submitted successfully.";
+        await loadStudents();
+      } catch (error) {
+        console.log(error);
+        status.innerText = "Error submitting scores.";
+      }
+    }
+
+    async function loadTeacherPosts() {
+      const wrap = document.getElementById("teacherAnnouncementList");
+      if (!wrap || !teacher || !teacher.schoolId) return;
+
+      wrap.innerHTML = `<div class="empty-state">Loading announcements...</div>`;
+
+      try {
+        const response = await fetch(
+          "http://localhost:3000/posts/" +
+          encodeURIComponent(teacher.schoolId) +
+          "?audience=teachers"
+        );
+
+        const posts = await response.json();
+
+        if (!response.ok) {
+          wrap.innerHTML = `<div class="empty-state">${posts.message || "Could not load announcements."}</div>`;
+          return;
+        }
+
+        if (!posts.length) {
+          wrap.innerHTML = `<div class="empty-state">No announcements yet.</div>`;
+          return;
+        }
+
+        wrap.innerHTML = "";
+
+        posts.forEach((post) => {
+          const div = document.createElement("div");
+          div.className = "announcement-card";
+
+          const createdTime = new Date(post.createdAt).toLocaleString();
+
+          let mediaHtml = "";
+
+          if (post.mediaUrl) {
+            if (post.mediaType === "image") {
+              mediaHtml = `
+                <div class="announcement-media">
+                  <img src="${post.mediaUrl}" alt="Announcement image" />
+                </div>
+              `;
+            } else if (post.mediaType === "video") {
+              mediaHtml = `
+                <div class="announcement-media">
+                  <video controls>
+                    <source src="${post.mediaUrl}">
+                  </video>
+                </div>
+              `;
+            } else if (post.mediaType === "file") {
+              mediaHtml = `
+                <div class="announcement-media">
+                  <a href="${post.mediaUrl}" target="_blank">Download ${post.fileName || "file"}</a>
+                </div>
+              `;
+            } else {
+              mediaHtml = `
+                <div class="announcement-media">
+                  <a href="${post.mediaUrl}" target="_blank">View attachment</a>
+                </div>
+              `;
+            }
+          }
+
+          div.innerHTML = `
+            <div class="announcement-top">
+              <div class="announcement-title">School Announcement</div>
+              <div class="announcement-time">${createdTime}</div>
+            </div>
+            <div class="announcement-body">${post.text || ""}</div>
+            ${mediaHtml}
+          `;
+
+          wrap.appendChild(div);
+        });
+      } catch (error) {
+        console.log(error);
+        wrap.innerHTML = `<div class="empty-state">Error loading announcements.</div>`;
+      }
+    }
+
+      window.addEventListener("load", () => {
+      const preloader = document.getElementById("preloader");
+      if (!preloader) return;
+
+      setTimeout(() => {
+        preloader.classList.add("hide");
+        setTimeout(() => preloader.remove(), 500);
+      }, 700);
+    });
+
+    if (!teacher) {
+      window.location.href = "teacher-login.html";
+    } else {
+      const savedTheme = localStorage.getItem("teacherDashboardTheme");
+      if (savedTheme === "dark") {
+        document.body.classList.add("dark");
+      }
+      updateThemeButton();
+
+      loadAssignmentOptions();
+      loadComponentColumns();
+      setTeacherInfo();
+      loadSchoolBranding();
+      loadStudents();
+      loadTeacherPosts();
+    }
+  </script>
+  <script src="ai-widget.js"></script>
+  <script src="common.js"></script>
+</body>
+</html>
+
