@@ -677,6 +677,7 @@
       }
     }
   </style>
+  <script src="js/config.js"></script>
 </head>
 
 <body>
@@ -923,7 +924,7 @@ function fillStudentInfo() {
 async function loadSchoolBranding() {
   try {
     const response = await fetch(
-      "http://localhost:3000/school-lookup?schoolId=" + encodeURIComponent(student.schoolId)
+      window.API_BASE + "/school-lookup?schoolId=" + encodeURIComponent(student.schoolId)
     );
 
     if (!response.ok) return;
@@ -952,7 +953,7 @@ async function loadStudentPosts() {
 
   try {
     const response = await fetch(
-      "http://localhost:3000/posts/" +
+      window.API_BASE + "/posts/" +
       encodeURIComponent(student.schoolId) +
       "?audience=students"
     );
@@ -1009,7 +1010,7 @@ async function loadStudentResultCardStatus() {
 
   try {
     const response = await fetch(
-      "http://localhost:3000/student-result/" +
+      window.API_BASE + "/student-result/" +
       encodeURIComponent(student.studentId) +
       "?session=" + encodeURIComponent(session) +
       "&term=" + encodeURIComponent(term)

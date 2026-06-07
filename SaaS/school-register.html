@@ -298,6 +298,7 @@
       }
     }
   </style>
+  <script src="js/config.js"></script>
 </head>
 <body><div id="preloader">
     <div class="loader-wrap">
@@ -402,7 +403,7 @@
       }
 
       try {
-        const response = await fetch("http://localhost:3000/school-register", {
+        const response = await fetch(window.API_BASE + "/school-register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

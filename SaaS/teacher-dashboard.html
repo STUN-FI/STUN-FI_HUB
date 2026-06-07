@@ -798,6 +798,7 @@
       }
     }
   </style>
+  <script src="js/config.js"></script>
 </head>
 <body>
   <div id="preloader">
@@ -1110,7 +1111,7 @@ function setTeacherInfo() {
     async function loadSchoolBranding() {
       try {
         const response = await fetch(
-          "http://localhost:3000/school-lookup?schoolId=" + encodeURIComponent(teacher.schoolId)
+          window.API_BASE + "/school-lookup?schoolId=" + encodeURIComponent(teacher.schoolId)
         );
 
         if (!response.ok) return;
@@ -1223,7 +1224,7 @@ function setTeacherInfo() {
 
   try {
     const studentRes = await fetch(
-      "http://localhost:3000/students-by-assignment?schoolId=" +
+      window.API_BASE + "/students-by-assignment?schoolId=" +
       encodeURIComponent(teacher.schoolId) +
       "&className=" +
       encodeURIComponent(teacherClass) +
@@ -1245,7 +1246,7 @@ function setTeacherInfo() {
 
     try {
       const draftRes = await fetch(
-        "http://localhost:3000/teacher-score-sheet?teacherId=" +
+        window.API_BASE + "/teacher-score-sheet?teacherId=" +
         encodeURIComponent(teacher.teacherId) +
         "&schoolId=" +
         encodeURIComponent(teacher.schoolId) +
@@ -1395,7 +1396,7 @@ function setTeacherInfo() {
         for (const student of students) {
           const components = collectComponents(student.studentId);
 
-          await fetch("http://localhost:3000/teacher-save-draft", {
+          await fetch(window.API_BASE + "/teacher-save-draft", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -1450,7 +1451,7 @@ function setTeacherInfo() {
         for (const student of students) {
           const components = collectComponents(student.studentId);
 
-          await fetch("http://localhost:3000/teacher-submit-score", {
+          await fetch(window.API_BASE + "/teacher-submit-score", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -1483,7 +1484,7 @@ function setTeacherInfo() {
 
       try {
         const response = await fetch(
-          "http://localhost:3000/posts/" +
+          window.API_BASE + "/posts/" +
           encodeURIComponent(teacher.schoolId) +
           "?audience=teachers"
         );

@@ -1,5 +1,5 @@
 (function(){
-  const API = 'http://localhost:3000';
+  const API = window.API_BASE;
   const student = JSON.parse(localStorage.getItem('student') || 'null');
   if(!student || !student.studentId || !student.schoolId){ window.location.href = 'student-login.html'; }
 

@@ -326,6 +326,7 @@
       }
     }
   </style>
+  <script src="js/config.js"></script>
 </head>
 <body>
   <div id="preloader">
@@ -444,7 +445,7 @@
 
       try {
         const response = await fetch(
-          "http://localhost:3000/school-lookup?email=" + encodeURIComponent(email)
+          window.API_BASE + "/school-lookup?email=" + encodeURIComponent(email)
         );
 
         if (!response.ok) {
@@ -480,7 +481,7 @@
       }
 
       try {
-        const response = await fetch("http://localhost:3000/login", {
+        const response = await fetch(window.API_BASE + "/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password })

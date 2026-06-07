@@ -179,6 +179,7 @@
       }
     }
   </style>
+  <script src="js/config.js"></script>
 </head>
 <body>
   <div id="preloader">
@@ -289,7 +290,7 @@
 
     try {
       const response = await fetch(
-        "http://localhost:3000/school-lookup?schoolId=" + encodeURIComponent(schoolId)
+        window.API_BASE + "/school-lookup?schoolId=" + encodeURIComponent(schoolId)
       );
 
       if (!response.ok) {
@@ -327,7 +328,7 @@
 
     try {
       const response = await fetch(
-        "http://localhost:3000/result/" +
+        window.API_BASE + "/result/" +
           encodeURIComponent(schoolId) +
           "/" +
           encodeURIComponent(regNumber)

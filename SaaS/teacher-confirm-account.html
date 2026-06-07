@@ -336,6 +336,7 @@
       }
     }
   </style>
+  <script src="js/config.js"></script>
 </head>
 <body>
 
@@ -445,7 +446,7 @@
       }
 
       try {
-        const response = await fetch("http://localhost:3000/teacher-check-record", {
+        const response = await fetch(window.API_BASE + "/teacher-check-record", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -518,7 +519,7 @@
       }
 
       try {
-        const response = await fetch("http://localhost:3000/teacher-confirm-account", {
+        const response = await fetch(window.API_BASE + "/teacher-confirm-account", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

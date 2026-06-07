@@ -331,6 +331,7 @@
       }
     }
   </style>
+  <script src="js/config.js"></script>
 </head>
 <body>
   <div id="preloader">
@@ -438,7 +439,7 @@
       if (!val) return resetBrand();
 
       try {
-        const response = await fetch(`http://localhost:3000/school-lookup?email=${encodeURIComponent(val)}`);
+        const response = await fetch(window.API_BASE + `/school-lookup?email=${encodeURIComponent(val)}`);
         const data = await response.json();
         if (response.ok && data) applyBrand(data);
         else resetBrand();
@@ -497,7 +498,7 @@
       }
 
       try {
-        const response = await fetch("http://localhost:3000/student-check-record", {
+        const response = await fetch(window.API_BASE + "/student-check-record", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -578,7 +579,7 @@
       }
 
       try {
-        const response = await fetch("http://localhost:3000/student-confirm-admission", {
+        const response = await fetch(window.API_BASE + "/student-confirm-admission", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
