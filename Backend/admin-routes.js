@@ -74,12 +74,16 @@ const SupportTicket = mongoose.model("SupportTicket", supportTicketSchema);
 const PlatformAnalytics = mongoose.model("PlatformAnalytics", platformAnalyticsSchema);
 
 module.exports = function registerAdminRoutes(app, { School, Student, Teacher, Result, Subscription, Post }) {
+  console.log("[adminRoutes] Starting to register admin routes");
+  console.log("[adminRoutes] App type:", typeof app, "Has get method:", typeof app.get);
 
   // =======================
   // PLATFORM OVERVIEW STATS
   // =======================
 
+  console.log("[adminRoutes] Registering /admin/platform-overview route");
   app.get("/admin/platform-overview", async (req, res) => {
+    console.log("GET /admin/platform-overview called");
     try {
       const totalSchools = await School.countDocuments();
       const activeSchools = await School.countDocuments({ accountStatus: "active" });
@@ -119,7 +123,9 @@ module.exports = function registerAdminRoutes(app, { School, Student, Teacher, R
   // SCHOOLS MANAGEMENT
   // =======================
 
+  console.log("[adminRoutes] Registering /admin/schools route");
   app.get("/admin/schools", async (req, res) => {
+    console.log("[adminRoutes] GET /admin/schools called");
     try {
       const search = req.query.search || "";
       const statusFilter = req.query.status || "";

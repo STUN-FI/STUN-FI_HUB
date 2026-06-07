@@ -278,6 +278,75 @@
     justify-content: flex-end;
   }
 
+  .notification-btn {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--line);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+
+  .notification-btn ion-icon {
+    font-size: 22px;
+    color: var(--text);
+  }
+
+  .clickable-plan {
+    cursor: pointer;
+    color: var(--accent);
+  }
+
+  .clickable-plan:hover {
+    text-decoration: underline;
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--danger);
+    color: white;
+    font-size: 12px;
+    font-weight: 900;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+  }
+
+  .notifications-list {
+    display: grid;
+    gap: 12px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .notification-item {
+    background: var(--card-2);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+  }
+
+  .notification-item-content p {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .notification-item-content small {
+    color: var(--muted);
+  }
+
   .sidebar-toggle {
     width: 52px;
     height: 52px;
@@ -288,6 +357,18 @@
     display: grid;
     place-items: center;
     flex-shrink: 0;
+  }
+
+  .plan-pill {
+    background: rgba(102, 204, 204, 0.12);
+    color: var(--accent);
+    border: 1px solid rgba(102, 204, 204, 0.35);
+    box-shadow: var(--shadow);
+    padding: 12px 16px;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 700;
   }
 
   .school-pill {
@@ -368,6 +449,13 @@
     grid-template-columns: minmax(320px, 0.8fr) minmax(0, 1.2fr);
     gap: 22px;
     align-items: start;
+  }
+
+  #studentsTab .grid > .card:first-child {
+    position: sticky;
+    top: 108px;
+    align-self: start;
+    z-index: 1;
   }
 
   .card {
@@ -1090,10 +1178,24 @@
     .topbar-actions {
       width: 100%;
       display: grid;
-      grid-template-columns: 52px 1fr;
+      grid-template-columns: 52px 48px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+    }
+
+    .topbar-actions .plan-pill {
+      min-width: 0;
+      width: auto;
+      display: inline-flex;
+      justify-content: center;
+      text-align: center;
+      padding: 12px 16px;
     }
 
     .topbar-actions .school-pill {
+      min-width: 0;
+      width: 100%;
+      grid-column: 1 / -1;
       text-align: center;
     }
 
@@ -1469,7 +1571,27 @@
 
       <div class="topbar-actions">
         <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()"><ion-icon name="menu-outline"></ion-icon></button>
+        <button class="notification-btn" id="notificationButton" onclick="openNotificationsModal()" type="button" aria-label="View notifications">
+          <ion-icon name="notifications-outline"></ion-icon>
+          <span class="notification-badge" id="notificationBadge"></span>
+        </button>
+        <div class="plan-pill clickable-plan" id="headerPlanName" onclick="openUpgradeModal()" role="button" aria-label="Open subscription plans">Plan: TRIAL</div>
         <div class="school-pill" id="schoolInfo">School ID: --</div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="notificationsModal">
+      <div class="modal">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
+          <div>
+            <h3>Notifications</h3>
+            <p style="margin:4px 0 0; color:var(--muted);">Recent messages from the admin.</p>
+          </div>
+          <button class="secondary-btn" onclick="closeNotificationsModal()"><ion-icon name="close-outline"></ion-icon></button>
+        </div>
+        <div class="notifications-list" id="notificationsList">
+          <div class="empty-state">Loading notifications...</div>
+        </div>
       </div>
     </div>
 
@@ -1718,7 +1840,7 @@
 
           <div class="form-group">
             <label>Plan Name</label>
-            <p style="margin: 0; font-weight: 600;" id="subscriptionPlanName">--</p>
+            <p style="margin: 0; font-weight: 600;" id="subscriptionPlanName" onclick="openUpgradeModal()" class="clickable-plan">--</p>
           </div>
 
           <div class="form-group">
@@ -1812,16 +1934,95 @@ let currentSessionHistory = [];
 let currentActiveSession = "";
 let resultStatusMap = {};
 let paymentStatusMap = {};
+let notifications = [];
 
 if (!school || !currentSchoolId) {
   window.location.href = "login.html";
 }
 
-   let currentAssignTeacherId = "";
+let currentAssignTeacherId = "";
 
 function openAssignModal(teacherId) {
   currentAssignTeacherId = teacherId;
   document.getElementById("assignModal").classList.add("active");
+}
+
+async function loadNotifications() {
+  if (!currentSchoolId) return;
+
+  try {
+    const response = await fetch(`http://localhost:3000/admin/school/${encodeURIComponent(currentSchoolId)}/notifications`);
+    const data = await response.json();
+
+    if (data?.success) {
+      notifications = data.data || [];
+    } else {
+      notifications = [];
+    }
+  } catch (error) {
+    console.error("Unable to load notifications", error);
+    notifications = [];
+  }
+
+  renderNotificationBadge();
+  renderNotificationsList();
+}
+
+function renderNotificationBadge() {
+  const badge = document.getElementById("notificationBadge");
+  if (!badge) return;
+
+  const count = notifications.length;
+  if (count > 0) {
+    badge.innerText = count > 9 ? "9+" : count;
+    badge.style.display = "inline-flex";
+  } else {
+    badge.style.display = "none";
+  }
+}
+
+function openNotificationsModal() {
+  document.getElementById("notificationsModal").classList.add("active");
+  loadNotifications();
+}
+
+function closeNotificationsModal() {
+  document.getElementById("notificationsModal").classList.remove("active");
+}
+
+function renderNotificationsList() {
+  const list = document.getElementById("notificationsList");
+  if (!list) return;
+
+  if (!notifications.length) {
+    list.innerHTML = `<div class="empty-state">No notifications yet.</div>`;
+    return;
+  }
+
+  list.innerHTML = notifications
+    .map((item) => {
+      const action = item.action || "Admin notification";
+      const created = item.createdAt ? new Date(item.createdAt).toLocaleString() : "Unknown time";
+      return `
+        <div class="notification-item">
+          <div class="notification-item-content">
+            <p>${escapeHtml(action)}</p>
+            <small>${escapeHtml(created)}</small>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
 }
 
 function closeAssignModal() {
@@ -4273,7 +4474,10 @@ async function loadSubscription() {
     }
     
     statusEl.innerHTML = `<p style="margin: 0; color: ${badgeColor}; font-weight: 600; font-size: 0.95rem;">${statusLabel}</p>`;
-    planNameEl.innerText = (sub?.planName || "trial").toUpperCase();
+    const planNameText = (sub?.planName || "trial").toUpperCase();
+    planNameEl.innerText = planNameText;
+    const headerPlanEl = document.getElementById("headerPlanName");
+    if (headerPlanEl) headerPlanEl.innerText = `Plan: ${planNameText}`;
     countEl.innerText = `${current} / ${limit === Infinity ? "∞" : limit} students`;
     progressEl.style.width = percentage + "%";
     statusTextEl.innerText = statusLabel;
@@ -4315,6 +4519,7 @@ async function init() {
   await loadSessionHistory();
   await loadStudents();
   await loadTeachers();
+  await loadNotifications();
   renderActivities();
   loadPosts("students");
 }

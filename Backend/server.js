@@ -12,6 +12,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const registerAiRoutes = require("./ai-routes");
+const registerAdminRoutes = require("./admin-routes");
 const app = express();
 
 app.use(express.static(path.join(__dirname, "../SaaS")));
@@ -793,23 +794,15 @@ const Result = mongoose.model("Result", resultSchema);
 const Subscription = mongoose.model("Subscription", subscriptionSchema);
 
 /* =========================
-   SUBSCRIPTION HELPERS
+   REGISTER ADMIN ROUTES
 ========================= */
 
-async function createTrialSubscription(schoolId) {
-  const trialEndDate = new Date();
-  trialEndDate.setDate(trialEndDate.getDate() + 30); // 30-day trial
-  
-  return await Subscription.create({
-    schoolId,
-    planName: "trial",
-    status: "trial",
-    studentLimit: 300,
-    startDate: new Date(),
-    endDate: trialEndDate,
-    amountPaid: 0
-  });
-}
+registerAdminRoutes(app, { School, Student, Teacher, Result, Subscription, Post });
+console.log("[server] Admin routes registered");
+
+/* =========================
+   SUBSCRIPTION HELPERS
+========================= */
 
 async function getSchoolSubscription(schoolId) {
   return await Subscription.findOne({ schoolId });
@@ -3641,10 +3634,6 @@ app.get("/subscription-status/:schoolId", async (req, res) => {
    SERVER
 ========================= */
 
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
-});
-
 app.get("/verify-session", verifyToken, (req, res) => {
   res.json({
     message: "Session is valid",
@@ -3696,4 +3685,11 @@ app.post("/process-promotions", async (req, res) => {
     console.log(error);
     res.status(500).json({ message: "Error processing promotions" });
   }
+});
+/* =========================
+   START SERVER
+========================= */
+
+app.listen(3000, () => {
+  console.log('Server running on http://localhost:3000');
 });
