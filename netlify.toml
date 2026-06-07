@@ -1,0 +1,4 @@
+[build]
+  base    = "SaaS"
+  publish = "SaaS"
+  command = ""
