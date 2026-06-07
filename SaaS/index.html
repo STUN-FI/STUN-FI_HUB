@@ -138,6 +138,7 @@
     }
 
     .hero {
+      position: relative;
       max-width: 1280px;
       width: 100%;
       margin: 0 auto;
@@ -146,6 +147,54 @@
       grid-template-columns: 1.15fr 0.85fr;
       gap: 26px;
       align-items: center;
+      overflow: hidden;
+    }
+
+    .hero-copy,
+    .hero-card {
+      position: relative;
+      z-index: 1;
+    }
+
+    .roles-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.68;
+    }
+
+    .roles-bg svg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: translateY(18px);
+      animation: floatBg 8.2s ease-in-out infinite;
+    }
+
+    @keyframes floatBg {
+      0%, 100% {
+        transform: translateY(18px) translateX(0);
+      }
+      25% {
+        transform: translateY(8px) translateX(-8px);
+      }
+      50% {
+        transform: translateY(-8px) translateX(0);
+      }
+      75% {
+        transform: translateY(8px) translateX(8px);
+      }
+    }
+
+    .roles-section {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .roles-section > * {
+      position: relative;
+      z-index: 1;
     }
 
     .hero-copy h2 {
@@ -180,6 +229,29 @@
     .hero-card h3 {
       margin: 0 0 10px;
       font-size: 1.2rem;
+    }
+
+    .hero-graphic {
+      width: 100%;
+      max-width: 260px;
+      margin: 0 auto 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .hero-graphic svg {
+      filter: drop-shadow(0 0 20px rgba(62,199,255,0.35)) drop-shadow(0 0 28px rgba(124,77,255,0.25));
+      animation: glowPulse 3.4s ease-in-out infinite;
+      border-radius: 26px;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% {
+        filter: drop-shadow(0 0 16px rgba(62,199,255,0.28)) drop-shadow(0 0 24px rgba(124,77,255,0.18));
+      }
+      50% {
+        filter: drop-shadow(0 0 30px rgba(62,199,255,0.45)) drop-shadow(0 0 40px rgba(124,77,255,0.3));
+      }
     }
 
     .hero-card p {
@@ -531,6 +603,24 @@
       </div>
 
       <div class="hero-card">
+        <div class="hero-graphic">
+          <svg width="260" height="260" viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#3EC7FF" />
+                <stop offset="100%" stop-color="#7C4DFF" />
+              </linearGradient>
+            </defs>
+            <circle cx="130" cy="130" r="112" fill="url(#brandGrad)" opacity="0.16" />
+            <circle cx="130" cy="130" r="86" fill="#0D172B" />
+            <path d="M82 138L130 100L178 138V178H82V138Z" fill="#fff" />
+            <path d="M110 178V146H150V178H110Z" fill="#7C4DFF" />
+            <circle cx="42" cy="56" r="12" fill="#3EC7FF" opacity="0.9" />
+            <circle cx="218" cy="52" r="10" fill="#7C4DFF" opacity="0.9" />
+            <circle cx="54" cy="208" r="8" fill="#82E9FF" opacity="0.9" />
+            <circle cx="206" cy="206" r="6" fill="#A67CFF" opacity="0.9" />
+          </svg>
+        </div>
         <h3>How the platform flows</h3>
         <p>
           Each user type starts from the correct entry point so authentication and dashboard access stay clean and secure.
@@ -554,6 +644,22 @@
     </section>
 
     <section class="roles-section" id="rolesSection">
+      <div class="roles-bg">
+        <svg viewBox="0 0 1200 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="rolesGlow" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#3EC7FF" stop-opacity="0.18" />
+              <stop offset="100%" stop-color="#7C4DFF" stop-opacity="0.12" />
+            </linearGradient>
+          </defs>
+          <path d="M0 160C160 70 320 220 520 165C720 110 860 40 1020 90C1180 145 1200 260 1200 260H0V160Z" fill="url(#rolesGlow)" />
+          <circle cx="140" cy="180" r="10" fill="#3EC7FF" opacity="0.9" />
+          <circle cx="380" cy="120" r="8" fill="#7C4DFF" opacity="0.85" />
+          <circle cx="610" cy="170" r="12" fill="#82E9FF" opacity="0.85" />
+          <circle cx="820" cy="100" r="14" fill="#A67CFF" opacity="0.85" />
+          <circle cx="1040" cy="150" r="10" fill="#3EC7FF" opacity="0.9" />
+        </svg>
+      </div>
       <div class="section-head">
         <div>
           <h3>Choose your access path</h3>
@@ -601,6 +707,7 @@
 
   <div class="modal-overlay" id="loginModal">
     <div class="modal">
+      <div class="modal-content">
       <div class="modal-head">
         <h3>Select Login Role</h3>
         <button class="close-btn" onclick="closeLoginModal()"><ion-icon name="close-outline"></ion-icon></button>
@@ -634,11 +741,13 @@
           </div>
         </div>
       </div>
+      </div>
     </div>
   </div>
 
   <div class="modal-overlay" id="aiModal">
     <div class="modal">
+      <div class="modal-content">
       <div class="modal-head">
         <h3>Ask the AI (Gemini)</h3>
         <button class="close-btn" onclick="closeAiModal()"><ion-icon name="close-outline"></ion-icon></button>
@@ -657,16 +766,17 @@
 
         <div class="hero-card" id="aiResponse" style="min-height:120px;white-space:pre-wrap;">AI responses will appear here.</div>
       </div>
+      </div>
     </div>
   </div>
 
   <script>
     function openLoginModal() {
-      document.getElementById("loginModal").classList.add("active");
+      openModal("loginModal");
     }
 
     function closeLoginModal() {
-      document.getElementById("loginModal").classList.remove("active");
+      closeModal("loginModal");
     }
 
     function scrollToRoles() {
@@ -692,12 +802,12 @@
 
     // AI modal handlers
     function openAiModal(){
-      document.getElementById('aiModal').classList.add('active');
+      openModal('aiModal');
       document.getElementById('aiPrompt').focus();
     }
 
     function closeAiModal(){
-      document.getElementById('aiModal').classList.remove('active');
+      closeModal('aiModal');
     }
 
     async function sendAi(){

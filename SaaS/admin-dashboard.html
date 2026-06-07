@@ -47,6 +47,27 @@
       margin-bottom: 22px;
     }
 
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      padding: 14px 18px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.08);
+      padding: 8px;
+      flex-shrink: 0;
+    }
+
     .brand h2 {
       margin: 0 0 6px;
       font-size: 2rem;
@@ -61,31 +82,73 @@
 
     .preloader-logo,
     .school-logo {
-      max-width: 160px;
-      width: auto;
-      height: auto;
-      display: block;
-      margin: 0 auto;
+      width: 120px;
+      max-width: 100%;
+      margin-bottom: 18px;
+      animation: pulseLogo 1.4s ease-in-out infinite;
     }
 
-    .top-actions {
+    #preloader {
+      position: fixed;
+      inset: 0;
+      background: #081224;
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
       align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    #preloader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-wrap {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .spinner {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.15);
+      border-top: 4px solid var(--accent);
+      animation: spin 0.9s linear infinite;
+    }
+
+    .loader-wrap p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 15px;
+      letter-spacing: 0.3px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulseLogo {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.92;
+      }
+      50% {
+        transform: scale(1.06);
+        opacity: 1;
+      }
     }
 
     .collapse-btn {
+      background: transparent;
       border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.06);
       color: var(--text);
-      padding: 12px 16px;
-      border-radius: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+      box-shadow: none;
     }
 
     .collapse-btn:hover {
@@ -784,14 +847,17 @@
     <div class="loader-wrap">
       <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo" class="preloader-logo">
       <!-- <div class="spinner"></div> -->
-      <!-- <p>Loading admin portal...</p> -->
+      <!-- <p>Loading portal...</p> -->
     </div>
   </div>
 
   <div class="topbar">
     <div class="brand">
-      <h2 id="welcomeTitle">Super Admin Dashboard</h2>
-      <p>Manage schools, subscriptions, analytics, support and platform health from one unified portal.</p>
+      <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo" class="brand-logo">
+      <div>
+        <h2 id="welcomeTitle">Super Admin Dashboard</h2>
+        <p>Manage schools, subscriptions, analytics, support and platform health from one unified portal.</p>
+      </div>
     </div>
 
     <div class="top-actions">
@@ -924,6 +990,7 @@
 
   <div class="modal-backdrop" id="schoolModalBackdrop" onclick="closeSchoolModal()"></div>
   <div class="modal" id="schoolModal">
+    <div class="modal-content">
     <div class="modal-header">
       <div>
         <h3 class="modal-title" id="detailName">School details</h3>
@@ -1078,7 +1145,7 @@
         </div>
       </div>
     </div>
-  </div>
+    </div>
 
   <script>
     const adminName = localStorage.getItem("adminName") || "Super Admin";
@@ -1606,6 +1673,10 @@
       window.location.href = "admin-login.html";
     }
 
+    async function loadEverything() {
+      await Promise.all([loadPlatformOverview(), loadPlatformAnalytics(), loadSchools(), loadActivityLog()]);
+    }
+
     window.addEventListener("load", async () => {
       if (isAdmin !== "true") {
         window.location.href = "admin-login.html";
@@ -1619,10 +1690,6 @@
         setTimeout(() => preloader.remove(), 400);
       }, 600);
     });
-
-    async function loadEverything() {
-      await Promise.all([loadPlatformOverview(), loadPlatformAnalytics(), loadSchools(), loadActivityLog()]);
-    }
   </script>
 
   <script src="ai-widget.js"></script>

@@ -799,11 +799,13 @@
 
   <div class="modal-overlay" id="submitModal">
     <div class="modal">
+      <div class="modal-content">
       <h3>Submit Scores</h3>
       <p>Are you sure you want to submit these scores to the school dashboard? After submission, the school admin will review them before assigning results to students.</p>
       <div class="modal-actions">
         <button class="submit-btn" onclick="confirmSubmitScores()">Yes, Submit</button>
         <button class="danger-btn" onclick="closeSubmitModal()">Cancel</button>
+      </div>
       </div>
     </div>
   </div>
@@ -1406,11 +1408,11 @@ function setTeacherInfo() {
     }
 
     function openSubmitModal() {
-      document.getElementById("submitModal").classList.add("active");
+      openModal("submitModal");
     }
 
     function closeSubmitModal() {
-      document.getElementById("submitModal").classList.remove("active");
+      closeModal("submitModal");
     }
 
     async function confirmSubmitScores() {
