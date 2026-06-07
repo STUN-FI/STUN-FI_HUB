@@ -10,3 +10,4 @@ uploads/
 dist/
 build/
 Backend/Credentials/
+Backend/Credentials/*.json
