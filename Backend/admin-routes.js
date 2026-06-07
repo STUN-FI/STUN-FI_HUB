@@ -43,6 +43,7 @@ const supportTicketSchema = new mongoose.Schema(
     type: { type: String, enum: ["notification", "password_reset", "impersonation", "suspension", "activation"] },
     status: { type: String, enum: ["pending", "completed", "failed"], default: "pending" },
     action: String, // description of action taken
+    read: { type: Boolean, default: false },
     impersonationToken: String,
     impersonationExpiry: Date,
     createdAt: { type: Date, default: Date.now, index: true },
@@ -241,15 +242,31 @@ module.exports = function registerAdminRoutes(app, { School, Student, Teacher, R
       res.json({
         success: true,
         data: notifications.map((ticket) => ({
+          _id: ticket._id,
           action: ticket.action || "Admin notification",
           status: ticket.status,
           adminEmail: ticket.adminEmail,
+          read: ticket.read || false,
           createdAt: ticket.createdAt
         }))
       });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "Error fetching admin notifications", error: error.message });
+    }
+  });
+
+  app.post("/admin/school/:schoolId/mark-notifications-read", async (req, res) => {
+    try {
+      const { schoolId } = req.params;
+      await SupportTicket.updateMany(
+        { schoolId, type: "notification" },
+        { read: true }
+      );
+      res.json({ success: true, message: "Notifications marked as read" });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Error marking notifications as read", error: error.message });
     }
   });
 

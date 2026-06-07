@@ -252,7 +252,7 @@
 
     .toolbar {
       display: grid;
-      grid-template-columns: 1fr 1fr auto;
+      grid-template-columns: 1fr 1fr auto auto;
       gap: 12px;
       margin-bottom: 16px;
       align-items: end;
@@ -284,8 +284,84 @@
     }
 
     .toolbar button.print-btn {
-      width: 100%;
-      display: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      font-size: 15px;
+      border-radius: 12px;
+      box-shadow: 0 10px 26px rgba(16,24,40,0.08);
+      background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+      color: white;
+      font-weight: 800;
+      border: none;
+      min-width: 180px;
+      justify-content: center;
+    }
+
+    .toolbar button.print-btn svg {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+      opacity: 0.95;
+    }
+
+    .print-logo {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      display: block;
+      border-radius: 8px;
+      background: white;
+      padding: 6px;
+    }
+
+    .print-header-top {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .print-btn[disabled] {
+      opacity: 0.56;
+      filter: grayscale(0.06);
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .print-btn-top {
+      display: inline-grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--text);
+      margin-left: 8px;
+      cursor: pointer;
+    }
+
+    .print-btn-top ion-icon {
+      font-size: 20px;
+    }
+
+    .print-btn-top[disabled] {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .print-title h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0.6px;
+    }
+
+    .print-accent {
+      height: 6px;
+      background: var(--accent);
+      border-radius: 4px;
+      margin: 12px 0;
     }
 
     select {
@@ -311,6 +387,21 @@
       border: 1px solid var(--line);
       background: var(--card-2);
       margin-bottom: 14px;
+    }
+
+    .promotion-decision {
+      border-radius: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      box-shadow: 0 12px 30px rgba(2,6,23,0.06);
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    body.dark .promotion-decision {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-color: rgba(255,255,255,0.06);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
     }
 
     .status-box h4 {
@@ -389,6 +480,18 @@
       background: var(--card-2);
       color: var(--muted);
       font-size: 13px;
+    }
+
+    /* Ensure table borders and headings follow theme variables (fix dark mode) */
+    .result-table-wrap th,
+    .result-table-wrap td {
+      border-color: var(--line);
+      color: var(--text);
+    }
+
+    body.dark .result-table-wrap th {
+      background: var(--card-2);
+      color: var(--text);
     }
 
     .component-chip {
@@ -613,6 +716,7 @@
       body {
         background: white;
         color: #111;
+        font-family: Georgia, 'Times New Roman', serif;
       }
 
       .sidebar,
@@ -652,6 +756,24 @@
 
       .print-header {
         display: block !important;
+        padding: 18px 12px !important;
+        border-radius: 0 !important;
+      }
+
+      .print-header .print-header-grid,
+      .print-header .print-header-top {
+        display: flex !important;
+        gap: 12px !important;
+        align-items: center !important;
+      }
+
+      .print-header .print-title h1,
+      .print-header .print-header-grid h3 {
+        font-size: 22px !important;
+        margin: 0 !important;
+      }
+
+      .print-accent { display:block !important; }
       }
 
       .result-summary {
@@ -669,12 +791,14 @@
 
       .result-table-wrap th,
       .result-table-wrap td {
-        border: 1px solid var(--accent);
-        padding: 10px;
+        border: 1px solid #222;
+        padding: 12px 14px;
       }
 
       .result-table-wrap th {
-        background: rgba(102, 204, 204, 0.15);
+        background: transparent;
+        color: #111;
+        font-weight: 700;
       }
 
       .pill {
@@ -683,6 +807,16 @@
 
       .no-print {
         display: none !important;
+      }
+      /* make summary items feel premium on print */
+      .result-summary .summary-item {
+        background: transparent !important;
+        border: none !important;
+        padding: 6px 0 !important;
+      }
+
+      .result-summary .summary-item p {
+        font-size: 18px !important;
       }
     }
   </style>
@@ -738,6 +872,9 @@
         <div class="topbar-actions">
           <button class="sidebar-toggle" onclick="toggleSidebar()"><ion-icon name="menu-outline"></ion-icon></button>
           <div class="pill" id="schoolInfo">School ID: --</div>
+          <button class="print-btn-top no-print" disabled onclick="printResultAsPDF()" aria-label="Print Result Top">
+            <ion-icon name="print-outline"></ion-icon>
+          </button>
         </div>
       </div>
 
@@ -762,7 +899,14 @@
           </div>
 
           <button class="primary-btn" onclick="loadResultAccess()">Check Result</button>
-          <button class="secondary-btn no-print print-btn" onclick="printResultAsPDF()">Print Result</button>
+          <button class="print-btn no-print" disabled onclick="printResultAsPDF()" aria-label="Print Result">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M6 9V3h12v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6 14H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="6" y="15" width="12" height="6" rx="1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Print
+          </button>
         </div>
 
         <div id="resultStatusArea"></div>
@@ -821,25 +965,21 @@
       const studentName = currentResultData?.student?.name || student.name || "Student";
       const printedAt = new Date().toLocaleString();
 
+      const logoSrc = currentSchoolData?.logo || 'img/WHITE PNG STUNFI.png';
       header.innerHTML = `
-        <div class="print-header-grid">
-          <div>
-            <h3>${schoolName}</h3>
-            <p>School ID: ${student.schoolId || "--"}</p>
+        <div class="print-header-top">
+          <img src="${logoSrc}" alt="School Logo" class="print-logo" />
+          <div class="print-title">
+            <h1>${schoolName}</h1>
+            <p style="margin:4px 0 0 0;color:var(--muted);">School ID: ${student.schoolId || "--"}</p>
           </div>
-          <div>
-            <p><strong>Student:</strong> ${studentName}</p>
-            <p><strong>Class:</strong> ${classText || "--"}</p>
-          </div>
-          <div>
-            <p><strong>Session:</strong> ${currentResultSession || document.getElementById("sessionSelect")?.value || "--"}</p>
-            <p><strong>Term:</strong> ${currentResultTerm || document.getElementById("termSelect")?.value || "--"}</p>
-          </div>
-          <div>
-            <p><strong>Printed:</strong> ${printedAt}</p>
-            <p><strong>Accent:</strong> ${getComputedStyle(document.documentElement).getPropertyValue("--accent").trim()}</p>
+          <div style="margin-left:auto;text-align:right;color:var(--muted);">
+            <p style="margin:0"><strong>Student:</strong> ${studentName}</p>
+            <p style="margin:4px 0 0 0"><strong>Class:</strong> ${classText || "--"}</p>
+            <p style="margin:8px 0 0 0"><strong>Printed:</strong> ${printedAt}</p>
           </div>
         </div>
+        <div class="print-accent"></div>
       `;
       header.style.display = "block";
     }
@@ -856,12 +996,19 @@
 
     function showPrintButton() {
       const btn = document.querySelector('.print-btn');
-      if (btn) btn.style.display = 'inline-flex';
+      const top = document.querySelector('.print-btn-top');
+      if (btn) {
+        btn.disabled = false;
+        btn.style.display = 'inline-flex';
+      }
+      if (top) top.disabled = false;
     }
 
     function hidePrintButton() {
       const btn = document.querySelector('.print-btn');
-      if (btn) btn.style.display = 'none';
+      const top = document.querySelector('.print-btn-top');
+      if (btn) btn.disabled = true;
+      if (top) top.disabled = true;
     }
 
     function adjustColor(hex, amount) {
@@ -1014,11 +1161,11 @@
         : null;
 
       return `
-        <div class="status-box" style="border-color:#cbd5e1;background:#f8fafc;">
+        <div class="promotion-decision status-box">
           <h4>Promotion Decision</h4>
           <p style="margin:0">${suggestedLine ? 'Suggested: ' + suggestedLine : ''}</p>
           <p style="margin:8px 0 0 0;font-weight:700">${finalLine}</p>
-          <p style="margin-top:8px;color:#6b7280;">Term: ${promotion?.term || term} • Session: ${promotion?.session || document.getElementById('sessionSelect')?.value || ''}</p>
+          <p style="margin-top:8px;color:var(--muted);">Term: ${promotion?.term || term} • Session: ${promotion?.session || document.getElementById('sessionSelect')?.value || ''}</p>
         </div>
       `;
     }

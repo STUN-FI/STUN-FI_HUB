@@ -60,6 +60,13 @@
       background: rgba(8,18,36,0.82);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: padding 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .nav.shrink {
+      padding: 10px 18px;
+      background: rgba(8,18,36,0.94);
+      border-bottom-color: rgba(255,255,255,0.1);
     }
 
     .brand {
@@ -76,18 +83,39 @@
       border-radius: 14px;
       background: rgba(255,255,255,0.04);
       padding: 6px;
+      transition: width 180ms ease, height 180ms ease, padding 180ms ease;
+    }
+
+    .nav.shrink .brand img {
+      width: 44px;
+      height: 44px;
+      padding: 4px;
     }
 
     .brand-text h1 {
       margin: 0;
       font-size: 1.2rem;
       line-height: 1.1;
+      transition: font-size 180ms ease;
+    }
+
+    .nav.shrink .brand-text h1 {
+      font-size: 1rem;
     }
 
     .brand-text p {
       margin: 4px 0 0;
       color: var(--muted);
       font-size: 13px;
+      transition: opacity 180ms ease;
+    }
+
+    .nav.shrink .brand-text p {
+      opacity: 0;
+      visibility: hidden;
+      height: 0;
+      margin: 0;
+      overflow: hidden;
     }
 
     .nav-actions {
@@ -405,6 +433,20 @@
       border-radius: 24px;
       padding: 22px;
       box-shadow: 0 18px 50px rgba(0,0,0,0.4);
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.48);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 100;
+      overflow-y: auto;
     }
 
     .modal-head {
@@ -562,6 +604,120 @@
         font-size: 1.05rem;
       }
     }
+
+    /* Improved small-screen header layout */
+    @media (max-width: 520px) {
+      .nav {
+        padding: 10px 14px;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .nav.shrink {
+        padding: 8px 10px;
+      }
+
+      /* Limit brand width so actions can fit on the first row when possible */
+      .brand {
+        min-width: 0;
+        max-width: 60%;
+        width: auto;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        flex-wrap: nowrap;
+      }
+
+      .brand-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 0;
+      }
+
+      /* Hide the subtitle to save vertical space */
+      .brand-text p {
+        display: none;
+      }
+
+      /* Make action buttons smaller and allow them to wrap nicely */
+      .nav-actions {
+        display: flex;
+        gap: 8px;
+        margin-left: auto;
+        flex-wrap: nowrap;
+        width: auto;
+        justify-content: flex-end;
+        align-items: center;
+      }
+
+      .nav-btn, .primary-btn, .secondary-btn {
+        padding: 6px 8px;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        white-space: nowrap;
+      }
+
+      .modal {
+        max-width: 100%;
+        min-width: 0;
+        border-radius: 18px;
+        padding: 16px;
+      }
+
+      .modal-overlay {
+        padding: 10px;
+      }
+
+      .modal-head {
+        gap: 10px;
+      }
+
+      .modal-head h3 {
+        font-size: 1.2rem;
+      }
+
+      .close-btn {
+        width: 38px;
+        height: 38px;
+      }
+
+      .login-option {
+        padding: 14px;
+      }
+
+      .login-grid {
+        gap: 12px;
+      }
+
+      /* Ensure the brand title truncates instead of pushing layout */
+      .brand-text h1 {
+        font-size: 1.06rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: font-size 180ms ease;
+      }
+
+      .nav.shrink .brand-text h1 {
+        font-size: 0.98rem;
+      }
+
+      .brand img {
+        width: 46px;
+        height: 46px;
+      }
+
+      .nav.shrink .brand img {
+        width: 40px;
+        height: 40px;
+      }
+      /* Hide the Explore Roles button to keep header on one line */
+      .explore-btn { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -574,7 +730,7 @@
   </div>
   <div class="page">
     <nav class="nav">
-      <div class="brand">
+      <div class="brand" id="homepageBrand">
         <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo">
         <div class="brand-text">
           <h1>STUN-FI HUB</h1>
@@ -583,7 +739,7 @@
       </div>
 
       <div class="nav-actions">
-        <button class="secondary-btn" onclick="scrollToRoles()">Explore Roles</button>
+        <button class="secondary-btn explore-btn" onclick="scrollToRoles()">Explore Roles</button>
         <button class="secondary-btn" id="aiBtn" onclick="openAiModal()">Ask AI</button>
         <button class="nav-btn" onclick="openLoginModal()">Login</button>
       </div>
@@ -782,6 +938,21 @@
     function scrollToRoles() {
       document.getElementById("rolesSection").scrollIntoView({ behavior: "smooth" });
     }
+
+    function updateHeaderShrink() {
+      const nav = document.querySelector('.nav');
+      if (!nav) return;
+      const threshold = 1;
+      if (window.scrollY > threshold) {
+        nav.classList.add('shrink');
+      } else {
+        nav.classList.remove('shrink');
+      }
+    }
+
+    window.addEventListener('scroll', updateHeaderShrink, { passive: true });
+    window.addEventListener('load', updateHeaderShrink);
+    window.addEventListener('resize', updateHeaderShrink);
 
     window.addEventListener("load", () => {
       const preloader = document.getElementById("preloader");

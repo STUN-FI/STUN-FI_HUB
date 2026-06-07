@@ -240,17 +240,21 @@
   .main {
     height: 100vh;
     overflow-y: auto;
-    padding: 26px;
+    padding: 0 26px 26px;
     min-width: 0;
   }
 
   .topbar {
     position: sticky;
     top: 0;
-    z-index: 20;
-    background: linear-gradient(to bottom, var(--bg) 75%, transparent);
-    padding-bottom: 18px;
-    margin-bottom: 8px;
+    z-index: 30;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(102, 204, 204, 0.18);
+    border-radius: 32px;
+    box-shadow: 0 32px 80px rgba(15, 23, 42, 0.08);
+    padding: 30px 32px;
+    margin: 0 0 24px;
     display: flex;
     justify-content: space-between;
     gap: 18px;
@@ -258,16 +262,26 @@
     flex-wrap: wrap;
   }
 
+  body.dark .topbar {
+    background: rgba(17, 24, 39, 0.92);
+    border-color: rgba(56, 189, 248, 0.12);
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.22);
+  }
+
   .topbar h2 {
     margin: 0;
-    font-size: clamp(1.65rem, 3vw, 2.35rem);
-    line-height: 1.1;
+    font-size: clamp(1.85rem, 3vw, 2.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-weight: 900;
   }
 
   .topbar p {
-    margin: 8px 0 0;
+    margin: 12px 0 0;
     color: var(--muted);
-    line-height: 1.45;
+    line-height: 1.55;
+    max-width: 560px;
+    font-size: 1rem;
   }
 
   .topbar-actions {
@@ -501,6 +515,83 @@
     border-color: var(--line);
   }
 
+  body.dark .btn-edit {
+    background: #1f2937;
+    color: #e5e7eb;
+    border-color: #374151;
+  }
+
+  body.dark .btn-edit:hover {
+    background: #374151;
+    border-color: #4b5563;
+  }
+
+  body.dark .btn-view {
+    background: #0c4a6e;
+    color: #e0f2fe;
+    border-color: #0369a1;
+  }
+
+  body.dark .btn-view:hover {
+    background: #0369a1;
+    border-color: #0284c7;
+  }
+
+  body.dark .btn-unlock {
+    background: rgba(102, 204, 204, 0.2);
+    color: #a5f3fc;
+    border-color: rgba(102, 204, 204, 0.4);
+  }
+
+  body.dark .btn-unlock:hover {
+    background: rgba(102, 204, 204, 0.3);
+    border-color: rgba(102, 204, 204, 0.6);
+  }
+
+  body.dark .btn-lock {
+    background: #78350f;
+    color: #fcd34d;
+    border-color: #b45309;
+  }
+
+  body.dark .btn-lock:hover {
+    background: #b45309;
+    border-color: #d97706;
+  }
+
+  body.dark .btn-subjects {
+    background: #4c1d95;
+    color: #e9d5ff;
+    border-color: #6d28d9;
+  }
+
+  body.dark .btn-subjects:hover {
+    background: #6d28d9;
+    border-color: #7c3aed;
+  }
+
+  body.dark .btn-paid {
+    background: #1b4332;
+    color: #dcfce7;
+    border-color: #2d6a4f;
+  }
+
+  body.dark .btn-paid:hover {
+    background: #2d6a4f;
+    border-color: #40916c;
+  }
+
+  body.dark .btn-unpaid {
+    background: #5f2120;
+    color: #fecaca;
+    border-color: #7f1d1d;
+  }
+
+  body.dark .btn-unpaid:hover {
+    background: #7f1d1d;
+    border-color: #991b1b;
+  }
+
   textarea {
     resize: vertical;
     min-height: 90px;
@@ -557,54 +648,150 @@
 
   ul.data-list li,
   ul.item-list li {
-    background: var(--card-2);
+    background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 14px;
+    border-radius: 22px;
+    padding: 22px;
+    transition: all 0.25s ease;
+  }
+
+  ul.data-list li:hover,
+  ul.item-list li:hover {
+    border-color: rgba(102, 204, 204, 0.35);
+    box-shadow: 0 8px 32px rgba(102, 204, 204, 0.08);
   }
 
   .item-row {
     display: grid;
-    grid-template-columns: 52px minmax(0, 1fr);
-    gap: 12px;
+    grid-template-columns: 62px minmax(0, 1fr);
+    gap: 18px;
     align-items: start;
   }
 
   .avatar {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
+    width: 62px;
+    height: 62px;
+    border-radius: 16px;
     display: grid;
     place-items: center;
     color: white;
     font-weight: 900;
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent), #54b8b8);
     flex-shrink: 0;
+    font-size: 20px;
   }
 
   .item-title {
     font-weight: 900;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     font-size: 16px;
     color: var(--text);
+    letter-spacing: -0.02em;
   }
 
   .item-meta {
     color: var(--muted);
-    font-size: 14px;
-    line-height: 1.6;
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 14px;
   }
 
   .item-actions {
-    margin-top: 10px;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 10px;
   }
 
   .mini-btn {
-    padding: 9px 12px;
-    font-size: 13px;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+  }
+
+  .mini-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .btn-edit {
+    background: #f3f4f6;
+    color: #374151;
+    border-color: #e5e7eb;
+  }
+
+  .btn-edit:hover {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+  }
+
+  .btn-view {
+    background: #dbeafe;
+    color: #1e40af;
+    border-color: #bfdbfe;
+  }
+
+  .btn-view:hover {
+    background: #bfdbfe;
+    border-color: #93c5fd;
+  }
+
+  .btn-unlock {
+    background: rgba(102, 204, 204, 0.15);
+    color: var(--accent);
+    border-color: rgba(102, 204, 204, 0.3);
+  }
+
+  .btn-unlock:hover {
+    background: rgba(102, 204, 204, 0.25);
+    border-color: rgba(102, 204, 204, 0.5);
+  }
+
+  .btn-lock {
+    background: #fed7aa;
+    color: #92400e;
+    border-color: #fbcf8f;
+  }
+
+  .btn-lock:hover {
+    background: #fbcf8f;
+    border-color: #f59e0b;
+  }
+
+  .btn-subjects {
+    background: #ede9fe;
+    color: #6d28d9;
+    border-color: #ddd6fe;
+  }
+
+  .btn-subjects:hover {
+    background: #ddd6fe;
+    border-color: #c4b5fd;
+  }
+
+  .btn-paid {
+    background: #dcfce7;
+    color: #166534;
+    border-color: #bbf7d0;
+  }
+
+  .btn-paid:hover {
+    background: #bbf7d0;
+    border-color: #86efac;
+  }
+
+  .btn-unpaid {
+    background: #fee2e2;
+    color: #7f1d1d;
+    border-color: #fecaca;
+  }
+
+  .btn-unpaid:hover {
+    background: #fecaca;
+    border-color: #fca5a5;
   }
 
   .assign-btn {
@@ -690,16 +877,38 @@
     border: 1px dashed var(--line);
   }
 
-  .activity-item,
-  .score-card,
-  .post-card,
-  .score-summary-item {
-    background: var(--card-2);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 14px;
-    margin-bottom: 10px;
+  .score-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
   }
+
+  .score-summary-item h5 {
+    margin: 0 0 6px 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .score-summary-item p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  @media (max-width: 1050px) {
+    .score-summary-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 700px) {
+    .score-summary-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
 
   .activity-title {
     font-weight: 900;
@@ -798,14 +1007,59 @@
     min-height: 20px;
   }
 
+  .post-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px;
+    transition: all 0.25s ease;
+  }
+
+  .post-card:hover {
+    border-color: rgba(102, 204, 204, 0.35);
+    box-shadow: 0 8px 24px rgba(102, 204, 204, 0.08);
+  }
+
+  .post-card strong {
+    display: inline-block;
+    background: rgba(102, 204, 204, 0.15);
+    color: var(--accent);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+
+  .post-card p {
+    line-height: 1.6;
+    color: var(--text);
+  }
+
   .post-card small {
     color: var(--muted);
+    font-size: 12px;
   }
 
   .post-card a {
     color: var(--accent);
     text-decoration: none;
     font-weight: 900;
+    transition: all 0.2s ease;
+  }
+
+  .post-card a:hover {
+    text-decoration: underline;
+  }
+
+  body.dark .post-card {
+    background: var(--card);
+    border-color: var(--line);
+  }
+
+  body.dark .post-card:hover {
+    border-color: rgba(102, 204, 204, 0.35);
+    box-shadow: 0 8px 24px rgba(102, 204, 204, 0.12);
   }
 
   .post-media-preview {
@@ -1101,13 +1355,18 @@
     }
 
   @media (max-width: 1050px) {
+    body {
+      overflow: auto;
+    }
+
     .layout {
       grid-template-columns: 1fr;
-      height: 100vh;
+      height: auto;
     }
 
     .layout.closed {
       grid-template-columns: 1fr;
+      height: auto;
     }
 
     .sidebar {
@@ -1134,8 +1393,17 @@
 
     .main {
       padding: 18px;
-      height: 100vh;
-      overflow-y: auto;
+      height: auto;
+      overflow-y: visible;
+    }
+
+    .scroll-card-body,
+    .scroll-card-body.tall,
+    .scroll-card-body.short {
+      max-height: none !important;
+      min-height: 0 !important;
+      height: auto !important;
+      overflow: visible !important;
     }
 
     .stats,
@@ -1205,13 +1473,87 @@
     }
 
     .score-toolbar,
-    .score-summary-grid,
-    .modal-actions {
+    .score-summary-grid {
       grid-template-columns: 1fr;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .modal-actions button {
       width: 100%;
+      min-width: unset;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+    }
+
+    .score-summary-item h5 {
+      font-size: 0.8rem;
+    }
+
+    .score-summary-item p {
+      font-size: 0.9rem;
+    }
+
+    #scoreModalPromotionArea {
+      padding: 10px !important;
+    }
+
+    #scoreModalPromotionArea label {
+      font-size: 0.9rem;
+    }
+
+    #scoreModalPromotionArea select,
+    #scoreModalPromotionArea input {
+      font-size: 0.9rem;
+      padding: 8px !important;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .modal {
+      max-width: 100% !important;
+      margin: 0 10px;
+    }
+
+    .modal-content {
+      padding: 12px !important;
+    }
+
+    .modal-content h3 {
+      font-size: 1.15rem;
+      margin-bottom: 10px;
+    }
+
+    #scoreModalSummary {
+      padding: 10px !important;
+      margin-bottom: 10px !important;
+    }
+
+    #scoreModalBody {
+      max-height: calc(100vh - 300px);
+      overflow-y: auto;
+    }
+
+    .score-toolbar {
+      gap: 8px !important;
+    }
+
+    .score-toolbar select {
+      font-size: 0.9rem;
+      padding: 8px !important;
+    }
+
+    .modal-actions {
+      gap: 6px;
+    }
+
+    .modal-actions button {
+      padding: 10px 8px;
+      font-size: 0.85rem;
     }
   }
 
@@ -1613,7 +1955,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
           <div>
             <h3>Notifications</h3>
-            <p style="margin:4px 0 0; color:var(--muted);">Recent messages from the admin.</p>
+            <p style="margin:4px 0 0; color:var(--muted);">Recent messages.</p>
           </div>
           <button class="secondary-btn" onclick="closeNotificationsModal()"><ion-icon name="close-outline"></ion-icon></button>
         </div>
@@ -1964,6 +2306,7 @@ let currentActiveSession = "";
 let resultStatusMap = {};
 let paymentStatusMap = {};
 let notifications = [];
+let notificationsViewed = false;
 
 if (!school || !currentSchoolId) {
   window.location.href = "login.html";
@@ -1984,7 +2327,10 @@ async function loadNotifications() {
     const data = await response.json();
 
     if (data?.success) {
-      notifications = data.data || [];
+      notifications = (data.data || []).map((item) => ({
+        ...item,
+        read: item.read || notificationsViewed
+      }));
     } else {
       notifications = [];
     }
@@ -2001,7 +2347,7 @@ function renderNotificationBadge() {
   const badge = document.getElementById("notificationBadge");
   if (!badge) return;
 
-  const count = notifications.length;
+  const count = notifications.filter((item) => !item.read).length;
   if (count > 0) {
     badge.innerText = count > 9 ? "9+" : count;
     badge.style.display = "inline-flex";
@@ -2010,7 +2356,21 @@ function renderNotificationBadge() {
   }
 }
 
-function openNotificationsModal() {
+async function openNotificationsModal() {
+  notificationsViewed = true;
+  
+  // Mark all notifications as read on the server
+  try {
+    await fetch(`http://localhost:3000/admin/school/${currentSchoolId}/mark-notifications-read`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+  } catch (err) {
+    console.log("Error marking notifications as read:", err);
+  }
+  
+  notifications = notifications.map((item) => ({ ...item, read: true }));
+  renderNotificationBadge();
   openModal("notificationsModal");
   loadNotifications();
 }
@@ -2512,6 +2872,25 @@ async function loadStudents() {
 function selectStudentGroup(key) {
   selectedStudentGroup = key;
   renderStudents();
+
+  const studentSection = document.getElementById("studentSectionContent");
+  const studentToggle = document.getElementById("studentSectionToggle");
+
+  if (studentSection) {
+    if (studentToggle && studentToggle.classList.contains("collapsed")) {
+      studentToggle.classList.remove("collapsed");
+      studentSection.style.display = "block";
+    }
+
+    const groupKey = encodeURIComponent(key);
+    const selectedGroup = document.querySelector(`#studentList .class-group[data-group-key="${groupKey}"]`);
+
+    if (selectedGroup) {
+      selectedGroup.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      studentSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
 }
 
 function clearSelectedStudentGroup() {
@@ -2623,6 +3002,7 @@ function renderStudents() {
     const group = grouped[groupKey];
     const header = document.createElement("li");
     header.className = "class-group";
+    header.dataset.groupKey = encodeURIComponent(groupKey);
     header.innerHTML = `
       <div class="class-group-header">
         <div>
@@ -2650,14 +3030,13 @@ function renderStudents() {
             ${getResultStatusBadge(student.studentId)}
             ${getPaymentBadge(student.studentId)}
             <div class="item-actions">
-              <button class="mini-btn" onclick="openStudentEdit('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}', '${(student.className || "").replace(/'/g, "\\'")}', '${(student.arm || "").replace(/'/g, "\\'")}')">Edit</button>
-              <button class="mini-btn" onclick="openScoreModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Scores</button>
-              <button class="mini-btn assign-btn" onclick="quickAssignResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Assign Result</button>
-              <button class="mini-btn" style="background:var(--accent);color:white;" onclick="quickUnlockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Unlock Result</button>
-              <button class="mini-btn" style="background:#f59e0b;color:white;" onclick="quickLockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Lock Again</button>
-              <button class="mini-btn mini-danger" onclick="openStudentDelete('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}')">Delete</button>
-              <button class="mini-btn" style="background:#8b5cf6;color:white;" onclick="openSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Assign Subjects</button>
-              <button class="mini-btn" style="background:var(--accent);color:white;" onclick="openViewSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Subjects</button>
+              <button class="mini-btn btn-edit" onclick="openStudentEdit('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}', '${(student.className || "").replace(/'/g, "\\'")}', '${(student.arm || "").replace(/'/g, "\\'")}')">Edit</button>
+              <button class="mini-btn btn-view" onclick="openScoreModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Scores</button>
+              <button class="mini-btn btn-unlock" onclick="quickUnlockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Unlock</button>
+              <button class="mini-btn btn-lock" onclick="quickLockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Lock</button>
+              <button class="mini-btn btn-subjects" onclick="openSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Assign Subj</button>
+              <button class="mini-btn btn-view" onclick="openViewSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Subj</button>
+              <button class="mini-btn btn-unpaid" onclick="openStudentDelete('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}')">Delete</button>
             </div>
           </div>
         </div>
@@ -3026,38 +3405,10 @@ function renderTeachers() {
           </div>
 
           <div class="item-actions">
-
-            <button class="mini-btn assign-btn"
-              onclick="openAssignModal('${teacher.teacherId}')">
-              Add Assignment
-            </button>
-
-            <button class="mini-btn"
-              onclick="openTeacherEdit(
-                '${teacher.teacherId}',
-                '${teacher.name.replace(/'/g, "\\'")}',
-                '${(teacher.email || "").replace(/'/g, "\\'")}',
-                '',
-                '',
-                ''
-              )">
-              Edit
-            </button>
-
-            <button
-              onclick="
-              viewTeacherSubjects(
-              '${teacher.teacherId}'
-              )
-              ">
-              View Subjects
-            </button>
-
-            <button class="mini-btn mini-danger"
-              onclick="openTeacherDelete('${teacher.teacherId}', '${teacher.name.replace(/'/g, "\\'")}')">
-              Delete
-            </button>
-
+            <button class="mini-btn btn-subjects" onclick="openAssignModal('${teacher.teacherId}')">Add Assignment</button>
+            <button class="mini-btn btn-edit" onclick="openTeacherEdit('${teacher.teacherId}', '${teacher.name.replace(/'/g, "\\'")}', '${(teacher.email || "").replace(/'/g, "\\'")}', '', '', '')">Edit</button>
+            <button class="mini-btn btn-view" onclick="viewTeacherSubjects('${teacher.teacherId}')">View Subjects</button>
+            <button class="mini-btn btn-unpaid" onclick="openTeacherDelete('${teacher.teacherId}', '${teacher.name.replace(/'/g, "\\'")}')">Delete</button>
           </div>
         </div>
       </div>
@@ -3924,12 +4275,12 @@ async function loadPosts(audience) {
 
       div.innerHTML = `
         <strong>${post.audience.toUpperCase()}</strong>
-        <p style="margin:8px 0;">${post.text || ""}</p>
+        <p style="margin:12px 0;">${post.text || ""}</p>
         ${mediaHtml}
-        <br>
-        <small>${new Date(post.createdAt).toLocaleString()}</small>
-        <br><br>
-        <button class="danger-btn" onclick="deletePost('${post.postId}', '${audience}')">Delete</button>
+        <div style="margin-top:12px; margin-bottom:8px;">
+          <small>${new Date(post.createdAt).toLocaleString()}</small>
+        </div>
+        <button class="mini-btn btn-unpaid" onclick="deletePost('${post.postId}', '${audience}')">Delete Post</button>
       `;
       
       container.appendChild(div);

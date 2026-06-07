@@ -88,6 +88,17 @@ select:focus {
   animation: fadeIn 260ms ease;
 }
 
+/* Ensure toasts sit above modal overlays and preloader */
+.toast-wrap {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 200000 !important;
+  display: grid;
+  gap: 10px;
+  max-width: 380px;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

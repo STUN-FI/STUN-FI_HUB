@@ -244,19 +244,32 @@
       position: sticky;
       top: 0;
       z-index: 20;
-      background: var(--bg);
-      padding-bottom: 14px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(102, 204, 204, 0.18);
+      border-radius: 28px;
+      box-shadow: 0 30px 75px rgba(15, 23, 42, 0.08);
+      padding: 28px 30px;
+    }
+
+    body.dark .topbar {
+      background: rgba(17, 24, 39, 0.92);
+      border-color: rgba(56, 189, 248, 0.12);
+      box-shadow: 0 30px 75px rgba(0, 0, 0, 0.22);
     }
 
     .topbar h2 {
       margin: 0 0 4px;
       font-size: 2rem;
       line-height: 1.15;
+      letter-spacing: -0.03em;
+      font-weight: 900;
     }
 
     .topbar p {
       margin: 0;
       color: var(--muted);
+      line-height: 1.55;
     }
 
     .topbar-actions {
