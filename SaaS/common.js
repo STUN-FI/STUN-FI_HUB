@@ -1,24 +1,3 @@
-window.CONFIG = window.CONFIG || {};
-window.CONFIG.API_BASE_URL = window.CONFIG.API_BASE_URL || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:3000'
-  : 'https://stun-fi-backend.onrender.com');
-window.API_BASE = window.API_BASE || window.CONFIG.API_BASE_URL;
-
-(function patchFetchToProductionAPI() {
-  const OLD_LOCAL_URL = 'http://localhost:3000';
-  const originalFetch = window.fetch.bind(window);
-
-  window.fetch = function(resource, init) {
-    if (typeof resource === 'string' && resource.startsWith(OLD_LOCAL_URL) && !window.location.hostname.startsWith('localhost') && !window.location.hostname.startsWith('127.0.0.1')) {
-      resource = window.API_BASE + resource.slice(OLD_LOCAL_URL.length);
-    } else if (resource instanceof Request && resource.url.startsWith(OLD_LOCAL_URL) && !window.location.hostname.startsWith('localhost') && !window.location.hostname.startsWith('127.0.0.1')) {
-      resource = new Request(window.API_BASE + resource.url.slice(OLD_LOCAL_URL.length), resource);
-    }
-
-    return originalFetch(resource, init);
-  };
-})();
-
 function openModal(id) {
   const overlay = document.getElementById(id);
   if (!overlay) return;

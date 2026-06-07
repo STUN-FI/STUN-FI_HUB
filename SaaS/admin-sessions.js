@@ -1,7 +1,5 @@
 (function(){
-  const API = window.CONFIG?.API_BASE_URL || window.API_BASE || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:3000'
-    : 'https://stun-fi-backend.onrender.com');
+  const API = 'http://localhost:3000';
 
   function el(id){ return document.getElementById(id); }
 
