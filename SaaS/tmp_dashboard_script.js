@@ -7,6 +7,7 @@ if (!token) {
 
 const school = JSON.parse(localStorage.getItem("school") || "null");
 const currentSchoolId = school?.schoolId || school?.id || "";
+const API_BASE = (window.CONFIG && window.CONFIG.API_BASE_URL) || 'http://localhost:5000';
 let students = [];
 let currentViewSubjectStudentId = "";
 let currentSubjectStudentId = "";
@@ -48,7 +49,7 @@ async function addAssignment() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/add-teacher-assignment", {
+    const response = await fetch(API_BASE + '/add-teacher-assignment', {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -308,7 +309,7 @@ function applySchoolProfile(profile) {
 async function loadSchoolProfile() {
   try {
     const response = await fetch(
-      "http://localhost:3000/school-profile/" + encodeURIComponent(currentSchoolId),
+      API_BASE + '/school-profile/' + encodeURIComponent(currentSchoolId),
       {
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("token")
@@ -346,7 +347,7 @@ async function saveSchoolProfile() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/update-school-profile", {
+    const response = await fetch(API_BASE + '/update-school-profile', {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -395,7 +396,7 @@ async function addStudent() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/add-student", {
+    const response = await fetch(API_BASE + '/add-student', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -435,7 +436,7 @@ async function loadStudents() {
 
   try {
     const response = await fetch(
-      "http://localhost:3000/school/" + encodeURIComponent(currentSchoolId),
+      API_BASE + '/school/' + encodeURIComponent(currentSchoolId),
       {
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("token")
@@ -755,7 +756,7 @@ async function quickAssignClassResults(className, arm) {
 
   for (const student of groupStudents) {
     try {
-      const response = await fetch("http://localhost:3000/assign-student-result", {
+      const response = await fetch(API_BASE + '/assign-student-result', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -832,7 +833,7 @@ async function loadStudentSubjects() {
 
   try {
     const response = await fetch(
-      "http://localhost:3000/student-subjects/" +
+      API_BASE + '/student-subjects/' +
       encodeURIComponent(currentViewSubjectStudentId) +
       "?schoolId=" +
       encodeURIComponent(currentSchoolId) +
@@ -878,7 +879,7 @@ async function deleteStudentSubject(subject) {
   if (!confirm("Remove " + subject + " from this student?")) return;
 
   try {
-    const response = await fetch("http://localhost:3000/delete-student-subject", {
+    const response = await fetch(API_BASE + '/delete-student-subject', {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json"
@@ -920,7 +921,7 @@ async function saveStudentSubjects() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/assign-subjects-to-student", {
+    const response = await fetch(API_BASE + '/assign-subjects-to-student', {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -960,7 +961,7 @@ async function saveStudentEdit() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/edit-student", {
+    const response = await fetch(API_BASE + '/edit-student', {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -999,7 +1000,7 @@ async function loadPaymentStatuses() {
     students.map(async (student) => {
       try {
         const response = await fetch(
-          "http://localhost:3000/student-payment-status/" +
+          API_BASE + '/student-payment-status/' +
           encodeURIComponent(student.studentId) +
           "?schoolId=" + encodeURIComponent(currentSchoolId) +
           "&session=" + encodeURIComponent(session) +
@@ -1062,7 +1063,7 @@ function closeStudentDelete() {
 
 async function confirmStudentDelete() {
   try {
-    const response = await fetch("http://localhost:3000/delete-student", {
+    const response = await fetch(API_BASE + '/delete-student', {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1098,7 +1099,7 @@ async function addTeacher() {
 
   try {
     const response = await fetch(
-      "http://localhost:3000/add-teacher",
+      API_BASE + '/add-teacher',
       {
         method: "POST",
         headers: {
@@ -1137,7 +1138,7 @@ async function addTeacher() {
 
 async function loadTeachers() {
   try {
-    const response = await fetch("http://localhost:3000/teachers/" + encodeURIComponent(currentSchoolId));
+    const response = await fetch(API_BASE + '/teachers/' + encodeURIComponent(currentSchoolId));
     const data = await response.json();
     if (!response.ok) return;
 
@@ -1295,7 +1296,7 @@ async function saveTeacherEdit() {
 
     const response =
       await fetch(
-        "http://localhost:3000/edit-teacher",
+        API_BASE + '/edit-teacher',
         {
           method: "PUT",
 
@@ -1357,7 +1358,7 @@ function closeTeacherDelete() {
 
 async function confirmTeacherDelete() {
   try {
-    const response = await fetch("http://localhost:3000/delete-teacher", {
+    const response = await fetch(API_BASE + '/delete-teacher', {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ teacherId: deletingTeacherId })
@@ -1426,7 +1427,7 @@ async function refreshScoreModal() {
 
   try {
     const response = await fetch(
-      "http://localhost:3000/school-student-scores/" +
+      API_BASE + '/school-student-scores/' +
       encodeURIComponent(currentScoreStudent.studentId) +
       "?schoolId=" + encodeURIComponent(currentSchoolId) +
       "&session=" + encodeURIComponent(session) +
@@ -1518,7 +1519,7 @@ async function assignCurrentStudentResult() {
   assignBtn.style.opacity = "0.65";
 
   try {
-    const response = await fetch("http://localhost:3000/assign-student-result", {
+    const response = await fetch(API_BASE + '/assign-student-result', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1561,7 +1562,7 @@ async function quickAssignResult(studentId, studentName) {
   if (!proceed) return;
 
   try {
-    const response = await fetch("http://localhost:3000/assign-student-result", {
+    const response = await fetch(API_BASE + '/assign-student-result', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1613,7 +1614,7 @@ async function uploadPostFile() {
     output.style.color = "inherit";
     output.innerText = "Uploading file...";
 
-    const response = await fetch("http://localhost:3000/upload-post-media", {
+    const response = await fetch(API_BASE + '/upload-post-media', {
       method: "POST",
       body: formData
     });
@@ -1658,7 +1659,7 @@ async function createPost() {
   }
 
   try {
-    const res = await fetch("http://localhost:3000/create-post", {
+    const res = await fetch(API_BASE + '/create-post', {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -1704,7 +1705,7 @@ async function loadPosts(audience) {
 
   try {
     const res = await fetch(
-      `http://localhost:3000/posts/${currentSchoolId}?audience=${audience}`
+      `${API_BASE}/posts/${currentSchoolId}?audience=${audience}`
     );
 
     const posts = await res.json();
@@ -1779,7 +1780,7 @@ async function deletePost(postId, audience) {
   if (!confirm("Delete this post?")) return;
 
   try {
-    const res = await fetch("http://localhost:3000/delete-post", {
+    const res = await fetch(API_BASE + '/delete-post', {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json"
@@ -1827,7 +1828,7 @@ async function uploadPostFile() {
     output.style.color = "inherit";
     output.innerText = "Uploading file...";
     
-    const response = await fetch("http://localhost:3000/upload-post-media", {
+    const response = await fetch(API_BASE + '/upload-post-media', {
       method: "POST",
       body: formData
     });
@@ -1872,7 +1873,7 @@ async function createPost() {
   }
   
   try {
-    const res = await fetch("http://localhost:3000/create-post", {
+    const res = await fetch(API_BASE + '/create-post', {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -1920,7 +1921,7 @@ async function loadPosts(audience) {
 
   try {
     const res = await fetch(
-      `http://localhost:3000/posts/${currentSchoolId}?audience=${audience}`
+      `${API_BASE}/posts/${currentSchoolId}?audience=${audience}`
     );
 
     const posts = await res.json();
@@ -2008,7 +2009,7 @@ async function deletePost(postId, audience) {
   if (!confirm("Delete this post?")) return;
   
   try {
-    const res = await fetch("http://localhost:3000/delete-post", {
+    const res = await fetch(API_BASE + '/delete-post', {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json"
@@ -2049,7 +2050,7 @@ async function unlockCurrentStudentResult() {
   unlockBtn.style.opacity = "0.65";
 
   try {
-    const response = await fetch("http://localhost:3000/unlock-student-result", {
+    const response = await fetch(API_BASE + '/unlock-student-result', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -2092,7 +2093,7 @@ async function quickUnlockResult(studentId, studentName) {
   if (!proceed) return;
 
   try {
-    const response = await fetch("http://localhost:3000/unlock-student-result", {
+    const response = await fetch(API_BASE + '/unlock-student-result', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -2129,7 +2130,7 @@ async function loadResultStatuses() {
     students.map(async (student) => {
       try {
         const response = await fetch(
-          "http://localhost:3000/student-result-status/" +
+          API_BASE + '/student-result-status/' +
           encodeURIComponent(student.studentId) +
           "?schoolId=" + encodeURIComponent(currentSchoolId) +
           "&session=" + encodeURIComponent(session) +
@@ -2200,7 +2201,7 @@ async function lockCurrentStudentResult() {
   lockBtn.style.opacity = "0.65";
 
   try {
-    const response = await fetch("http://localhost:3000/lock-student-result", {
+    const response = await fetch(API_BASE + '/lock-student-result', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -2243,7 +2244,7 @@ async function quickLockResult(studentId, studentName) {
   if (!proceed) return;
 
   try {
-    const response = await fetch("http://localhost:3000/lock-student-result", {
+    const response = await fetch(API_BASE + '/lock-student-result', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -2281,7 +2282,7 @@ async function markStudentPaid(studentId, studentName) {
   if (!proceed) return;
 
   try {
-    const response = await fetch("http://localhost:3000/mark-result-paid", {
+    const response = await fetch(API_BASE + '/mark-result-paid', {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -2322,7 +2323,7 @@ async function markStudentUnpaid(studentId, studentName) {
   if (!proceed) return;
 
   try {
-    const response = await fetch("http://localhost:3000/mark-result-unpaid", {
+    const response = await fetch(API_BASE + '/mark-result-unpaid', {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -2410,7 +2411,7 @@ try{
 
 const response=
 await fetch(
-`http://localhost:3000/teacher-subjects/${teacherId}`
+`${API_BASE}/teacher-subjects/${teacherId}`
 );
 
 const data=
@@ -2520,7 +2521,7 @@ return;
 
 await fetch(
 
-`http://localhost:3000/teacher-subject/${viewingTeacher}`,
+`${API_BASE}/teacher-subject/${viewingTeacher}`,
 
 {
 

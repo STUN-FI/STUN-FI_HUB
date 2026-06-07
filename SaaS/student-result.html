@@ -9,6 +9,7 @@
 <link rel='stylesheet' href='styles.css'>
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+  <script src="js/config.js"></script>
 
   <style>
     :root {
@@ -1069,7 +1070,7 @@
     async function loadSchoolBranding() {
       try {
         const response = await fetch(
-          "http://localhost:3000/school-lookup?schoolId=" + encodeURIComponent(student.schoolId)
+          CONFIG.API_BASE_URL + '/school-lookup?schoolId=' + encodeURIComponent(student.schoolId)
         );
 
         if (!response.ok) return;
@@ -1244,7 +1245,7 @@
     async function loadPromotionForSession(session) {
       try {
         const response = await fetch(
-          "http://localhost:3000/student-promotion/" +
+          CONFIG.API_BASE_URL + '/student-promotion/' +
           encodeURIComponent(student.studentId) + "/" +
           encodeURIComponent(student.schoolId) + "/" +
           encodeURIComponent(session)
@@ -1287,7 +1288,7 @@
         const promotion = await loadPromotionForSession(session);
 
         const response = await fetch(
-          "http://localhost:3000/student-result/" +
+          CONFIG.API_BASE_URL + '/student-result/' +
           encodeURIComponent(student.studentId) +
           "?session=" + encodeURIComponent(session) +
           "&term=" + encodeURIComponent(term)
@@ -1308,7 +1309,7 @@
         // fetch promotion settings to compute suggestion
         let suggestion = null;
         try {
-          const settingsResp = await fetch("http://localhost:3000/promotion-settings/" + encodeURIComponent(student.schoolId) + "/" + encodeURIComponent(session));
+          const settingsResp = await fetch(CONFIG.API_BASE_URL + '/promotion-settings/' + encodeURIComponent(student.schoolId) + '/' + encodeURIComponent(session));
           if (settingsResp.ok) {
             const settings = await settingsResp.json();
             suggestion = computeSuggestedFromSettings(data.average, student.className, settings);
