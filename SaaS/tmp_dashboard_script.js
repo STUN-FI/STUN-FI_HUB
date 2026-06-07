@@ -7,7 +7,9 @@ if (!token) {
 
 const school = JSON.parse(localStorage.getItem("school") || "null");
 const currentSchoolId = school?.schoolId || school?.id || "";
-const API_BASE = (window.CONFIG && window.CONFIG.API_BASE_URL) || 'http://localhost:5000';
+const API_BASE = window.CONFIG?.API_BASE_URL || window.API_BASE || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:5000'
+  : 'https://stun-fi-backend.onrender.com');
 let students = [];
 let currentViewSubjectStudentId = "";
 let currentSubjectStudentId = "";
