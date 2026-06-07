@@ -1162,18 +1162,10 @@
       Enterprise: { limit: 2500, price: 4200 }
     };
 
-    const API_BASE = (() => {
-      if (window.location.protocol === "file:") {
-        return window.API_BASE;
-      }
-      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-        return window.location.port === "3000" ? "" : window.API_BASE;
-      }
-      return window.API_BASE;
-    })();
+    const API_BASE = window.API_BASE;
 
     function api(path) {
-      return `${API_BASE}${path}`;
+      return window.api(path);
     }
 
     function formatDate(value) {
