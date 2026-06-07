@@ -38,3 +38,50 @@ document.addEventListener('keydown', function (event) {
 // Expose helpers globally for existing inline scripts to call
 window.openModal = openModal;
 window.closeModal = closeModal;
+
+// Enforce uppercase for school id, student id, and registration inputs across forms
+(function enforceUppercaseInputs(){
+  const selector = [
+    'input[id*="schoolid" i]', 'input[name*="schoolid" i]',
+    'input[id*="studentid" i]', 'input[name*="studentid" i]',
+    'input[id*="regno" i]', 'input[name*="regno" i]',
+    'input[id*="reg-number" i]', 'input[name*="reg-number" i]',
+    'input[id*="regnumber" i]', 'input[name*="regnumber" i]',
+    'input[id*="registration" i]', 'input[name*="registration" i]',
+    'input[id*="reg" i]', 'input[name*="reg" i]'
+  ].join(',');
+
+  // Convert value to uppercase on input and blur; handle paste
+  document.addEventListener('input', (e) => {
+    const t = e.target;
+    if (!t || t.tagName !== 'INPUT') return;
+    try {
+      if (t.matches && t.matches(selector)) {
+        const pos = t.selectionStart;
+        t.value = t.value.toUpperCase();
+        if (typeof pos === 'number') t.setSelectionRange(pos, pos);
+      }
+    } catch (err) { /* ignore */ }
+  }, true);
+
+  document.addEventListener('paste', (e) => {
+    const t = e.target;
+    if (!t || t.tagName !== 'INPUT') return;
+    try {
+      if (t.matches && t.matches(selector)) {
+        // Allow paste then uppercase in next tick
+        setTimeout(() => t.value = (t.value || '').toUpperCase(), 0);
+      }
+    } catch (err) { }
+  }, true);
+
+  document.addEventListener('blur', (e) => {
+    const t = e.target;
+    if (!t || t.tagName !== 'INPUT') return;
+    try {
+      if (t.matches && t.matches(selector)) {
+        t.value = (t.value || '').toUpperCase();
+      }
+    } catch (err) { }
+  }, true);
+})();

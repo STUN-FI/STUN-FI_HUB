@@ -173,6 +173,17 @@ select:focus {
   opacity: 0;
   transform: translateY(6px);
   transition: opacity 240ms ease 80ms, transform 240ms ease 80ms;
+
+/* Force uppercase display for school/student/reg inputs across forms */
+input[id*="schoolid" i], input[name*="schoolid" i],
+input[id*="studentid" i], input[name*="studentid" i],
+input[id*="regno" i], input[name*="regno" i],
+input[id*="reg-number" i], input[name*="reg-number" i],
+input[id*="reg" i], input[name*="reg" i],
+input[id*="registration" i], input[name*="registration" i],
+input[id*="regnumber" i], input[name*="regnumber" i] {
+  text-transform: uppercase;
+}
 }
 .modal-overlay.active .modal .modal-content,
 .modal-overlay.active .modal-card .modal-content,
