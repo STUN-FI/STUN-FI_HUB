@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>Super Admin Dashboard</title>
+  <title>STUN-FI HUB | Super Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="img/Favicon.png" type="image/x-icon">
   <link rel='stylesheet' href='styles.css'>
@@ -72,6 +72,25 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .collapse-btn {
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    }
+
+    .collapse-btn:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-1px);
     }
 
     button,
@@ -107,8 +126,44 @@
       max-width: 1400px;
       margin: 0 auto 40px;
       display: grid;
-      grid-template-columns: 320px 1fr;
+      grid-template-columns: minmax(320px, 380px) 1fr;
       gap: 24px;
+      align-items: start;
+      transition: grid-template-columns 0.3s ease;
+    }
+
+    .layout.collapsed {
+      grid-template-columns: 0px 1fr;
+    }
+
+    .layout.collapsed aside {
+      width: 0;
+      max-width: 0;
+      overflow: hidden;
+    }
+
+    aside {
+      min-width: 0;
+      transition: width 0.3s ease, max-width 0.3s ease;
+    }
+
+    @media (min-width: 1121px) {
+      aside {
+        position: sticky;
+        top: 24px;
+        align-self: start;
+        max-height: calc(100vh) ;
+        overflow-y: auto;
+      }
+
+      aside::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      aside::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.12);
+        border-radius: 999px;
+      }
     }
 
     .card {
@@ -118,6 +173,11 @@
       backdrop-filter: blur(22px);
       padding: 24px;
       box-shadow: 0 20px 80px rgba(0, 0, 0, 0.18);
+      margin-bottom: 24px;
+    }
+
+    .card:last-child {
+      margin-bottom: 0;
     }
 
     .card h3 {
@@ -545,6 +605,28 @@
         grid-template-columns: 1fr;
       }
 
+      .layout.collapsed {
+        grid-template-columns: 1fr;
+      }
+
+      .layout.collapsed aside {
+        width: auto;
+        max-width: none;
+        overflow: visible;
+      }
+
+      .collapse-btn {
+        display: none;
+      }
+
+      .small-stat-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .school-top {
+        grid-template-columns: 1fr;
+      }
+
       .modal-grid {
         grid-template-columns: 1fr;
       }
@@ -564,7 +646,24 @@
 
     @media (max-width: 720px) {
       body {
-        padding: 14px;
+        padding: 12px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .top-actions {
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .top-actions button,
+      .top-actions .danger-btn {
+        flex: 1;
+        min-width: 0;
       }
 
       .topbar,
@@ -573,8 +672,109 @@
         padding: 18px;
       }
 
+      .layout {
+        gap: 18px;
+      }
+
+      .small-stat-grid,
+      .toolbar,
+      .modal-tabs,
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar input,
+      .toolbar select {
+        min-width: 0;
+      }
+
+      .school-top {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .school-logo {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+      }
+
+      .modal {
+        width: calc(100vw - 24px);
+      }
+
       .table-wrap table {
-        min-width: 720px;
+        min-width: auto;
+      }
+
+      th,
+      td {
+        padding: 12px 10px;
+      }
+
+      .table-actions button {
+        min-width: auto;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      .brand h2 {
+        font-size: 1.5rem;
+      }
+
+      .brand p {
+        font-size: 0.9rem;
+      }
+
+      .topbar {
+        gap: 10px;
+      }
+
+      .top-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .top-actions button,
+      .top-actions .danger-btn,
+      .mini-btn,
+      .pill-button {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .layout {
+        gap: 16px;
+      }
+
+      .modal {
+        width: calc(100vw - 16px);
+        padding: 16px;
+      }
+
+      .modal-header {
+        gap: 12px;
+      }
+
+      .modal-title {
+        font-size: 1.2rem;
+      }
+
+      .table-wrap table {
+        font-size: 0.88rem;
+      }
+
+      .table-wrap th,
+      .table-wrap td {
+        padding: 10px 8px;
       }
     }
   </style>
@@ -583,8 +783,8 @@
   <div id="preloader">
     <div class="loader-wrap">
       <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo" class="preloader-logo">
-      <div class="spinner"></div>
-      <p>Loading admin portal...</p>
+      <!-- <div class="spinner"></div> -->
+      <!-- <p>Loading admin portal...</p> -->
     </div>
   </div>
 
@@ -595,6 +795,7 @@
     </div>
 
     <div class="top-actions">
+      <button id="sidebarToggle" class="collapse-btn" onclick="toggleSidebar()"><ion-icon name="close-outline"></ion-icon> Hide sidebar</button>
       <button onclick="loadEverything()"><ion-icon name="refresh-outline"></ion-icon> Refresh</button>
       <button class="danger-btn" onclick="logout()"><ion-icon name="log-out-outline"></ion-icon> Logout</button>
     </div>
@@ -1092,6 +1293,16 @@
         `;
         tableBody.appendChild(row);
       });
+    }
+
+    function toggleSidebar() {
+      const layout = document.querySelector(".layout");
+      const toggleBtn = document.getElementById("sidebarToggle");
+      if (!layout || !toggleBtn) return;
+      const collapsed = layout.classList.toggle("collapsed");
+      toggleBtn.innerHTML = collapsed
+        ? '<ion-icon name="menu-outline"></ion-icon> Show sidebar'
+        : '<ion-icon name="close-outline"></ion-icon> Hide sidebar';
     }
 
     async function loadActivityLog() {
