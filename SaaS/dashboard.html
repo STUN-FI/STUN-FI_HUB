@@ -2705,6 +2705,13 @@ function applySchoolProfile(profile) {
 
 async function loadSchoolProfile() {
   try {
+    const cached = localStorage.getItem("schoolProfileCache");
+    if (cached) {
+      const data = JSON.parse(cached);
+      uploadedLogoData = data.logo || "";
+      applySchoolProfile(data);
+    }
+
     const response = await fetch(
       window.API_BASE + "/school-profile/" + encodeURIComponent(currentSchoolId),
       {
@@ -2727,6 +2734,7 @@ async function loadSchoolProfile() {
 
     uploadedLogoData = data.logo || "";
     applySchoolProfile(data);
+    localStorage.setItem("schoolProfileCache", JSON.stringify(data));
   } catch (error) {
     console.log(error);
   }
@@ -4896,8 +4904,8 @@ async function loadSubscription() {
 
       setTimeout(() => {
         preloader.classList.add("hide");
-        setTimeout(() => preloader.remove(), 500);
-      }, 700);
+        setTimeout(() => preloader.remove(), 300);
+      }, 100);
     });
 
 async function init() {
@@ -4910,14 +4918,16 @@ async function init() {
   }
   updateThemeButton();
 
-  await loadSchoolProfile();
-  await loadSubscription();
-  await loadSessionHistory();
-  await loadStudents();
-  await loadTeachers();
-  await loadNotifications();
+  await Promise.all([
+    loadSchoolProfile(),
+    loadSubscription(),
+    loadSessionHistory(),
+    loadStudents(),
+    loadTeachers(),
+    loadNotifications()
+  ]);
   renderActivities();
-  loadPosts("students");
+  setTimeout(() => loadPosts("students"), 500);
 }
 
 let viewingTeacher=null;
