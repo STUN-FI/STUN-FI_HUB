@@ -944,13 +944,20 @@ app.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    if (!school.password) {
+      console.error("School login failed: missing password hash", { email, schoolId: school.id, accountStatus: school.accountStatus });
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
     const isMatch = await passwordMatches(password, school.password);
 
     if (!isMatch) {
+      console.warn("School login failed: invalid password", { email, schoolId: school.id });
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     if (school.accountStatus !== "active") {
+      console.warn("School login attempt for inactive account", { email, schoolId: school.id, accountStatus: school.accountStatus });
       return res.status(403).json({
         message: `School account is ${school.accountStatus}`
       });
@@ -973,7 +980,7 @@ app.post("/login", async (req, res) => {
       }
     });
   } catch (error) {
-    console.error("School login error:", error);
+    console.error("School login error:", error.message || error, { email: req.body.email });
     res.status(500).json({ message: "Server error" });
   }
 });
