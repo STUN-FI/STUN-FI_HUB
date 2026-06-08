@@ -43,7 +43,16 @@ app.use(express.json({ limit: "20mb" }));
 registerAiRoutes(app);
 
 // Use the MONGO_URI variable defined above (not a separate dbURI)
-mongoose.connect(MONGO_URI)
+const maskedMongoUri = MONGO_URI
+  ? MONGO_URI.replace(/(mongodb(?:\+srv)?:\/\/)([^:]+):([^@]+)@/, '$1<user>:<pass>@')
+  : 'NOT SET';
+console.log('Connecting to MongoDB URI:', maskedMongoUri);
+
+mongoose.connect(MONGO_URI, {
+  connectTimeoutMS: 30000,
+  serverSelectionTimeoutMS: 30000,
+  socketTimeoutMS: 45000
+})
   .then(async () => {
     console.log("Database connected successfully!");
     await seedAdmin();
