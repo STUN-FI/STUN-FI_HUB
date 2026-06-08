@@ -1,0 +1,528 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>STUN-FI HUB | School Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="shortcut icon" href="img/Favicon.png" type="image/x-icon">
+    <link rel='stylesheet' href='styles.css'>
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+  <style>
+    :root {
+      --accent: #66cccc;
+      --accent-hover: #54b8b8;
+      --bg: #0b1120;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --line: rgba(255,255,255,0.1);
+      --danger: #ef4444;
+      --success: #22c55e;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top right, rgba(102,204,204,0.15), transparent 25%),
+        radial-gradient(circle at bottom left, rgba(102,204,204,0.1), transparent 20%),
+        var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 980px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    .left,
+    .right {
+      padding: 40px 34px;
+    }
+
+    .left {
+      background: rgba(255,255,255,0.03);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .school-logo {
+      width: 140px;
+      height: 140px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      object-fit: cover;
+      background: rgba(255,255,255,0.06);
+      border: 2px solid var(--line);
+    }
+
+    .left h1 {
+      margin: 0 0 12px;
+      font-size: 1.8rem;
+      line-height: 1.15;
+      color: var(--accent);
+    }
+
+    .left p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .right h2 {
+      margin: 0 0 8px;
+      font-size: 1.6rem;
+    }
+
+    .subtext {
+      margin: 0 0 22px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      outline: none;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      font-size: 15px;
+      transition: 0.2s ease;
+    }
+
+    input[type="email"]::placeholder,
+    input[type="password"]::placeholder,
+    input[type="text"]::placeholder {
+      color: #8ea0b8;
+    }
+
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(102, 204, 204, 0.15);
+    }
+
+    .checkbox-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 12px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 16px;
+      background: var(--accent);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-size: 15px;
+      margin-top: 6px;
+    }
+
+    .btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .output {
+      min-height: 22px;
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .output.success {
+      color: var(--success);
+    }
+
+    .output.error {
+      color: var(--danger);
+    }
+
+    .links {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .links a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+     #preloader {
+      position: fixed;
+      inset: 0;
+      background: #081224;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    #preloader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-wrap {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .preloader-logo {
+      width: 120px;
+      max-width: 100%;
+      margin-bottom: 18px;
+      animation: pulseLogo 1.4s ease-in-out infinite;
+    }
+
+    .spinner {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.15);
+      border-top: 4px solid var(--accent);
+      animation: spin 0.9s linear infinite;
+    }
+
+    .loader-wrap p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 15px;
+      letter-spacing: 0.3px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulseLogo {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.92;
+      }
+      50% {
+        transform: scale(1.06);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .wrapper {
+        grid-template-columns: 1fr;
+      }
+
+      .left {
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+        padding: 30px 34px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 18px;
+        text-align: left;
+      }
+
+      .left h1,
+      .left p {
+        text-align: left;
+        margin: 0;
+      }
+
+      .school-logo {
+        width: 100px;
+        height: 100px;
+      }
+
+      .left h1 {
+        font-size: 1.5rem;
+      }
+
+      .right h2 {
+        font-size: 1.35rem;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .left,
+      .right {
+        padding: 26px 20px;
+      }
+
+      .left h1 {
+        font-size: 1.3rem;
+      }
+
+      .right h2 {
+        font-size: 1.2rem;
+      }
+
+      .school-logo {
+        width: 80px;
+        height: 80px;
+      }
+    }
+  </style>
+  <script src="js/config.js"></script>
+</head>
+<body>
+  <div id="preloader">
+    <div class="loader-wrap">
+      <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo" class="preloader-logo">
+    </div>
+  </div>
+
+  <div class="wrapper">
+    <div class="left">
+      <img id="schoolLogo" class="school-logo" src="" alt="School Logo">
+      <h1 id="schoolName">School Login</h1>
+      <p id="schoolMotto">Enter your school email and password to continue.</p>
+    </div>
+
+    <div class="right">
+      <h2>School Login</h2>
+      <p class="subtext">Enter your email and password to access the school dashboard.</p>
+
+      <div class="form-group">
+        <label for="email">School Email</label>
+        <input type="email" id="email" placeholder="School email address" autocomplete="email" oninput="detectSchool()">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Password">
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="showPwdCheckbox" onclick="togglePassword('password')">
+        <label for="showPwdCheckbox" style="margin: 0; cursor: pointer;">Show password</label>
+      </div>
+
+      <button class="btn" onclick="login()">Login</button>
+
+      <div class="output" id="output"></div>
+
+      <div class="links">
+        <a href="school-forgot-password.html">Forgot password?</a>
+        <a href="school-register.html">Don't have an account? Register</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    const defaultBrand = {
+      name: "School Login",
+      motto: "Enter your school email and password to continue.",
+      logo: "",
+      accentColor: "#66cccc"
+    };
+
+    function togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      input.type = input.type === "password" ? "text" : "password";
+    }
+
+    function getInitials(name) {
+      return (name || "School")
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(part => part[0].toUpperCase())
+        .join("");
+    }
+
+    function adjustColor(hex, amount) {
+      let col = hex.replace("#", "");
+      let num = parseInt(col, 16);
+
+      let r = (num >> 16) + amount;
+      let g = ((num >> 8) & 0x00FF) + amount;
+      let b = (num & 0x0000FF) + amount;
+
+      r = Math.max(0, Math.min(255, r));
+      g = Math.max(0, Math.min(255, g));
+      b = Math.max(0, Math.min(255, b));
+
+      return "#" + (r << 16 | g << 8 | b).toString(16).padStart(6, "0");
+    }
+
+    function createFallbackLogo(name, color) {
+      const initials = getInitials(name);
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+          <rect width="100%" height="100%" fill="${color}"/>
+          <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="62" fill="white" font-weight="bold">${initials}</text>
+        </svg>
+      `;
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
+
+    function applyBrand(brand) {
+      const color = brand.accentColor || "#66cccc";
+
+      document.documentElement.style.setProperty("--accent", color);
+      document.documentElement.style.setProperty("--accent-hover", adjustColor(color, -18));
+
+      document.getElementById("schoolName").innerText = brand.name || defaultBrand.name;
+      document.getElementById("schoolMotto").innerText = brand.motto || defaultBrand.motto;
+      document.getElementById("schoolLogo").src =
+        brand.logo || createFallbackLogo(brand.name || "School", color);
+    }
+
+    function resetBrand() {
+      applyBrand(defaultBrand);
+    }
+
+    async function detectSchool() {
+      const email = document.getElementById("email").value.trim();
+
+      if (!email) {
+        resetBrand();
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          window.API_BASE + "/school-lookup?email=" + encodeURIComponent(email)
+        );
+
+        if (!response.ok) {
+          resetBrand();
+          return;
+        }
+
+        const data = await response.json();
+
+        applyBrand({
+          name: data.name || defaultBrand.name,
+          motto: data.motto || defaultBrand.motto,
+          logo: data.logo || "",
+          accentColor: data.accentColor || "#66cccc"
+        });
+      } catch (error) {
+        console.log(error);
+        resetBrand();
+      }
+    }
+
+    async function login() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const output = document.getElementById("output");
+
+      output.innerText = "";
+
+      if (!email || !password) {
+        output.innerText = "Please fill all fields";
+        output.className = "output error";
+        return;
+      }
+
+      try {
+        const response = await fetch(window.API_BASE + "/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("school", JSON.stringify(data.school));
+
+          window.location.href = "dashboard.html";
+        } else {
+          output.innerText = data.message || "Login failed";
+          output.className = "output error";
+        }
+      } catch (error) {
+        console.log(error);
+        output.innerText = "Error connecting to server";
+        output.className = "output error";
+      }
+    }
+
+     window.addEventListener("load", () => {
+      const preloader = document.getElementById("preloader");
+      if (!preloader) return;
+
+      setTimeout(() => {
+        preloader.classList.add("hide");
+        setTimeout(() => preloader.remove(), 300);
+      }, 100);
+    });
+
+    resetBrand();
+  </script>
+
+  <script src="common.js"></script>
+</body>
+</html>
+

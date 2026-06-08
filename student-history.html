@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>STUN-FI HUB | Academic History</title>
+  <link rel='stylesheet' href='styles.css'>
+  <script src="js/config.js"></script>
+</head>
+<body>
+  <div class="card" style="max-width:1000px;margin:28px auto;padding:22px;">
+    <h3>Academic History</h3>
+    <p class="muted">View past sessions, terms and promotion decisions.</p>
+
+    <div style="display:flex;gap:12px;margin-top:18px;align-items:end;">
+      <div style="flex:1">
+        <label style="display:block;color:#6b7280;margin-bottom:6px">Session</label>
+        <select id="historySession" style="width:100%"></select>
+      </div>
+      <div style="width:180px">
+        <label style="display:block;color:#6b7280;margin-bottom:6px">Term</label>
+        <select id="historyTerm">
+          <option>1st Term</option>
+          <option>2nd Term</option>
+          <option selected>3rd Term</option>
+        </select>
+      </div>
+      <div>
+        <button class="primary-btn" id="loadHistoryBtn">Load</button>
+      </div>
+    </div>
+
+    <div id="historyContent" style="margin-top:18px"></div>
+  </div>
+
+  <script src="student-history.js"></script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STUN-FI HUB | Register School</title>
+
+    <link rel="shortcut icon" href="img/Favicon.png" type="image/x-icon">
+<link rel='stylesheet' href='styles.css'>
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+  <style>
+    :root {
+      --accent: #66cccc;
+      --accent-hover: #54b8b8;
+      --bg: #0b1120;
+      --card: rgba(255, 255, 255, 0.08);
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --line: rgba(255,255,255,0.1);
+      --danger: #ef4444;
+      --success: #22c55e;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top right, rgba(102,204,204,0.15), transparent 25%),
+        radial-gradient(circle at bottom left, rgba(102,204,204,0.1), transparent 20%),
+        var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 1000px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    .left,
+    .right {
+      padding: 40px 34px;
+    }
+
+    .left {
+      background: rgba(255,255,255,0.03);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .logo {
+      width: 190px;
+      max-width: 100%;
+      margin-bottom: 22px;
+    }
+
+    .left h1 {
+      margin: 0 0 12px;
+      font-size: 2rem;
+      line-height: 1.15;
+    }
+
+    .left p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .right h2 {
+      margin: 0 0 8px;
+      font-size: 1.6rem;
+    }
+
+    .subtext {
+      margin: 0 0 22px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      outline: none;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    input::placeholder {
+      color: #8ea0b8;
+    }
+
+    .password-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 16px;
+      background: var(--accent);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-size: 15px;
+      margin-top: 6px;
+    }
+
+    .btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .output {
+      min-height: 22px;
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .output.success {
+      color: var(--success);
+    }
+
+    .output.error {
+      color: var(--danger);
+    }
+
+    .bottom-link {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .bottom-link a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .bottom-link a:hover {
+      text-decoration: underline;
+    }
+
+     #preloader {
+      position: fixed;
+      inset: 0;
+      background: #081224;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    #preloader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-wrap {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .preloader-logo {
+      width: 120px;
+      max-width: 100%;
+      margin-bottom: 18px;
+      animation: pulseLogo 1.4s ease-in-out infinite;
+    }
+
+    .spinner {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.15);
+      border-top: 4px solid var(--accent);
+      animation: spin 0.9s linear infinite;
+    }
+
+    .loader-wrap p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 15px;
+      letter-spacing: 0.3px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulseLogo {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.92;
+      }
+      50% {
+        transform: scale(1.06);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .wrapper {
+        grid-template-columns: 1fr;
+      }
+
+      .left {
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 18px;
+        text-align: left;
+      }
+
+      .left h1,
+      .left p {
+        text-align: left;
+        margin: 0;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .left,
+      .right {
+        padding: 26px 20px;
+      }
+
+      .password-row {
+        grid-template-columns: 1fr;
+      }
+
+      .left h1 {
+        font-size: 1.6rem;
+      }
+
+      .right h2 {
+        font-size: 1.35rem;
+      }
+    }
+  </style>
+  <script src="js/config.js"></script>
+</head>
+<body><div id="preloader">
+    <div class="loader-wrap">
+      <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo" class="preloader-logo">
+      <!-- <div class="spinner"></div> -->
+      <!-- <p>Loading portal...</p> -->
+    </div>
+  </div>
+  <div class="wrapper">
+    <div class="left">
+      <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo" class="logo" />
+      <h1>Register your school under STUN-FI HUB</h1>
+      <p>
+        Create your school account, appear automatically on the super admin dashboard,
+        then log in and customize your portal to your taste.
+      </p>
+
+      <div class="pill-row">
+        <div class="pill">School Portal</div>
+        <div class="pill">Teacher System</div>
+        <div class="pill">Student Portal</div>
+      </div>
+    </div>
+
+    <div class="right">
+      <h2>School Registration</h2>
+      <p class="subtext">Fill in your school details to create an account.</p>
+
+      <div class="form-group">
+        <label for="schoolName">School Name</label>
+        <input id="schoolName" type="text" placeholder="Enter school name" />
+      </div>
+
+      <div class="form-group">
+        <label for="schoolEmail">School Email</label>
+        <input id="schoolEmail" type="email" placeholder="Enter school email" required autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label for="schoolPhone">Phone Number</label>
+        <input id="schoolPhone" type="tel" placeholder="Enter school phone number" />
+      </div>
+
+      <div class="password-row">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="Create password" />
+          <label style="display:flex; gap:8px; align-items:center; margin-top:8px;">
+          <input type="checkbox" onclick="togglePassword('password')" style="width:auto;">
+          Show password
+        </label>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input id="confirmPassword" type="password" placeholder="Confirm password" />
+          <label style="display:flex; gap:8px; align-items:center; margin-top:8px;">
+          <input type="checkbox" onclick="togglePassword('confirmPassword')" style="width:auto;">
+          Show confirm password
+        </label>
+        </div>
+      </div>
+
+      <button class="btn" onclick="registerSchool()">Register School</button>
+
+      <div id="output" class="output"></div>
+
+      <div class="bottom-link">
+        Already have a school account?
+        <a href="login.html">Login here</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      input.type = input.type === "password" ? "text" : "password";
+    }
+
+    async function registerSchool() {
+      const output = document.getElementById("output");
+      output.className = "output";
+      output.innerText = "";
+
+      const name = document.getElementById("schoolName").value.trim();
+      const email = document.getElementById("schoolEmail").value.trim();
+      const phone = document.getElementById("schoolPhone").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+      if (!name || !email || !password || !confirmPassword) {
+        output.classList.add("error");
+        output.innerText = "Please fill the required fields.";
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        output.classList.add("error");
+        output.innerText = "Passwords do not match.";
+        return;
+      }
+
+      try {
+        const response = await fetch(window.API_BASE + "/school-register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            phone,
+            password
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          output.classList.add("success");
+          output.innerText = `School registered successfully. Your School ID is ${data.school.id}. Redirecting to login...`;
+
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 1800);
+        } else {
+          output.classList.add("error");
+          output.innerText = data.message || "Registration failed.";
+        }
+      } catch (error) {
+        console.log(error);
+        output.classList.add("error");
+        output.innerText = "Server error. Please try again.";
+      }
+    }
+
+     window.addEventListener("load", () => {
+      const preloader = document.getElementById("preloader");
+      if (!preloader) return;
+
+      setTimeout(() => {
+        preloader.classList.add("hide");
+        setTimeout(() => preloader.remove(), 500);
+      }, 700);
+    });
+  </script>
+
+  <script src="common.js"></script>
+</body>
+</html>
+

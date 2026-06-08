@@ -1,0 +1,383 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>STUN-FI HUB | Result Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="shortcut icon" href="img/Favicon.png" type="image/x-icon">
+<link rel='stylesheet' href='styles.css'>
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+  <style>
+    :root {
+      --accent: #66cccc;
+      --accent-hover: #54b8b8;
+      --bg: #0f172a;
+      --card: rgba(255, 255, 255, 0.06);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 500px;
+      padding: 30px;
+      border-radius: 20px;
+      background: var(--card);
+      backdrop-filter: blur(20px);
+      text-align: center;
+    }
+
+    .logo {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 10px;
+      display: block;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    h2 {
+      margin: 10px 0;
+      font-size: 2rem;
+    }
+
+    .motto {
+      color: var(--muted);
+      margin-bottom: 20px;
+      min-height: 22px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .resultBox {
+      margin-top: 20px;
+      text-align: left;
+      display: none;
+    }
+
+    .subject {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .highlight {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .pay {
+      margin-top: 15px;
+      background: gold;
+      color: black;
+    }
+
+    #status {
+      margin-top: 14px;
+      min-height: 20px;
+      color: var(--muted);
+    }
+
+     #preloader {
+      position: fixed;
+      inset: 0;
+      background: #081224;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    #preloader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-wrap {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .preloader-logo {
+      width: 120px;
+      max-width: 100%;
+      margin-bottom: 18px;
+      animation: pulseLogo 1.4s ease-in-out infinite;
+    }
+
+    .spinner {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.15);
+      border-top: 4px solid var(--accent);
+      animation: spin 0.9s linear infinite;
+    }
+
+    .loader-wrap p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 15px;
+      letter-spacing: 0.3px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulseLogo {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.92;
+      }
+      50% {
+        transform: scale(1.06);
+        opacity: 1;
+      }
+    }
+  </style>
+  <script src="js/config.js"></script>
+</head>
+<body>
+  <div id="preloader">
+    <div class="loader-wrap">
+      <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo" class="preloader-logo">
+      <!-- <div class="spinner"></div> -->
+      <!-- <p>Loading portal...</p> -->
+    </div>
+  </div>
+<div class="card">
+  <img id="logo" class="logo" src="" alt="School Logo">
+  <h2 id="name">Result Portal</h2>
+  <p id="motto" class="motto">Enter your details</p>
+
+  <input id="schoolId" placeholder="School ID" oninput="detectSchool()">
+  <input id="regNumber" placeholder="Reg Number">
+
+  <button id="checkBtn" onclick="checkResult()">Check Result</button>
+
+  <p id="status"></p>
+
+  <div class="resultBox" id="resultBox">
+    <h3 id="studentName"></h3>
+    <div id="subjects"></div>
+    <div class="highlight">Total: <span id="total"></span></div>
+    <div class="highlight">Average: <span id="average"></span></div>
+    <button class="pay">ðŸ”’ Pay to Download PDF</button>
+  </div>
+</div>
+
+<script>
+  const defaultBrand = {
+    name: "Result Portal",
+    motto: "Enter your details",
+    logo: "",
+    accentColor: "#66cccc"
+  };
+
+  function getInitials(name) {
+    return (name || "School")
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part[0].toUpperCase())
+      .join("");
+  }
+
+  function adjustColor(hex, amount) {
+    let col = hex.replace("#", "");
+    let num = parseInt(col, 16);
+
+    let r = (num >> 16) + amount;
+    let g = ((num >> 8) & 0x00FF) + amount;
+    let b = (num & 0x0000FF) + amount;
+
+    r = Math.max(0, Math.min(255, r));
+    g = Math.max(0, Math.min(255, g));
+    b = Math.max(0, Math.min(255, b));
+
+    return "#" + (r << 16 | g << 8 | b).toString(16).padStart(6, "0");
+  }
+
+  function createFallbackLogo(name, color) {
+    const initials = getInitials(name);
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+        <rect width="100%" height="100%" fill="${color}"/>
+        <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="62" fill="white" font-weight="bold">${initials}</text>
+      </svg>
+    `;
+    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
+
+  function applyBrand(brand) {
+    const color = brand.accentColor || "#66cccc";
+
+    document.documentElement.style.setProperty("--accent", color);
+    document.documentElement.style.setProperty("--accent-hover", adjustColor(color, -18));
+
+    document.getElementById("name").innerText = brand.name || defaultBrand.name;
+    document.getElementById("motto").innerText = brand.motto || defaultBrand.motto;
+    document.getElementById("logo").src =
+      brand.logo || createFallbackLogo(brand.name || "School", color);
+  }
+
+  function resetBrand() {
+    applyBrand(defaultBrand);
+  }
+
+  function resetResultBox() {
+    document.getElementById("status").innerText = "";
+    document.getElementById("resultBox").style.display = "none";
+    document.getElementById("studentName").innerText = "";
+    document.getElementById("subjects").innerHTML = "";
+    document.getElementById("total").innerText = "";
+    document.getElementById("average").innerText = "";
+  }
+
+  async function detectSchool() {
+    const schoolId = document.getElementById("schoolId").value.trim();
+
+    resetResultBox();
+
+    if (!schoolId) {
+      resetBrand();
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        window.API_BASE + "/school-lookup?schoolId=" + encodeURIComponent(schoolId)
+      );
+
+      if (!response.ok) {
+        resetBrand();
+        return;
+      }
+
+      const data = await response.json();
+
+      applyBrand({
+        name: data.name || defaultBrand.name,
+        motto: data.motto || defaultBrand.motto,
+        logo: data.logo || "",
+        accentColor: data.accentColor || "#66cccc"
+      });
+    } catch (error) {
+      console.log(error);
+      resetBrand();
+    }
+  }
+
+  async function checkResult() {
+    const schoolId = document.getElementById("schoolId").value.trim();
+    const regNumber = document.getElementById("regNumber").value.trim();
+    const status = document.getElementById("status");
+
+    resetResultBox();
+
+    if (!schoolId || !regNumber) {
+      status.innerText = "Please enter School ID and Reg Number";
+      return;
+    }
+
+    status.innerText = "Checking...";
+
+    try {
+      const response = await fetch(
+        window.API_BASE + "/result/" +
+          encodeURIComponent(schoolId) +
+          "/" +
+          encodeURIComponent(regNumber)
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        status.innerText = data.message || "Result not found";
+        return;
+      }
+
+      status.innerHTML = 'Result Ready <ion-icon name="checkmark-done-outline"></ion-icon>';
+      document.getElementById("resultBox").style.display = "block";
+      document.getElementById("studentName").innerText = data.name;
+
+      const subjectsDiv = document.getElementById("subjects");
+      subjectsDiv.innerHTML = "";
+
+      data.scores.forEach((s) => {
+        const div = document.createElement("div");
+        div.className = "subject";
+        div.innerText = `${s.subject} <ion-icon name="chevron-forward-outline"></ion-icon> ${s.total} (${s.grade})`;
+        subjectsDiv.appendChild(div);
+      });
+
+      document.getElementById("total").innerText = data.total;
+      document.getElementById("average").innerText = Number(data.average || 0).toFixed(2);
+    } catch (error) {
+      console.log(error);
+      status.innerText = "Error checking result";
+    }
+  }
+
+   window.addEventListener("load", () => {
+      const preloader = document.getElementById("preloader");
+      if (!preloader) return;
+
+      setTimeout(() => {
+        preloader.classList.add("hide");
+        setTimeout(() => preloader.remove(), 500);
+      }, 700);
+    });
+
+  resetBrand();
+  resetResultBox();
+</script>
+
+  <script src="common.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,194 @@
+:root {
+  --accent: #66cccc;
+  --accent-hover: #54b8b8;
+  --accent-soft: rgba(102, 204, 204, 0.16);
+  --accent-strong: rgba(102, 204, 204, 0.94);
+  --shadow-soft: 0 18px 48px rgba(15, 23, 42, 0.12);
+  --shadow-ring: 0 0 0 1px rgba(148, 163, 184, 0.12);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  outline: none;
+}
+
+button,
+.primary-btn,
+.secondary-btn,
+.mini-btn,
+.logout-btn,
+.theme-btn,
+.simple-btn {
+  cursor: pointer;
+}
+
+button:hover,
+.primary-btn:hover,
+.secondary-btn:hover,
+.mini-btn:hover,
+.logout-btn:hover,
+.theme-btn:hover,
+.simple-btn:hover {
+  transform: translateY(-1px);
+}
+
+.card,
+.slider-card,
+.accent-panel,
+.profile-preview,
+.activity-item,
+.tab-panel,
+.upgrade-card {
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.card:hover,
+.slider-card:hover,
+.accent-panel:hover,
+.activity-item:hover,
+.upgrade-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+.accent-chip {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: inline-block;
+  vertical-align: middle;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+button,
+input,
+select,
+textarea {
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: 0 0 0 3px rgba(102, 204, 204, 0.16);
+}
+
+.toast {
+  animation: fadeIn 260ms ease;
+}
+
+/* Ensure toasts sit above modal overlays and preloader */
+.toast-wrap {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 200000 !important;
+  display: grid;
+  gap: 10px;
+  max-width: 380px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal & overlay transitions (centralized) */
+.modal-overlay,
+.modal-backdrop,
+.mobile-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0);
+  opacity: 0;
+  pointer-events: none;
+  transition: background-color 220ms ease, opacity 220ms ease;
+  z-index: 1000;
+}
+
+.modal-overlay.active,
+.modal-overlay.show,
+.modal-backdrop.visible,
+.mobile-overlay.show {
+  background: rgba(0,0,0,0.38);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal,
+.modal-card,
+.modal-backdrop + .modal {
+  transform: translateY(12px) scale(0.98);
+  opacity: 0;
+  transition: transform 220ms cubic-bezier(.22,.9,.36,1), opacity 220ms ease;
+  will-change: transform, opacity;
+}
+
+.modal-overlay.active .modal,
+.modal-overlay.show .modal,
+.modal.visible,
+.modal-backdrop.visible + .modal,
+.modal-backdrop.visible ~ .modal {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* Slight pop animation for small dialogs */
+.modal.small {
+  transform-origin: center center;
+}
+
+/* Ensure modals are keyboard accessible but hidden to pointer-events when closed */
+.modal[aria-hidden="true"] { pointer-events: none; }
+
+/* Smooth hide for mobile overlay elements */
+.mobile-overlay {
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+/* Utility: fade in content inside modal when visible */
+.modal .modal-content,
+.modal-card .modal-content {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 240ms ease 80ms, transform 240ms ease 80ms;
+
+/* Force uppercase display for school/student/reg inputs across forms */
+input[id*="schoolid" i], input[name*="schoolid" i],
+input[id*="studentid" i], input[name*="studentid" i],
+input[id*="regno" i], input[name*="regno" i],
+input[id*="reg-number" i], input[name*="reg-number" i],
+input[id*="reg" i], input[name*="reg" i],
+input[id*="registration" i], input[name*="registration" i],
+input[id*="regnumber" i], input[name*="regnumber" i] {
+  text-transform: uppercase;
+}
+}
+.modal-overlay.active .modal .modal-content,
+.modal-overlay.active .modal-card .modal-content,
+.modal.visible .modal-content,
+.modal-card.visible .modal-content {
+  opacity: 1;
+  transform: translateY(0);
+}
