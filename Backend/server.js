@@ -19,11 +19,20 @@ const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URL || "mongodb:/
 
 app.use(express.static(path.join(__dirname, "../SaaS")));
 
+// Log environment status for debugging
+if (process.env.NODE_ENV === 'production') {
+  console.log("[PRODUCTION] Environment Variables Status:");
+  console.log("  JWT_SECRET:", process.env.JWT_SECRET ? "SET" : "NOT SET (using default)");
+  console.log("  MONGODB_URI:", process.env.MONGODB_URI ? "SET" : "NOT SET");
+  console.log("  EMAIL_USER:", process.env.EMAIL_USER ? "SET" : "NOT SET");
+  console.log("  EMAIL_PASS:", process.env.EMAIL_PASS ? "SET" : "NOT SET");
+}
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: process.env.EMAIL_USER || "noreply@stunfi.com",
+    pass: process.env.EMAIL_PASS || ""
   }
 });
 
@@ -32,10 +41,8 @@ app.use(express.json({ limit: "20mb" }));
 
 registerAiRoutes(app);
 
-// Use a clear, modern Mongoose connection without deprecated options
-const dbURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/stunfi_saas";
-
-mongoose.connect(dbURI)
+// Use the MONGO_URI variable defined above (not a separate dbURI)
+mongoose.connect(MONGO_URI)
   .then(async () => {
     console.log("Database connected successfully!");
     await seedAdmin();
