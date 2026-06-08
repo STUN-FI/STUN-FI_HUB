@@ -2,7 +2,6 @@ require("dotenv").config();
 
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = "stunfi_secret_key"; // later move to .env
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const express = require("express");
@@ -14,6 +13,9 @@ const fs = require("fs");
 const registerAiRoutes = require("./ai-routes");
 const registerAdminRoutes = require("./admin-routes");
 const app = express();
+
+const JWT_SECRET = process.env.JWT_SECRET || "stunfi_secret_key";
+const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URL || "mongodb://127.0.0.1:27017/stunfi_saas";
 
 app.use(express.static(path.join(__dirname, "../SaaS")));
 
@@ -30,7 +32,7 @@ app.use(express.json({ limit: "20mb" }));
 
 registerAiRoutes(app);
 
-mongoose.connect("mongodb://127.0.0.1:27017/stunfi_saas")
+mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(async () => {
     console.log("MongoDB connected");
     await seedAdmin();
