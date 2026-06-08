@@ -32,13 +32,16 @@ app.use(express.json({ limit: "20mb" }));
 
 registerAiRoutes(app);
 
-mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+// Use a clear, modern Mongoose connection without deprecated options
+const dbURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/stunfi_saas";
+
+mongoose.connect(dbURI)
   .then(async () => {
-    console.log("MongoDB connected");
+    console.log("Database connected successfully!");
     await seedAdmin();
   })
-  .catch((error) => {
-    console.log("MongoDB connection error:", error);
+  .catch((err) => {
+    console.error("Database connection error:", err);
   });
 
 /* =========================
