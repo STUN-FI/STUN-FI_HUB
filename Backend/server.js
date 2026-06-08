@@ -15,7 +15,7 @@ const registerAdminRoutes = require("./admin-routes");
 const app = express();
 
 const JWT_SECRET = process.env.JWT_SECRET || "stunfi_secret_key";
-const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URL || "mongodb://127.0.0.1:27017/stunfi_saas";
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI || process.env.MONGO_URL || "mongodb://127.0.0.1:27017/stunfi_saas";
 
 app.use(express.static(path.join(__dirname, "../SaaS")));
 
@@ -23,6 +23,7 @@ app.use(express.static(path.join(__dirname, "../SaaS")));
 if (process.env.NODE_ENV === 'production') {
   console.log("[PRODUCTION] Environment Variables Status:");
   console.log("  JWT_SECRET:", process.env.JWT_SECRET ? "SET" : "NOT SET (using default)");
+  console.log("  MONGO_URI:", process.env.MONGO_URI ? "SET" : "NOT SET");
   console.log("  MONGODB_URI:", process.env.MONGODB_URI ? "SET" : "NOT SET");
   console.log("  EMAIL_USER:", process.env.EMAIL_USER ? "SET" : "NOT SET");
   console.log("  EMAIL_PASS:", process.env.EMAIL_PASS ? "SET" : "NOT SET");
