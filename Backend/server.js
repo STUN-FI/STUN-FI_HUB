@@ -401,6 +401,11 @@ async function generatePostId() {
   return "POST" + String(count + 1).padStart(4, "0");
 }
 
+async function generateSchoolId() {
+  const count = await School.countDocuments();
+  return "SCH" + String(count + 1).padStart(4, "0");
+}
+
 /* =========================
    SCHEMAS
 ========================= */
@@ -1558,6 +1563,7 @@ app.post("/school-register", async (req, res) => {
       }
     });
   } catch (error) {
+    console.error("School registration error:", error && error.message ? error.message : error, { body: req.body });
     res.status(500).json({ message: "Error registering school" });
   }
 });
