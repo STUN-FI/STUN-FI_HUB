@@ -15,7 +15,11 @@ const registerAdminRoutes = require("./admin-routes");
 const app = express();
 
 const JWT_SECRET = process.env.JWT_SECRET || "stunfi_secret_key";
-const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI || process.env.MONGO_URL || "mongodb://127.0.0.1:27017/stunfi_saas";
+const MONGO_URI = (process.env.MONGO_URI || process.env.MONGODB_URI || process.env.MONGO_URL || "mongodb://127.0.0.1:27017/stunfi_saas").trim();
+
+if (/\s/.test(MONGO_URI)) {
+  console.warn("WARNING: MONGO_URI contains whitespace. Remove spaces from the Render env var.");
+}
 
 app.use(express.static(path.join(__dirname, "../SaaS")));
 
