@@ -892,6 +892,42 @@ async function isSubscriptionActive(schoolId) {
   return check.isActive;
 }
 
+async function createTrialSubscription(schoolId) {
+  try {
+    const now = new Date();
+    const endDate = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000); // 14 days trial
+
+    const existing = await Subscription.findOne({ schoolId });
+    if (existing) {
+      // update to ensure trial present
+      existing.planName = existing.planName || "trial";
+      existing.status = existing.status || "trial";
+      existing.startDate = existing.startDate || now;
+      existing.endDate = existing.endDate || endDate;
+      existing.studentLimit = existing.studentLimit || 200;
+      await existing.save();
+      return existing;
+    }
+
+    const doc = await Subscription.create({
+      schoolId,
+      planName: "trial",
+      status: "trial",
+      studentLimit: 200,
+      startDate: now,
+      endDate,
+      amountPaid: 0,
+      autoRenew: false
+    });
+
+    return doc;
+  } catch (error) {
+    console.error("createTrialSubscription error:", error && error.message ? error.message : error);
+    // do not throw to avoid breaking registration flow
+    return null;
+  }
+}
+
 /* =========================
    SEED ADMIN
 ========================= */
