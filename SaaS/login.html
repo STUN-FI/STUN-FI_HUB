@@ -115,7 +115,8 @@
     }
 
     input[type="email"],
-    input[type="password"] {
+    input[type="password"],
+    input[type="text"] {
       width: 100%;
       padding: 14px;
       border-radius: 12px;
@@ -128,12 +129,14 @@
     }
 
     input[type="email"]::placeholder,
-    input[type="password"]::placeholder {
+    input[type="password"]::placeholder,
+    input[type="text"]::placeholder {
       color: #8ea0b8;
     }
 
     input[type="email"]:focus,
-    input[type="password"]:focus {
+    input[type="password"]:focus,
+    input[type="text"]:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(102, 204, 204, 0.15);
     }
@@ -381,6 +384,7 @@
 
     function togglePassword(inputId) {
       const input = document.getElementById(inputId);
+      if (!input) return;
       input.type = input.type === "password" ? "text" : "password";
     }
 
