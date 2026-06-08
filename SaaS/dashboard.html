@@ -2,6 +2,7 @@
 <html>
 <head>
 ,
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="shortcut icon" href="img/Favicon.png" type="image/x-icon">
   <title>STUN-FI HUB | School Dashboard</title>
 
@@ -2538,13 +2539,25 @@ function toggleSidebar() {
   const isMobile = window.innerWidth <= 1050;
 
   if (isMobile) {
-    sidebar.classList.toggle("open");
-    overlay.classList.toggle("show");
+    const isOpen = sidebar.classList.contains("open");
+
+    if (isOpen) {
+      sidebar.classList.remove("open");
+      overlay.classList.remove("show");
+      sidebar.classList.add("closed");
+    } else {
+      sidebar.classList.remove("closed");
+      sidebar.classList.add("open");
+      overlay.classList.add("show");
+    }
   } else {
     sidebar.classList.toggle("closed");
     layout.classList.toggle("closed");
   }
-  localStorage.setItem("sidebarClosed", sidebar.classList.contains("closed"));
+
+  if (!isMobile) {
+    localStorage.setItem("sidebarClosed", sidebar.classList.contains("closed"));
+  }
 }
 
 function closeSidebar() {
@@ -2554,9 +2567,11 @@ function closeSidebar() {
 
   sidebar.classList.remove("open");
   overlay.classList.remove("show");
-
   sidebar.classList.add("closed");
-  layout.classList.add("closed");
+
+  if (window.innerWidth > 1050) {
+    layout.classList.add("closed");
+  }
 }
 
 window.addEventListener("load", () => {
