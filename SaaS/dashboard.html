@@ -2061,7 +2061,7 @@
           </div>
 
           <div class="form-group">
-            <label for="regNumber">Reg Number <span style="color: var(--muted); font-size: 0.9em;">(STU + Numbers)</span></label>
+            <label for="regNumber">Reg Number <span style="color: var(--muted); font-size: 0.9em;">(STU + Numbers, auto student ID = STD + same digits)</span></label>
             <div style="display: flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--card);">
               <span style="padding: 0 12px; color: var(--accent); font-weight: bold; user-select: none; flex-shrink: 0;">STU</span>
               <input id="regNumber" placeholder="1234" style="flex: 1; border: none; padding: 10px 12px; background: transparent; outline: none;" pattern="[0-9]*" inputmode="numeric" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4)">
@@ -3082,6 +3082,7 @@ function renderStudents() {
   const filtered = students.filter((student) => (
     student.name.toLowerCase().includes(search) ||
     student.regNumber.toLowerCase().includes(search) ||
+    (student.studentId || "").toLowerCase().includes(search) ||
     (student.className || "").toLowerCase().includes(search) ||
     (student.arm || "").toLowerCase().includes(search)
   ));
@@ -3142,6 +3143,7 @@ function renderStudents() {
           <div>
             <div class="item-title">${student.name}</div>
             <div class="item-meta">
+              Student ID: ${student.studentId || "-"}<br>
               Reg Number: ${student.regNumber}<br>
               Class: ${student.className || "-"} ${student.arm || ""}<br>
               Email: ${student.email || "Not activated yet"}

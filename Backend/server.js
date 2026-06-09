@@ -2319,7 +2319,13 @@ app.post("/add-student", async (req, res) => {
       return res.status(400).json({ message: "Reg number already exists in this school" });
     }
 
-    const studentId = await generateStudentId();
+    let studentId;
+    const regMatch = /^STU(\d+)$/i.exec(regNumber);
+    if (regMatch) {
+      studentId = "STD" + regMatch[1];
+    } else {
+      studentId = await generateStudentId();
+    }
 
     const student = await Student.create({
       studentId,
