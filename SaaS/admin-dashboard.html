@@ -1165,7 +1165,8 @@
     const API_BASE = window.API_BASE;
 
     function api(path) {
-      return window.api(path);
+      if (!path.startsWith("/")) path = "/" + path;
+      return (window.API_BASE || "").replace(/\/$/, "") + path;
     }
 
     function formatDate(value) {
