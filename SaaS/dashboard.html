@@ -1580,7 +1580,7 @@
 <body>
   <div id="preloader">
     <div class="loader-wrap">
-      <img src="img/WHITE PNG STUNFI.png" alt="STUN-FI Logo" class="preloader-logo">
+      <img src="img/stunfi-logo-white.png" alt="STUN-FI Logo" class="preloader-logo">
       <!-- <div class="spinner"></div> -->
       <!-- <p>Loading portal...</p> -->
     </div>
@@ -1904,7 +1904,7 @@
   <aside class="sidebar" id="sidebar">
     <button class="sidebar-close" onclick="closeSidebar()"><ion-icon name="close-outline"></ion-icon></button>
     <div class="brand">
-      <img src="img/WHITE PNG STUNFI.png" alt="STUNFI Logo" class="main-brand-logo">
+      <img src="img/stunfi-logo-white.png" alt="STUNFI Logo" class="main-brand-logo">
       <p>School management dashboard for students, teachers, and branding.</p>
     </div>
 
@@ -2011,12 +2011,12 @@
 
           <div class="form-group">
             <label for="className">Class</label>
-            <input id="className" placeholder="Class (e.g JSS1)" oninput="this.value = this.value.toUpperCase()">
+            <input id="className" placeholder="Class (e.g JSS1)" maxlength="6" oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase()">
           </div>
 
           <div class="form-group">
             <label for="arm">Arm</label>
-            <input id="arm" placeholder="Arm (e.g A)" oninput="this.value = this.value.replace(/[^A-Za-z]/g, '').toUpperCase()">
+            <input id="arm" placeholder="Arm (e.g A)" maxlength="1" oninput="this.value = this.value.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0,1)">
           </div>
 
           <button class="primary-btn" onclick="addStudent()"><ion-icon name="add-outline"></ion-icon> Add Student</button>
@@ -2797,6 +2797,16 @@ async function addStudent() {
 
   if (!name || !regNumber || !className || !arm) {
     toast("Please fill all student fields", "error");
+    return;
+  }
+
+  if (!/^[A-Z0-9]+$/.test(className)) {
+    toast("Class must contain only letters and numbers", "error");
+    return;
+  }
+
+  if (!/^[A-Z]$/.test(arm)) {
+    toast("Arm must be a single alphabet letter", "error");
     return;
   }
 
