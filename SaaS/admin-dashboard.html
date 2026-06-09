@@ -37,6 +37,7 @@
     }
 
     .topbar {
+      width: 100%;
       max-width: 1400px;
       margin: 0 auto;
       display: flex;
@@ -56,6 +57,20 @@
       border-radius: 18px;
       padding: 14px 18px;
       min-width: 0;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-end;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .top-actions button,
+    .top-actions .danger-btn {
+      min-width: 140px;
     }
 
     .brand-logo {
@@ -186,6 +201,7 @@
     }
 
     .layout {
+      width: 100%;
       max-width: 1400px;
       margin: 0 auto 40px;
       display: grid;
