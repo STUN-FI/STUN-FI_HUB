@@ -856,6 +856,28 @@
         padding: 10px 8px;
       }
     }
+
+    @media (max-width: 720px) {
+      .modal {
+        position: fixed;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100vw - 24px) !important;
+        max-height: calc(100vh - 16px);
+        border-radius: 12px;
+        overflow-y: auto;
+        padding: 14px;
+      }
+
+      .modal.visible {
+        transform: translateX(-50%) !important;
+      }
+
+      .modal-backdrop {
+        inset: 0;
+      }
+    }
   </style>
   <script src="js/config.js"></script>
 </head>
