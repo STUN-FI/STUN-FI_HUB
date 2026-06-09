@@ -387,23 +387,93 @@ async function getPromotionSettings(schoolId, session) {
 }
 
 async function generateStudentId() {
-  const count = await Student.countDocuments();
-  return "STD" + String(count + 1).padStart(4, "0");
+  try {
+    // Find the highest existing studentId to avoid duplicates on deletion
+    const lastStudent = await Student.findOne({ studentId: { $exists: true } })
+      .sort({ studentId: -1 })
+      .select('studentId');
+    
+    let nextNum = 1;
+    if (lastStudent && lastStudent.studentId) {
+      const match = lastStudent.studentId.match(/\d+/);
+      if (match) {
+        nextNum = parseInt(match[0]) + 1;
+      }
+    }
+    
+    return "STD" + String(nextNum).padStart(4, "0");
+  } catch (error) {
+    console.error("Error in generateStudentId:", error.message);
+    // Fallback to count if parsing fails
+    const count = await Student.countDocuments();
+    return "STD" + String(count + 1).padStart(4, "0");
+  }
 }
 
 async function generateTeacherId() {
-  const count = await Teacher.countDocuments();
-  return "TCH" + String(count + 1).padStart(4, "0");
+  try {
+    const lastTeacher = await Teacher.findOne({ teacherId: { $exists: true } })
+      .sort({ teacherId: -1 })
+      .select('teacherId');
+    
+    let nextNum = 1;
+    if (lastTeacher && lastTeacher.teacherId) {
+      const match = lastTeacher.teacherId.match(/\d+/);
+      if (match) {
+        nextNum = parseInt(match[0]) + 1;
+      }
+    }
+    
+    return "TCH" + String(nextNum).padStart(4, "0");
+  } catch (error) {
+    console.error("Error in generateTeacherId:", error.message);
+    const count = await Teacher.countDocuments();
+    return "TCH" + String(count + 1).padStart(4, "0");
+  }
 }
 
 async function generatePostId() {
-  const count = await Post.countDocuments();
-  return "POST" + String(count + 1).padStart(4, "0");
+  try {
+    const lastPost = await Post.findOne({ postId: { $exists: true } })
+      .sort({ postId: -1 })
+      .select('postId');
+    
+    let nextNum = 1;
+    if (lastPost && lastPost.postId) {
+      const match = lastPost.postId.match(/\d+/);
+      if (match) {
+        nextNum = parseInt(match[0]) + 1;
+      }
+    }
+    
+    return "POST" + String(nextNum).padStart(4, "0");
+  } catch (error) {
+    console.error("Error in generatePostId:", error.message);
+    const count = await Post.countDocuments();
+    return "POST" + String(count + 1).padStart(4, "0");
+  }
 }
 
 async function generateSchoolId() {
-  const count = await School.countDocuments();
-  return "SCH" + String(count + 1).padStart(4, "0");
+  try {
+    const lastSchool = await School.findOne({ schoolId: { $exists: true } })
+      .sort({ schoolId: -1 })
+      .select('schoolId');
+    
+    let nextNum = 1;
+    if (lastSchool && lastSchool.schoolId) {
+      const match = lastSchool.schoolId.match(/\d+/);
+      if (match) {
+        nextNum = parseInt(match[0]) + 1;
+      }
+    }
+    
+    return "SCH" + String(nextNum).padStart(4, "0");
+  } catch (error) {
+    console.error("Error in generateSchoolId:", error.message);
+    const count = await School.countDocuments();
+    return "SCH" + String(count + 1).padStart(4, "0");
+  }
 }
 
 /* =========================
