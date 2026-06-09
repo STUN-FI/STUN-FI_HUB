@@ -840,59 +840,69 @@ async function getSchoolSubscription(schoolId) {
 }
 
 async function checkSubscriptionStatus(schoolId) {
-  const subscription = await getSchoolSubscription(schoolId);
-  
-  if (!subscription) {
-    return { status: "no-subscription", isActive: false };
+  try {
+    const subscription = await getSchoolSubscription(schoolId);
+    
+    if (!subscription) {
+      return { status: "no-subscription", isActive: false };
+    }
+    
+    const now = new Date();
+    
+    if (subscription.status === "cancelled") {
+      return { status: "cancelled", isActive: false };
+    }
+    
+    if (subscription.endDate < now) {
+      // Auto-expire if not done
+      subscription.status = "expired";
+      await subscription.save();
+      return { status: "expired", isActive: false, subscription };
+    }
+    
+    return { status: subscription.status, isActive: true, subscription };
+  } catch (error) {
+    console.error("Error in checkSubscriptionStatus:", error.message);
+    return { status: "error", isActive: false };
   }
-  
-  const now = new Date();
-  
-  if (subscription.status === "cancelled") {
-    return { status: "cancelled", isActive: false };
-  }
-  
-  if (subscription.endDate < now) {
-    // Auto-expire if not done
-    subscription.status = "expired";
-    await subscription.save();
-    return { status: "expired", isActive: false, subscription };
-  }
-  
-  return { status: subscription.status, isActive: true, subscription };
 }
 
 async function checkStudentLimit(schoolId) {
-  let subscription = await getSchoolSubscription(schoolId);
-  
-  if (!subscription) {
-    subscription = await createTrialSubscription(schoolId);
+  try {
+    let subscription = await getSchoolSubscription(schoolId);
+    
     if (!subscription) {
-      return { canAdd: false, message: "No subscription found" };
+      subscription = await createTrialSubscription(schoolId);
+      if (!subscription) {
+        return { canAdd: false, message: "No subscription found and could not create trial" };
+      }
     }
-  }
-  
-  const subscriptionCheck = await checkSubscriptionStatus(schoolId);
-  if (!subscriptionCheck.isActive) {
-    return { canAdd: false, message: "Subscription is not active" };
-  }
-  
-  const studentCount = await Student.countDocuments({ schoolId });
-  
-  if (studentCount >= subscription.studentLimit) {
-    return {
-      canAdd: false,
-      message: `Your subscription student limit (${subscription.studentLimit}) has been reached. Please upgrade your plan.`,
-      currentCount: studentCount,
-      limit: subscription.studentLimit
+    
+    const subscriptionCheck = await checkSubscriptionStatus(schoolId);
+    if (!subscriptionCheck.isActive) {
+      return { canAdd: false, message: "Subscription is not active" };
+    }
+    
+    const studentCount = await Student.countDocuments({ schoolId });
+    
+    if (studentCount >= subscription.studentLimit) {
+      return {
+        canAdd: false,
+        message: `Your subscription student limit (${subscription.studentLimit}) has been reached. Please upgrade your plan.`,
+        currentCount: studentCount,
+        limit: subscription.studentLimit
+      };
+    }
+    
+    return { 
+      canAdd: true, 
+      currentCount: studentCount, 
+      limit: subscription.studentLimit 
     };
+  } catch (error) {
+    console.error("Error in checkStudentLimit:", error.message);
+    return { canAdd: false, message: "Error checking student limit: " + error.message };
   }
-  
-  return { 
-    canAdd: true, 
-    currentCount: studentCount, 
-    limit: subscription.studentLimit 
-  };
 }
 
 async function isSubscriptionActive(schoolId) {
@@ -907,12 +917,14 @@ async function createTrialSubscription(schoolId) {
 
     const existing = await Subscription.findOne({ schoolId });
     if (existing) {
-      // update to ensure trial present
+      // update to ensure all required fields are present
       existing.planName = existing.planName || "trial";
       existing.status = existing.status || "trial";
       existing.startDate = existing.startDate || now;
       existing.endDate = existing.endDate || endDate;
       existing.studentLimit = existing.studentLimit || 200;
+      existing.amountPaid = existing.amountPaid || 0;
+      existing.autoRenew = existing.autoRenew !== undefined ? existing.autoRenew : false;
       await existing.save();
       return existing;
     }
@@ -2239,7 +2251,7 @@ app.post("/add-student", async (req, res) => {
 
     const studentId = await generateStudentId();
 
-   const student = await Student.create({
+    const student = await Student.create({
       studentId,
       name,
       regNumber,
@@ -2257,7 +2269,8 @@ app.post("/add-student", async (req, res) => {
       student
     });
   } catch (error) {
-    res.status(500).json({ message: "Error adding student" });
+    console.error("Error in add-student endpoint:", error.message, error.stack);
+    res.status(500).json({ message: "Error adding student", error: error.message });
   }
 });
 
