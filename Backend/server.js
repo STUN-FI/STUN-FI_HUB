@@ -863,10 +863,13 @@ async function checkSubscriptionStatus(schoolId) {
 }
 
 async function checkStudentLimit(schoolId) {
-  const subscription = await getSchoolSubscription(schoolId);
+  let subscription = await getSchoolSubscription(schoolId);
   
   if (!subscription) {
-    return { canAdd: false, message: "No subscription found" };
+    subscription = await createTrialSubscription(schoolId);
+    if (!subscription) {
+      return { canAdd: false, message: "No subscription found" };
+    }
   }
   
   const subscriptionCheck = await checkSubscriptionStatus(schoolId);
