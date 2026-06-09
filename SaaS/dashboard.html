@@ -2061,8 +2061,11 @@
           </div>
 
           <div class="form-group">
-            <label for="regNumber">Reg Number</label>
-            <input id="regNumber" placeholder="STU" value="STU" oninput="if (!this.value.startsWith('STU')) this.value = 'STU' + this.value.replace(/^STU/, ''); this.value = this.value.toUpperCase()">
+            <label for="regNumber">Reg Number <span style="color: var(--muted); font-size: 0.9em;">(STU + Numbers)</span></label>
+            <div style="display: flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--card);">
+              <span style="padding: 0 12px; color: var(--accent); font-weight: bold; user-select: none; flex-shrink: 0;">STU</span>
+              <input id="regNumber" placeholder="1234" style="flex: 1; border: none; padding: 10px 12px; background: transparent; outline: none;" pattern="[0-9]*" inputmode="numeric" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4)">
+            </div>
           </div>
 
           <div class="form-group">
@@ -2866,11 +2869,11 @@ async function saveSchoolProfile() {
 
 async function addStudent() {
   const name = document.getElementById("studentName").value.trim();
-  let regNumber = document.getElementById("regNumber").value.trim();
+  let regNumberSuffix = document.getElementById("regNumber").value.trim();
   const className = document.getElementById("className").value.trim();
   const arm = document.getElementById("arm").value.trim();
 
-  if (!name || !regNumber || !className || !arm) {
+  if (!name || !regNumberSuffix || !className || !arm) {
     toast("Please fill all student fields", "error");
     return;
   }
@@ -2885,9 +2888,12 @@ async function addStudent() {
     return;
   }
 
-  if (!regNumber.startsWith("STU")) {
-    regNumber = "STU" + regNumber;
+  if (!/^[0-9]+$/.test(regNumberSuffix)) {
+    toast("Registration number suffix must contain only numbers", "error");
+    return;
   }
+
+  const regNumber = "STU" + regNumberSuffix;
 
   try {
     const response = await fetch(window.API_BASE + "/add-student", {
@@ -2906,7 +2912,7 @@ async function addStudent() {
 
     if (response.ok) {
       document.getElementById("studentName").value = "";
-      document.getElementById("regNumber").value = "STU";
+      document.getElementById("regNumber").value = "";
       document.getElementById("className").value = "";
       document.getElementById("arm").value = "";
       await loadStudents();
