@@ -999,7 +999,63 @@
 
   .post-form-grid {
     display: grid;
+    gap: 14px;
+  }
+
+  .audience-control {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
+  }
+
+  .audience-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .audience-pill:hover {
+    border-color: rgba(56, 189, 248, 0.45);
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .audience-pill input {
+    display: none;
+  }
+
+  .audience-pill input:checked + span {
+    background: var(--accent);
+    color: white;
+    border-radius: 14px;
+    padding: 12px 15px;
+    display: inline-block;
+    width: 100%;
+    box-shadow: 0 16px 40px rgba(56, 189, 248, 0.16);
+  }
+
+  .media-upload-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .file-name {
+    color: var(--muted);
+    font-size: 0.95rem;
+    min-width: 0;
+    word-break: break-all;
   }
 
   .post-output {
@@ -2102,10 +2158,16 @@
           <h3>Post Announcement</h3>
 
           <div class="post-form-grid">
-            <select id="postAudience">
-              <option value="students">Post to Students</option>
-              <option value="teachers">Post to Teachers</option>
-            </select>
+            <div class="audience-control">
+              <label class="audience-pill">
+                <input type="checkbox" id="postAudienceStudents" checked />
+                <span>Students</span>
+              </label>
+              <label class="audience-pill">
+                <input type="checkbox" id="postAudienceTeachers" checked />
+                <span>Teachers</span>
+              </label>
+            </div>
 
             <textarea id="postText" placeholder="Write announcement..." rows="4"></textarea>
 
@@ -2116,9 +2178,15 @@
               <option value="file">File</option>
             </select>
 
-            <input type="file" id="postFile" onchange="uploadPostFile()" />
+            <input type="file" id="postFile" class="hidden-file" onchange="uploadPostFile()" />
+            <div class="media-upload-row">
+              <button type="button" class="upload-btn" onclick="document.getElementById('postFile').click()">
+                <ion-icon name="cloud-upload-outline"></ion-icon> Choose Media
+              </button>
+              <span id="selectedFileName" class="file-name">No file selected</span>
+            </div>
 
-            <input type="text" id="mediaUrl" placeholder="Uploaded file URL will appear here" readonly />
+            <input type="text" id="mediaUrl" placeholder="Uploaded media URL will appear here" readonly />
 
             <input type="text" id="fileName" placeholder="Uploaded file name" readonly style="display:none;" />
 
@@ -4160,13 +4228,18 @@ async function uploadPostFile() {
   const fileInput = document.getElementById("postFile");
   const mediaTypeSelect = document.getElementById("postMediaType");
   const output = document.getElementById("postOutput");
+  const selectedFileName = document.getElementById("selectedFileName");
 
   output.innerText = "";
   output.style.color = "";
 
-  if (!fileInput.files.length) return;
+  if (!fileInput.files.length) {
+    selectedFileName.innerText = "No file selected";
+    return;
+  }
 
   const file = fileInput.files[0];
+  selectedFileName.innerText = file.name;
   const formData = new FormData();
   formData.append("media", file);
   
@@ -4206,12 +4279,25 @@ async function createPost() {
   output.innerText = "";
   output.style.color = "";
 
-  const audience = document.getElementById("postAudience").value;
+  const audience = [];
+  if (document.getElementById("postAudienceStudents").checked) {
+    audience.push("students");
+  }
+  if (document.getElementById("postAudienceTeachers").checked) {
+    audience.push("teachers");
+  }
+
   const text = document.getElementById("postText").value.trim();
   const mediaType = document.getElementById("postMediaType").value;
   const mediaUrl = document.getElementById("mediaUrl").value.trim();
   const fileName = document.getElementById("fileName").value.trim();
   
+  if (!audience.length) {
+    output.style.color = "red";
+    output.innerText = "Please choose at least one audience.";
+    return;
+  }
+
   if (!text && !mediaUrl) {
     output.style.color = "red";
     output.innerText = "Write something or upload media.";
@@ -4245,9 +4331,10 @@ async function createPost() {
       document.getElementById("postFile").value = "";
       document.getElementById("mediaUrl").value = "";
       document.getElementById("fileName").value = "";
+      document.getElementById("selectedFileName").innerText = "No file selected";
       toggleFileNameField();
 
-      loadPosts(audience);
+      loadPosts(audience.includes("students") ? "students" : "teachers");
     } else {
       output.style.color = "red";
       output.innerText = data.message || "Could not create post.";
@@ -4318,8 +4405,12 @@ async function loadPosts(audience) {
         }
       }
 
+      const audienceLabel = post.audience === "both"
+        ? "Students & Teachers"
+        : post.audience.charAt(0).toUpperCase() + post.audience.slice(1);
+
       div.innerHTML = `
-        <strong>${post.audience.toUpperCase()}</strong>
+        <strong>${audienceLabel}</strong>
         <p style="margin:12px 0;">${post.text || ""}</p>
         ${mediaHtml}
         <div style="margin-top:12px; margin-bottom:8px;">

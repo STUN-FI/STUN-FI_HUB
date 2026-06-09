@@ -1837,18 +1837,31 @@ app.get("/school-lookup", async (req, res) => {
 app.post("/create-post", async (req, res) => {
   try {
     const schoolId = (req.body.schoolId || "").trim();
-    const audience = (req.body.audience || "").trim();
+    const rawAudience = req.body.audience;
     const text = (req.body.text || "").trim();
     const mediaUrl = (req.body.mediaUrl || "").trim();
     const mediaType = (req.body.mediaType || "").trim();
     const fileName = (req.body.fileName || "").trim();
 
-    if (!schoolId || !audience) {
+    const audienceValues = Array.isArray(rawAudience)
+      ? rawAudience.map((item) => (item || "").toString().trim().toLowerCase())
+      : typeof rawAudience === "string"
+        ? rawAudience.split(",").map((item) => item.trim().toLowerCase())
+        : [];
+
+    const filteredAudience = [...new Set(audienceValues.filter(Boolean))];
+    let audience = filteredAudience.join(",");
+
+    if (!schoolId || !filteredAudience.length) {
       return res.status(400).json({ message: "School ID and audience are required" });
     }
 
-    if (!["students", "teachers"].includes(audience)) {
-      return res.status(400).json({ message: "Audience must be students or teachers" });
+    if (filteredAudience.includes("students") && filteredAudience.includes("teachers")) {
+      audience = "both";
+    } else if (filteredAudience.length === 1 && ["students", "teachers", "both"].includes(filteredAudience[0])) {
+      audience = filteredAudience[0];
+    } else {
+      return res.status(400).json({ message: "Audience must be students, teachers, or both" });
     }
 
     if (!text && !mediaUrl) {
@@ -1896,17 +1909,21 @@ app.post("/create-post", async (req, res) => {
 app.get("/posts/:schoolId", async (req, res) => {
   try {
     const schoolId = (req.params.schoolId || "").trim();
-    const audience = (req.query.audience || "").trim();
+    const audience = (req.query.audience || "").trim().toLowerCase();
 
     if (!schoolId || !audience) {
       return res.status(400).json({ message: "School ID and audience are required" });
     }
 
-    if (!["students", "teachers"].includes(audience)) {
-      return res.status(400).json({ message: "Audience must be students or teachers" });
+    if (!["students", "teachers", "both"].includes(audience)) {
+      return res.status(400).json({ message: "Audience must be students, teachers, or both" });
     }
 
-    const posts = await Post.find({ schoolId, audience }).sort({ createdAt: -1 });
+    const queryAudience = audience === "both"
+      ? { $in: ["students", "teachers", "both"] }
+      : { $in: [audience, "both"] };
+
+    const posts = await Post.find({ schoolId, audience: queryAudience }).sort({ createdAt: -1 });
 
     res.json(posts);
   } catch (error) {
