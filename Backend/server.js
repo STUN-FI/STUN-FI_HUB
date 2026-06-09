@@ -1748,9 +1748,10 @@ app.post("/upload-post-media", upload.single("media"), async (req, res) => {
       mediaType = "video";
     }
 
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
     res.json({
       message: "File uploaded successfully",
-      mediaUrl: `http://localhost:3000/uploads/${req.file.filename}`,
+      mediaUrl: `${baseUrl}/uploads/${req.file.filename}`,
       mediaType,
       fileName: req.file.originalname
     });
