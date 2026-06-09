@@ -1580,7 +1580,7 @@
 <body>
   <div id="preloader">
     <div class="loader-wrap">
-      <img src="img/stunfi-logo-white.png" alt="STUN-FI Logo" class="preloader-logo">
+      <img id="preloaderLogo" src="img/BLACK%20PNG%20STUNFI.png" alt="STUN-FI Logo" class="preloader-logo">
       <!-- <div class="spinner"></div> -->
       <!-- <p>Loading portal...</p> -->
     </div>
@@ -2593,12 +2593,19 @@ function toggleTheme() {
   document.body.classList.toggle("dark");
   localStorage.setItem("dashboardTheme", document.body.classList.contains("dark") ? "dark" : "light");
   updateThemeButton();
+  updatePreloaderLogo();
   toast(document.body.classList.contains("dark") ? "Dark mode enabled" : "Light mode enabled", "success");
 }
 
 function updateThemeButton() {
   const btn = document.getElementById("themeToggle");
   btn.innerHTML = document.body.classList.contains("dark") ? '<ion-icon name="sunny-outline"></ion-icon> Light Mode' : '<ion-icon name="moon-outline"></ion-icon> Dark Mode';
+}
+
+function updatePreloaderLogo() {
+  const logo = document.getElementById("preloaderLogo");
+  if (!logo) return;
+  logo.src = document.body.classList.contains("dark") ? "img/stunfi-logo-white.png" : "img/BLACK%20PNG%20STUNFI.png";
 }
 
 function applyAccentColor() {
@@ -4930,6 +4937,7 @@ async function init() {
   if (savedTheme === "dark") {
     document.body.classList.add("dark");
   }
+  updatePreloaderLogo();
   updateThemeButton();
 
   await Promise.all([
