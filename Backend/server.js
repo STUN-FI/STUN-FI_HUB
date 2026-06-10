@@ -10,7 +10,7 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const registerAiRoutes = require("./ai-routes");
+const { GoogleGenAI } = require("@google/genai");
 const registerAdminRoutes = require("./admin-routes");
 const app = express();
 
@@ -31,20 +31,32 @@ if (process.env.NODE_ENV === 'production') {
   console.log("  MONGODB_URI:", process.env.MONGODB_URI ? "SET" : "NOT SET");
   console.log("  EMAIL_USER:", process.env.EMAIL_USER ? "SET" : "NOT SET");
   console.log("  EMAIL_PASS:", process.env.EMAIL_PASS ? "SET" : "NOT SET");
+  console.log("  GEMINI_API_KEY:", process.env.GEMINI_API_KEY ? "SET" : "NOT SET");
 }
 
+const emailUser = process.env.EMAIL_USER || "stunfihub@gmail.com";
+const emailPass = process.env.EMAIL_PASS || "fxsjcbfkndfypxhf";
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER || "noreply@stunfi.com",
-    pass: process.env.EMAIL_PASS || ""
+    user: emailUser,
+    pass: emailPass
   }
 });
 
+if (!emailUser || !emailPass) {
+  console.warn("EMAIL_USER or EMAIL_PASS is not configured. Forgot password email delivery will fail.");
+}
+
+const geminiApiKey = process.env.GEMINI_API_KEY || "AIzaSyBW_begbhYKhDyHFl8k111Uhhp9JZY_mFE";
+const geminiClient = new GoogleGenAI({ apiKey: geminiApiKey });
+
+if (!geminiApiKey) {
+  console.warn("GEMINI_API_KEY is not configured. AI report comment generation will be disabled.");
+}
+
 app.use(cors());
 app.use(express.json({ limit: "20mb" }));
-
-registerAiRoutes(app);
 
 // Use the MONGO_URI variable defined above (not a separate dbURI)
 const maskedMongoUri = MONGO_URI
@@ -193,6 +205,63 @@ async function generateStudentResultSummary(studentId, schoolId, session, term) 
   const average = scores.length ? total / scores.length : 0;
   const grade = getOverallGrade(average);
   return { total, average, grade, subjectCount: scores.length };
+}
+
+function extractGenAIText(response) {
+  if (!response || !Array.isArray(response.output)) {
+    return "";
+  }
+
+  for (const outputItem of response.output) {
+    if (!outputItem || !Array.isArray(outputItem.content)) continue;
+
+    for (const contentItem of outputItem.content) {
+      if (typeof contentItem === "string" && contentItem.trim()) {
+        return contentItem.trim();
+      }
+      if (contentItem && typeof contentItem.text === "string" && contentItem.text.trim()) {
+        return contentItem.text.trim();
+      }
+    }
+  }
+
+  return "";
+}
+
+function buildAIPromptForStudentReport({ student, scores, session, term }) {
+  const studentName = student.name || student.fullName || "Student";
+  const className = student.className || "Unknown class";
+  const studentId = student.studentId || student._id?.toString() || "Unknown ID";
+  const validScores = Array.isArray(scores) ? scores : [];
+
+  const subjectLines = validScores.length
+    ? validScores.map((score) => {
+        const grade = score.grade || getOverallGrade(Number(score.total || 0));
+        const status = score.status || "Status not provided";
+        return `- ${score.subject || "Unknown subject"}: ${score.total || 0} (${grade}) — ${status}`;
+      }).join("\n")
+    : "- No submitted scores available.";
+
+  const average = validScores.length
+    ? (validScores.reduce((sum, item) => sum + Number(item.total || 0), 0) / validScores.length).toFixed(2)
+    : "N/A";
+  const grade = validScores.length ? getOverallGrade(Number(average)) : "N/A";
+
+  return `You are an experienced academic teacher writing a concise progress comment for a school report. Use the details below to write one short, positive, and honest teacher comment. Mention strengths and one area for improvement. Do not include a title or heading.
+
+Student name: ${studentName}
+Student ID: ${studentId}
+Class: ${className}
+Session: ${session}
+Term: ${term}
+
+Subjects:
+${subjectLines}
+
+Overall average: ${average}
+Overall grade: ${grade}
+
+Create a single report comment suitable for a teacher's remark box.`;
 }
 
 async function getPromotionSuggestionForStudent(student, resultDoc, settings) {
@@ -1485,8 +1554,13 @@ app.post("/teacher-forgot-password", async (req, res) => {
 
     const resetLink = `${process.env.BASE_URL}/reset-password.html?token=${token}&type=teacher`;
 
+    if (!emailUser || !emailPass) {
+      console.error("Teacher password reset email blocked because SMTP credentials are missing.", { EMAIL_USER_SET: !!emailUser, EMAIL_PASS_SET: !!emailPass });
+      return res.status(500).json({ message: "Email service is not configured on the server" });
+    }
+
     await transporter.sendMail({
-      from: `"STUN-FI HUB" <${process.env.EMAIL_USER}>`,
+      from: `"STUN-FI HUB" <${emailUser}>`,
       to: email,
       subject: "Password Reset - STUN-FI HUB",
       html: `
@@ -1510,7 +1584,7 @@ app.post("/teacher-forgot-password", async (req, res) => {
 
     res.json({ message: "Reset link sent to email" });
   } catch (error) {
-    console.log(error);
+    console.error("Teacher reset email failed:", error && error.message ? error.message : error);
     res.status(500).json({ message: "Error sending teacher reset email" });
   }
 });
@@ -1567,8 +1641,13 @@ app.post("/student-forgot-password", async (req, res) => {
 
     const resetLink = `${process.env.BASE_URL}/reset-password.html?token=${token}&type=student`;
 
+    if (!emailUser || !emailPass) {
+      console.error("Student password reset email blocked because SMTP credentials are missing.", { EMAIL_USER_SET: !!emailUser, EMAIL_PASS_SET: !!emailPass });
+      return res.status(500).json({ message: "Email service is not configured on the server" });
+    }
+
     await transporter.sendMail({
-      from: `"STUN-FI HUB" <${process.env.EMAIL_USER}>`,
+      from: `"STUN-FI HUB" <${emailUser}>`,
       to: email,
       subject: "Password Reset - STUN-FI HUB",
       html: `
@@ -1592,7 +1671,7 @@ app.post("/student-forgot-password", async (req, res) => {
 
     res.json({ message: "Reset link sent to email" });
   } catch (error) {
-    console.log(error);
+    console.error("Student reset email failed:", error && error.message ? error.message : error);
     res.status(500).json({ message: "Error sending student reset email" });
   }
 });
@@ -1674,8 +1753,13 @@ app.post("/school-forgot-password", async (req, res) => {
 
     const resetLink = `${process.env.BASE_URL}/reset-password.html?token=${token}&type=school`;
 
+    if (!emailUser || !emailPass) {
+      console.error("School password reset email blocked because SMTP credentials are missing.", { EMAIL_USER_SET: !!emailUser, EMAIL_PASS_SET: !!emailPass });
+      return res.status(500).json({ message: "Email service is not configured on the server" });
+    }
+
     await transporter.sendMail({
-      from: `"STUN-FI HUB" <${process.env.EMAIL_USER}>`,
+      from: `"STUN-FI HUB" <${emailUser}>`,
       to: email,
       subject: "Password Reset - STUN-FI HUB",
       html: `
@@ -1699,7 +1783,7 @@ app.post("/school-forgot-password", async (req, res) => {
 
     res.json({ message: "Reset link sent to email" });
   } catch (error) {
-    console.log(error);
+    console.error("School reset email failed:", error && error.message ? error.message : error);
     res.status(500).json({ message: "Error sending school reset email" });
   }
 });
@@ -3299,6 +3383,73 @@ app.get("/debug-submitted-scores", async (req, res) => {
 // =========================
 // AI / LLM ENDPOINTS
 // =========================
+
+app.post("/ai/generate-report-comment", async (req, res) => {
+  try {
+    const { studentId, schoolId, session, term } = req.body;
+
+    if (!studentId || !schoolId || !session || !term) {
+      return res.status(400).json({ message: "studentId, schoolId, session, and term are required" });
+    }
+
+    if (!geminiApiKey) {
+      return res.status(500).json({ message: "AI service is not configured on the server" });
+    }
+
+    const student = await Student.findOne({ studentId, schoolId });
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const scores = await Score.find({ studentId, schoolId, session, term });
+    if (!scores.length) {
+      return res.status(400).json({ message: "No submitted scores found for this student in the selected session and term" });
+    }
+
+    const prompt = buildAIPromptForStudentReport({ student, scores, session, term });
+    // Try preferred model first; if it's not available for this API/version,
+    // retry with a known supported model (`gemini-2.0-flash`) as a fallback.
+    const preferredModels = ["gemini-1.5-mini", "gemini-2.0-flash"];
+    let response = null;
+    let lastErr = null;
+
+    for (const modelName of preferredModels) {
+      try {
+        response = await geminiClient.models.generateContent({
+          model: modelName,
+          contents: prompt,
+          config: { temperature: 0.4, maxOutputTokens: 220 }
+        });
+        break; // success
+      } catch (err) {
+        lastErr = err;
+        // If it's a 404 about the model not being found, try the next model.
+        const status = err && err.response && err.response.status;
+        const body = err && err.response && err.response.data;
+        if (status === 404 && body && typeof body === "object" && body.error && body.error.message && /not found/i.test(body.error.message)) {
+          continue;
+        }
+        // For other errors, stop retrying and surface the error.
+        break;
+      }
+    }
+
+    if (!response) {
+      console.error("AI model selection error:", lastErr && (lastErr.response && lastErr.response.data ? lastErr.response.data : lastErr.message));
+      return res.status(500).json({ message: "AI service error or requested model not available. Check GEMINI_API_KEY and model availability." });
+    }
+
+    const comment = (response && (response.text || response.outputText || response.output)) ? (response.text || response.outputText || (Array.isArray(response.output) ? response.output.map(o=>o.text||o).join('\n') : String(response.output))) : "";
+    if (!comment) {
+      return res.status(500).json({ message: "AI service returned an empty comment" });
+    }
+
+    res.json({ comment });
+  } catch (error) {
+    console.error("AI report comment error:", error);
+    res.status(500).json({ message: "Error generating AI comment" });
+  }
+});
 
 /* =========================
    ACADEMIC SESSION ROUTES

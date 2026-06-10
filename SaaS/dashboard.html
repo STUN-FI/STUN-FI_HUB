@@ -1826,10 +1826,15 @@
       Select a student to view submitted scores.
     </div>
 
+    <div id="scoreModalAIComment" class="empty-state" style="padding:14px; margin-bottom:12px;">
+      Tap "Generate AI Comment" to create a report comment from the student's scores.
+    </div>
+
     <div id="scoreModalBody"></div>
 
     <div class="modal-actions">
       <button class="secondary-btn" onclick="refreshScoreModal()">Refresh Scores</button>
+      <button class="secondary-btn" onclick="generateAIComment()">Generate AI Comment</button>
       <button class="assign-btn" id="assignResultBtn" onclick="assignCurrentStudentResult()">Confirm Promotion</button>
       <button class="danger-btn" onclick="closeScoreModal()">Close</button>
     </div>
@@ -3925,6 +3930,40 @@ async function refreshScoreModal() {
     console.log(error);
     summary.innerHTML = `Error loading summary.`;
     body.innerHTML = `<div class="empty-state">Error loading submitted scores.</div>`;
+  }
+}
+
+async function generateAIComment() {
+  if (!currentScoreStudent) return;
+
+  const session = document.getElementById("scoreSessionSelect").value;
+  const term = document.getElementById("scoreTermSelect").value;
+  const aiCommentBox = document.getElementById("scoreModalAIComment");
+
+  aiCommentBox.innerHTML = `<div class="empty-state">Generating AI comment...</div>`;
+
+  try {
+    const response = await fetch(window.API_BASE + "/ai/generate-report-comment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        studentId: currentScoreStudent.studentId,
+        schoolId: currentSchoolId,
+        session,
+        term
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      aiCommentBox.innerHTML = `<div class="empty-state">${data.message || "Unable to generate AI comment."}</div>`;
+      return;
+    }
+
+    aiCommentBox.innerHTML = `<div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:14px; color:#0f172a;">${data.comment || "No comment was generated."}</div>`;
+  } catch (error) {
+    console.error("Error generating AI comment:", error);
+    aiCommentBox.innerHTML = `<div class="empty-state">Error generating AI comment.</div>`;
   }
 }
 
