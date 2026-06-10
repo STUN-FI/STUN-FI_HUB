@@ -4320,7 +4320,7 @@ async function createPost() {
       },
       body: JSON.stringify({
         schoolId: currentSchoolId,
-        audience,
+        audience: audience.join(","),
         text,
         mediaUrl,
         mediaType,
@@ -5305,7 +5305,8 @@ Delete
 
 init();
 </script>
-
+  <script src="ai-widget.js"></script>
+  <script src="common.js"></script>
 </body>
 </html>
 

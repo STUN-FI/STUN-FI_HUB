@@ -10,6 +10,7 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const registerAiRoutes = require("./ai-routes");
 const registerAdminRoutes = require("./admin-routes");
 const app = express();
 
@@ -42,6 +43,8 @@ const transporter = nodemailer.createTransport({
 
 app.use(cors());
 app.use(express.json({ limit: "20mb" }));
+
+registerAiRoutes(app);
 
 // Use the MONGO_URI variable defined above (not a separate dbURI)
 const maskedMongoUri = MONGO_URI
@@ -1916,18 +1919,28 @@ app.get("/school-lookup", async (req, res) => {
 // school creates a post for students or teachers
 app.post("/create-post", async (req, res) => {
   try {
-    const schoolId = (req.body.schoolId || "").trim();
+    const schoolId = (req.body.schoolId || "").toString().trim();
     const rawAudience = req.body.audience;
-    const text = (req.body.text || "").trim();
-    const mediaUrl = (req.body.mediaUrl || "").trim();
-    const mediaType = (req.body.mediaType || "").trim();
-    const fileName = (req.body.fileName || "").trim();
+    const text = (req.body.text || "").toString().trim();
+    const mediaUrl = (req.body.mediaUrl || "").toString().trim();
+    const mediaType = (req.body.mediaType || "").toString().trim();
+    const fileName = (req.body.fileName || "").toString().trim();
 
-    const audienceValues = Array.isArray(rawAudience)
-      ? rawAudience.map((item) => (item || "").toString().trim().toLowerCase())
-      : typeof rawAudience === "string"
-        ? rawAudience.split(",").map((item) => item.trim().toLowerCase())
-        : [];
+    const audienceValues = (() => {
+      if (Array.isArray(rawAudience)) {
+        return rawAudience.map((item) => (item || "").toString().trim().toLowerCase());
+      }
+
+      if (typeof rawAudience === "string") {
+        return rawAudience.split(",").map((item) => item.trim().toLowerCase());
+      }
+
+      if (rawAudience && typeof rawAudience === "object") {
+        return Object.values(rawAudience).map((item) => (item || "").toString().trim().toLowerCase());
+      }
+
+      return [];
+    })();
 
     const filteredAudience = [...new Set(audienceValues.filter(Boolean))];
     let audience = filteredAudience.join(",");
@@ -3284,7 +3297,7 @@ app.get("/debug-submitted-scores", async (req, res) => {
 });
 
 // =========================
-// Academic session routes
+// AI / LLM ENDPOINTS
 // =========================
 
 /* =========================
