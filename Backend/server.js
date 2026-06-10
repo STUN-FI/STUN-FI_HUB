@@ -10,7 +10,6 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const registerAiRoutes = require("./ai-routes");
 const registerAdminRoutes = require("./admin-routes");
 const app = express();
 
@@ -43,8 +42,6 @@ const transporter = nodemailer.createTransport({
 
 app.use(cors());
 app.use(express.json({ limit: "20mb" }));
-
-registerAiRoutes(app);
 
 // Use the MONGO_URI variable defined above (not a separate dbURI)
 const maskedMongoUri = MONGO_URI
@@ -3287,7 +3284,7 @@ app.get("/debug-submitted-scores", async (req, res) => {
 });
 
 // =========================
-// AI / LLM ENDPOINTS
+// Academic session routes
 // =========================
 
 /* =========================

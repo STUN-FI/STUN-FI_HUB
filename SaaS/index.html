@@ -741,7 +741,6 @@
 
       <div class="nav-actions">
         <button class="secondary-btn explore-btn" onclick="scrollToRoles()">Explore Roles</button>
-        <button class="secondary-btn" id="aiBtn" onclick="openAiModal()">Ask AI</button>
         <button class="nav-btn" onclick="openLoginModal()">Login</button>
       </div>
     </nav>
@@ -902,31 +901,6 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="aiModal">
-    <div class="modal">
-      <div class="modal-content">
-      <div class="modal-head">
-        <h3>Ask the AI (Gemini)</h3>
-        <button class="close-btn" onclick="closeAiModal()"><ion-icon name="close-outline"></ion-icon></button>
-      </div>
-
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <textarea id="aiPrompt" rows="6" placeholder="Ask a question about the portal, features, or get help..." style="width:100%;padding:12px;border-radius:12px;background:#061020;border:1px solid rgba(255,255,255,0.06);color:var(--text);"></textarea>
-
-        <div style="display:flex;gap:10px;align-items:center;">
-          <button class="primary-btn" id="aiSendBtn">Send</button>
-          <select id="aiModel" style="padding:10px;border-radius:10px;background:#0f172a;color:var(--text);border:1px solid rgba(255,255,255,0.06);">
-            <option value="text-bison-001">text-bison-001</option>
-            <option value="chat-bison-001">chat-bison-001</option>
-          </select>
-        </div>
-
-        <div class="hero-card" id="aiResponse" style="min-height:120px;white-space:pre-wrap;">AI responses will appear here.</div>
-      </div>
-      </div>
-    </div>
-  </div>
-
   <script>
     function openLoginModal() {
       openModal("loginModal");
@@ -968,59 +942,9 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         closeLoginModal();
-        closeAiModal();
-      }
-    });
-
-    // AI modal handlers
-    function openAiModal(){
-      openModal('aiModal');
-      document.getElementById('aiPrompt').focus();
-    }
-
-    function closeAiModal(){
-      closeModal('aiModal');
-    }
-
-    async function sendAi(){
-      const prompt = document.getElementById('aiPrompt').value.trim();
-      const model = document.getElementById('aiModel').value;
-      const respEl = document.getElementById('aiResponse');
-      if(!prompt){
-        respEl.textContent = 'Please enter a question.';
-        return;
-      }
-      respEl.textContent = 'Thinking...';
-
-      try{
-        const r = await fetch('/ai/chat',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ prompt, model })
-        });
-        const data = await r.json();
-        if(data.text){
-          respEl.textContent = data.text;
-        } else if(data.raw){
-          respEl.textContent = JSON.stringify(data.raw, null, 2);
-        } else {
-          respEl.textContent = 'No response from AI.';
-        }
-      }catch(err){
-        respEl.textContent = 'Error calling AI: '+err.message;
-      }
-    }
-
-    document.getElementById('aiSendBtn').addEventListener('click', sendAi);
-
-    // also send on Ctrl+Enter inside textarea
-    document.getElementById('aiPrompt').addEventListener('keydown',(e)=>{
-      if((e.ctrlKey||e.metaKey) && e.key === 'Enter'){
-        sendAi();
       }
     });
   </script>
-  <script src="ai-widget.js"></script>
   <script src="common.js"></script>
 </body>
 </html>

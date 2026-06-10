@@ -19,7 +19,6 @@ It helps schools move from fragmented workflows to a centralized dashboard that 
 - A static frontend in `SaaS/` presents role-specific pages for school admins, teachers, students and platform administrators.
 - The Node.js backend in `Backend/` powers the APIs that fetch school metrics, manage subscriptions, and store results, sessions, and promotion history.
 - A Super Admin dashboard provides platform-wide monitoring and school management capabilities.
-- Integrated AI support is included for chat, guidance, and text analysis through the backend API.
 
 ## Benefits for Schools, Teachers and Students
 
@@ -70,7 +69,6 @@ The platform is designed to increase administrative efficiency, improve transpar
 - Activity log and analytics endpoints to track platform performance
 - Export endpoints for school student and teacher data
 - Notifications, password reset, and support ticket workflows
-- AI chat/help/analyze endpoints via backend integration
 - Static multi-role frontend pages for administrator, school, teacher and student workflows
 
 ## Tech Stack
@@ -85,14 +83,12 @@ The platform is designed to increase administrative efficiency, improve transpar
 - cors for cross-origin support
 - multer for file uploads
 - nodemailer for email-related workflows
-- Google Gemini / GenAI support via `@google/genai`
 
 ## Repository Structure
 
 - `Backend/`
   - `server.js` - Express server and backend application entry point
   - `admin-routes.js` - Super Admin and platform management APIs
-  - `ai-routes.js` - AI chat/help/analyze endpoints
   - `package.json` - backend dependencies
   - `Credentials/` - service account and upload artifacts
 - `SaaS/`
@@ -118,16 +114,6 @@ node server.js
 ```
 
 The backend serves the static frontend from `../SaaS` and exposes API routes under `/api` and `/admin`.
-
-## AI Integration
-
-Backend AI endpoints are available at:
-
-- `POST /api/ai/chat`
-- `POST /api/ai/help`
-- `POST /api/ai/analyze`
-
-See `Backend/README.md` for Google Gemini / GenAI configuration details.
 
 ## License
 
