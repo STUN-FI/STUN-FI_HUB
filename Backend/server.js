@@ -3456,26 +3456,20 @@ app.post("/ai/generate-report-comment", async (req, res) => {
     }
 
     const prompt = buildAIPromptForStudentReport({ student, scores, session, term });
-    // Try preferred model first; if it's not available for this API/version,
-    // retry with a known supported model (`gemini-2.0-flash`) as a fallback.
     const preferredModels = ["gemini-1.5-mini", "gemini-2.0-flash"];
     let response = null;
     let lastErr = null;
 
     for (const modelName of preferredModels) {
       try {
-        response = await geminiClient.models.generateContent({
-          model: modelName,
-          contents: prompt,
-          config: { temperature: 0.4, maxOutputTokens: 220 }
-        });
+        const model = geminiClient.getGenerativeModel({ model: modelName });
+        response = await model.generateContent(prompt);
         break; // success
       } catch (err) {
         lastErr = err;
+        console.error(`Model ${modelName} error:`, err.message || err);
         // If it's a 404 about the model not being found, try the next model.
-        const status = err && err.response && err.response.status;
-        const body = err && err.response && err.response.data;
-        if (status === 404 && body && typeof body === "object" && body.error && body.error.message && /not found/i.test(body.error.message)) {
+        if (err.message && /not found|not available/i.test(err.message)) {
           continue;
         }
         // For other errors, stop retrying and surface the error.
@@ -3484,11 +3478,28 @@ app.post("/ai/generate-report-comment", async (req, res) => {
     }
 
     if (!response) {
-      console.error("AI model selection error:", lastErr && (lastErr.response && lastErr.response.data ? lastErr.response.data : lastErr.message));
+      console.error("AI model selection error:", lastErr && (lastErr.message || JSON.stringify(lastErr)));
       return res.status(500).json({ message: "AI service error or requested model not available. Check GEMINI_API_KEY and model availability." });
     }
 
-    const comment = (response && (response.text || response.outputText || response.output)) ? (response.text || response.outputText || (Array.isArray(response.output) ? response.output.map(o=>o.text||o).join('\n') : String(response.output))) : "";
+    // Extract text from Google Generative AI response
+    let comment = "";
+    try {
+      // Try different response formats
+      if (response.text && typeof response.text === "function") {
+        comment = response.text();
+      } else if (response.text && typeof response.text === "string") {
+        comment = response.text;
+      } else if (response.candidates && Array.isArray(response.candidates) && response.candidates[0]) {
+        const firstCandidate = response.candidates[0];
+        if (firstCandidate.content && firstCandidate.content.parts && Array.isArray(firstCandidate.content.parts)) {
+          comment = firstCandidate.content.parts.map(p => p.text || "").join("");
+        }
+      }
+    } catch (e) {
+      console.error("Error extracting text from response:", e);
+    }
+    
     if (!comment) {
       return res.status(500).json({ message: "AI service returned an empty comment" });
     }
