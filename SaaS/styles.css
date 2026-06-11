@@ -89,6 +89,17 @@ textarea {
   text-transform: uppercase;
 }
 
+/* Ensure action buttons in student/teacher lists display uppercase */
+#studentList button,
+#teacherList button,
+.item-list button,
+.item-list .mini-btn,
+.mini-btn.btn-edit,
+.mini-btn.btn-view,
+.mini-btn.btn-subjects {
+  text-transform: uppercase;
+}
+
 .toast {
   animation: fadeIn 260ms ease;
 }
