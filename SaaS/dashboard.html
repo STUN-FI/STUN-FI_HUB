@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-,
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="shortcut icon" href="img/Favicon.png" type="image/x-icon">
   <title>STUN-FI HUB | School Dashboard</title>
@@ -5315,22 +5315,26 @@ return;
 }
 
 wrap.innerHTML=
-list.map(x=>`
+list.map(x=>{
+  const subject = escapeHtml(String((x.subject||'').replace(/â€”|â€“|â€”/g,'—').replace(/â€™/g,"'").replace(/â€œ|â€�/g,'"')));
+  const className = escapeHtml(String((x.className||'').replace(/â€”|â€“|â€”/g,'—')));
+  const arm = escapeHtml(String((x.arm||'N/A').replace(/â€”|â€“|â€”/g,'—')));
+  return `
 
 <div class="teacher-subject-item">
 
 <div>
 
-<b>${x.subject}</b>
+<b>${subject}</b>
 
 <div class="teacher-subject-meta">
 
 <span>
-${x.className}
+${className}
 </span>
 
 <span>
-${x.arm || "N/A"}
+${arm}
 </span>
 
 </div>
@@ -5340,13 +5344,7 @@ ${x.arm || "N/A"}
 <button
 class="remove-subject-btn"
 
-onclick="
-deleteTeacherSubject(
-'${x.subject}',
-'${x.className}',
-'${x.arm}'
-)
-">
+onclick="deleteTeacherSubject('${subject}','${className}','${arm}')">
 
 Delete
 
@@ -5354,7 +5352,8 @@ Delete
 
 </div>
 
-`).join("");
+`
+}).join("");
 
 }
 
