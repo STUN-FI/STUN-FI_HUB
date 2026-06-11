@@ -89,6 +89,12 @@ textarea {
   text-transform: uppercase;
 }
 
+/* Explicitly disable uppercase for password and email fields */
+input[type="email"],
+input[type="password"] {
+  text-transform: none !important;
+}
+
 /* Ensure action buttons in student/teacher lists display uppercase */
 #studentList button,
 #teacherList button,
