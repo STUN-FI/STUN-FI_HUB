@@ -525,19 +525,37 @@ async function generatePostId() {
 
 async function generateSchoolId() {
   try {
-    const lastSchool = await School.findOne({ schoolId: { $exists: true } })
-      .sort({ schoolId: -1 })
-      .select('schoolId');
-    
+    const lastSchool = await School.findOne({
+      $or: [
+        { id: { $regex: /^SCH\d{4}$/ } },
+        { schoolId: { $exists: true } }
+      ]
+    })
+      .sort({ id: -1, schoolId: -1 })
+      .select('id schoolId');
+
+    const currentId = (lastSchool && (lastSchool.id || lastSchool.schoolId)) || "";
     let nextNum = 1;
-    if (lastSchool && lastSchool.schoolId) {
-      const match = lastSchool.schoolId.match(/\d+/);
+
+    if (currentId) {
+      const match = currentId.match(/\d+/);
       if (match) {
         nextNum = parseInt(match[0]) + 1;
       }
     }
-    
-    return "SCH" + String(nextNum).padStart(4, "0");
+
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const candidate = "SCH" + String(nextNum).padStart(4, "0");
+      const exists = await School.exists({ id: candidate });
+      if (!exists) {
+        return candidate;
+      }
+      nextNum += 1;
+    }
+
+    // Fallback in case the sequential generation failed due to unexpected duplicates.
+    const count = await School.countDocuments();
+    return "SCH" + String(count + 1).padStart(4, "0");
   } catch (error) {
     console.error("Error in generateSchoolId:", error.message);
     const count = await School.countDocuments();
