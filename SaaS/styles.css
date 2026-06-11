@@ -210,3 +210,57 @@ input[id*="regnumber" i], input[name*="regnumber" i] {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Minimal / Dashboard-like theme overrides for Admin */
+.minimal-ui {
+  --bg: none;
+  --card-bg: rgba(255,255,255,0.03);
+  --card-border: rgba(255,255,255,0.06);
+  --card-radius: 18px;
+  --card-padding: 18px;
+}
+
+.minimal-ui body {
+  background: none;
+}
+
+.minimal-ui .card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  box-shadow: none;
+}
+
+.minimal-ui .brand {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.minimal-ui .top-actions button,
+.minimal-ui .top-actions .danger-btn {
+  background: var(--accent);
+  border-radius: 12px;
+  padding: 10px 12px;
+  min-width: auto;
+}
+
+.minimal-ui .small-stat p,
+.minimal-ui .small-stat h4 {
+  font-weight: 700;
+}
+
+.minimal-ui .layout {
+  gap: 20px;
+}
+
+.minimal-ui .table-wrap th,
+.minimal-ui .table-wrap td {
+  padding: 12px 10px;
+}
+
+/* compact progress bar for capacity */
+.minimal-ui .stat-card p {
+  font-weight: 800;
+  font-size: 1.4rem;
+}

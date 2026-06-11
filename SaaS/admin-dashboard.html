@@ -901,6 +901,7 @@
 
     <div class="top-actions">
       <button id="sidebarToggle" class="collapse-btn" onclick="toggleSidebar()"><ion-icon name="close-outline"></ion-icon> Hide sidebar</button>
+      <button id="toggleMinimalUI" class="theme-btn" title="Toggle minimal UI"><ion-icon name="contrast-outline"></ion-icon> Minimal</button>
       <button onclick="loadEverything()"><ion-icon name="refresh-outline"></ion-icon> Refresh</button>
       <button class="danger-btn" onclick="logout()"><ion-icon name="log-out-outline"></ion-icon> Logout</button>
     </div>
@@ -1725,6 +1726,29 @@
   </script>
 
   <script src="common.js"></script>
+  <script>
+    // Minimal UI toggle for admin dashboard — persists choice in localStorage
+    (function() {
+      const key = 'adminMinimalUI';
+      const btn = document.getElementById('toggleMinimalUI');
+      function apply(state) {
+        if (state) document.documentElement.classList.add('minimal-ui');
+        else document.documentElement.classList.remove('minimal-ui');
+        if (btn) btn.classList.toggle('active', !!state);
+      }
+      // init after load
+      window.addEventListener('load', () => {
+        const val = localStorage.getItem(key) === 'true';
+        apply(val);
+      });
+      if (btn) btn.addEventListener('click', () => {
+        const current = document.documentElement.classList.contains('minimal-ui');
+        const next = !current;
+        apply(next);
+        localStorage.setItem(key, next ? 'true' : 'false');
+      });
+    })();
+  </script>
 </body>
 </html>
 
