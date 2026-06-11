@@ -771,7 +771,7 @@ const postSchema = new mongoose.Schema(
 
     audience: {
       type: String,
-      enum: ["students", "teachers"],
+      enum: ["students", "teachers", "both"],
       required: true
     },
 
@@ -2101,6 +2101,7 @@ app.post("/create-post", async (req, res) => {
       post
     });
   } catch (error) {
+    console.error("Create post error:", error);
     res.status(500).json({ message: "Error creating post" });
   }
 });
