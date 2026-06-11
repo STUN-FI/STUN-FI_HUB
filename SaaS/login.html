@@ -328,6 +328,12 @@
         height: 80px;
       }
     }
+
+    /* Override to prevent text-transform uppercase on password and email fields */
+    input[type="password"],
+    input[type="email"] {
+      text-transform: none !important;
+    }
   </style>
   <script src="js/config.js"></script>
 </head>
