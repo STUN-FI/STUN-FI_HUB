@@ -75,7 +75,7 @@ window.closeModal = closeModal;
     const t = e.target;
     if (!t || t.tagName !== 'INPUT') return;
     try {
-      if (t.matches && t.matches(selector)) {
+      if (t.matches && t.matches(selector) && t.type !== 'password') {
         const pos = t.selectionStart;
         t.value = t.value.toUpperCase();
         if (typeof pos === 'number') t.setSelectionRange(pos, pos);
@@ -87,7 +87,7 @@ window.closeModal = closeModal;
     const t = e.target;
     if (!t || t.tagName !== 'INPUT') return;
     try {
-      if (t.matches && t.matches(selector)) {
+      if (t.matches && t.matches(selector) && t.type !== 'password') {
         setTimeout(() => {
           t.value = (t.value || '').toUpperCase();
         }, 0);
@@ -99,7 +99,7 @@ window.closeModal = closeModal;
     const t = e.target;
     if (!t || t.tagName !== 'INPUT') return;
     try {
-      if (t.matches && t.matches(selector)) {
+      if (t.matches && t.matches(selector) && t.type !== 'password') {
         t.value = (t.value || '').toUpperCase();
       }
     } catch (err) { }
