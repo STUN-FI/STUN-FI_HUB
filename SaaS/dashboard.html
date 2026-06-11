@@ -1724,7 +1724,7 @@
 
     <div class="form-group">
       <label>Subject</label>
-      <input id="assignSubject">
+      <input id="assignSubject" placeholder="e.g., Math, English, Biology">
     </div>
 
     <div class="form-group">
@@ -2498,41 +2498,52 @@ function closeAssignModal() {
 }
 
 async function addAssignment() {
-  const subject = document.getElementById("assignSubject").value.trim();
+  const raw = document.getElementById("assignSubject").value.trim();
   const className = document.getElementById("assignClass").value.trim();
   const arm = document.getElementById("assignArm").value.trim();
 
-  if (!subject || !className) {
+  if (!raw || !className) {
     toast("Subject and class required", "error");
     return;
   }
 
+  // Split by comma and filter out empty items
+  const subjects = raw.split(",").map(s => s.trim()).filter(Boolean);
+  if (subjects.length === 0) {
+    toast("No valid subjects provided", "error");
+    return;
+  }
+
   try {
-    const response = await fetch(window.API_BASE + "/add-teacher-assignment", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        teacherId: currentAssignTeacherId,
-        subject,
-        className,
-        arm
-      })
-    });
+    const promises = subjects.map((subject) =>
+      fetch(window.API_BASE + "/add-teacher-assignment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          teacherId: currentAssignTeacherId,
+          subject,
+          className,
+          arm
+        })
+      }).then(async (res) => ({ ok: res.ok, status: res.status, body: await res.json().catch(() => ({})), subject }))
+    );
 
-    const data = await response.json();
+    const results = await Promise.all(promises);
+    const failed = results.filter(r => !r.ok);
 
-    if (response.ok) {
+    if (failed.length === 0) {
       closeAssignModal();
       await loadTeachers();
-      toast("Assignment added", "success");
+      toast(`${subjects.length} assignment(s) added`, "success");
     } else {
-      toast(data.message || "Error adding assignment", "error");
+      // show partial success info
+      await loadTeachers();
+      toast(`${subjects.length - failed.length} added, ${failed.length} failed`, "warning");
+      console.error('Assignment add failures:', failed);
     }
 
   } catch (err) {
-    console.log(err);
+    console.error(err);
     toast("Server error", "error");
   }
 }
