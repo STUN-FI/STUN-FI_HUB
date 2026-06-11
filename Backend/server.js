@@ -2033,32 +2033,34 @@ app.post("/create-post", async (req, res) => {
     const mediaType = (req.body.mediaType || "").toString().trim();
     const fileName = (req.body.fileName || "").toString().trim();
 
-    const audienceValues = (() => {
-      if (Array.isArray(rawAudience)) {
-        return rawAudience.map((item) => (item || "").toString().trim().toLowerCase());
-      }
+    const allowedAudiences = ["students", "teachers", "both"];
+    const audienceValues = [];
 
-      if (typeof rawAudience === "string") {
-        return rawAudience.split(",").map((item) => item.trim().toLowerCase());
-      }
-
-      if (rawAudience && typeof rawAudience === "object") {
-        return Object.values(rawAudience).map((item) => (item || "").toString().trim().toLowerCase());
-      }
-
-      return [];
-    })();
-
-    const filteredAudience = [...new Set(audienceValues.filter(Boolean))];
-    let audience = filteredAudience.join(",");
-
-    if (!schoolId || !filteredAudience.length) {
-      return res.status(400).json({ message: "School ID and audience are required" });
+    if (Array.isArray(rawAudience)) {
+      rawAudience.forEach((item) => {
+        const str = (item || "").toString();
+        audienceValues.push(...str.split(","));
+      });
+    } else if (typeof rawAudience === "string") {
+      audienceValues.push(...rawAudience.split(","));
+    } else if (rawAudience && typeof rawAudience === "object") {
+      Object.values(rawAudience).forEach((item) => {
+        const str = (item || "").toString();
+        audienceValues.push(...str.split(","));
+      });
     }
+
+    const filteredAudience = [...new Set(
+      audienceValues
+        .map((item) => item.trim().toLowerCase())
+        .filter(Boolean)
+    )];
+
+    let audience = "";
 
     if (filteredAudience.includes("students") && filteredAudience.includes("teachers")) {
       audience = "both";
-    } else if (filteredAudience.length === 1 && ["students", "teachers", "both"].includes(filteredAudience[0])) {
+    } else if (filteredAudience.length === 1 && allowedAudiences.includes(filteredAudience[0])) {
       audience = filteredAudience[0];
     } else {
       return res.status(400).json({ message: "Audience must be students, teachers, or both" });
@@ -2101,7 +2103,7 @@ app.post("/create-post", async (req, res) => {
       post
     });
   } catch (error) {
-    console.error("Create post error:", error);
+    console.error("Create post error:", error?.stack || error);
     res.status(500).json({ message: "Error creating post" });
   }
 });
