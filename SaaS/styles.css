@@ -84,14 +84,18 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(102, 204, 204, 0.16);
 }
 
-input:not([type="email"]):not([type="password"]),
+input:not([type="email"]):not([type="password"]):not(#password):not(#confirmPassword):not(#schoolPassword):not(#newPassword),
 textarea {
   text-transform: uppercase;
 }
 
-/* Explicitly disable uppercase for password and email fields */
+/* Explicitly disable uppercase for email and password fields, even when password toggles to text */
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input#password,
+input#confirmPassword,
+input#schoolPassword,
+input#newPassword {
   text-transform: none !important;
 }
 
