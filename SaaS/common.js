@@ -68,40 +68,38 @@ window.closeModal = closeModal;
 
 // Enforce uppercase for all form inputs except email and password
 (function enforceUppercaseInputs(){
-  const selector = 'input:not([type="email"]):not([type="password"])';
-
   // Convert value to uppercase on input and blur; handle paste
   document.addEventListener('input', (e) => {
     const t = e.target;
     if (!t || t.tagName !== 'INPUT') return;
+    // Skip email and password fields
+    if (t.type === 'email' || t.type === 'password') return;
     try {
-      if (t.matches && t.matches(selector) && t.type !== 'password') {
-        const pos = t.selectionStart;
-        t.value = t.value.toUpperCase();
-        if (typeof pos === 'number') t.setSelectionRange(pos, pos);
-      }
+      const pos = t.selectionStart;
+      t.value = t.value.toUpperCase();
+      if (typeof pos === 'number') t.setSelectionRange(pos, pos);
     } catch (err) { /* ignore */ }
   }, true);
 
   document.addEventListener('paste', (e) => {
     const t = e.target;
     if (!t || t.tagName !== 'INPUT') return;
+    // Skip email and password fields
+    if (t.type === 'email' || t.type === 'password') return;
     try {
-      if (t.matches && t.matches(selector) && t.type !== 'password') {
-        setTimeout(() => {
-          t.value = (t.value || '').toUpperCase();
-        }, 0);
-      }
+      setTimeout(() => {
+        t.value = (t.value || '').toUpperCase();
+      }, 0);
     } catch (err) { }
   }, true);
 
   document.addEventListener('blur', (e) => {
     const t = e.target;
     if (!t || t.tagName !== 'INPUT') return;
+    // Skip email and password fields
+    if (t.type === 'email' || t.type === 'password') return;
     try {
-      if (t.matches && t.matches(selector) && t.type !== 'password') {
-        t.value = (t.value || '').toUpperCase();
-      }
+      t.value = (t.value || '').toUpperCase();
     } catch (err) { }
   }, true);
 })();
