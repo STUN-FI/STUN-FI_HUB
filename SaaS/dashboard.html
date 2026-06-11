@@ -2043,8 +2043,8 @@
         <p id="totalClasses">0</p>
       </div>
       <div class="stat-card">
-        <h4>School Arms</h4>
-        <p id="totalArms">0</p>
+        <h4>Capacity</h4>
+        <p id="schoolCapacity">0 / 0</p>
       </div>
     </section>
 
@@ -3706,7 +3706,12 @@ function updateStats() {
   const uniqueArms = new Set(students.map(s => (s.arm || "").trim()).filter(Boolean));
 
   document.getElementById("totalClasses").innerText = uniqueClasses.size;
-  document.getElementById("totalArms").innerText = uniqueArms.size;
+
+  // Capacity: show filled students / total capacity (fallback to 200)
+  const schoolObj = JSON.parse(localStorage.getItem("school") || "null") || {};
+  const totalCapacity = parseInt(schoolObj.capacity) || 200;
+  const filled = students.length;
+  document.getElementById("schoolCapacity").innerText = `${filled} / ${totalCapacity}`;
 }
 
 function closeScoreModal() {
