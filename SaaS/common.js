@@ -68,12 +68,15 @@ window.closeModal = closeModal;
 
 // Enforce uppercase for all form inputs except email and password
 (function enforceUppercaseInputs(){
+  // List of password field IDs to exclude from uppercase
+  const passwordFieldIds = ['password', 'confirmPassword', 'schoolPassword', 'newPassword'];
+  
   // Convert value to uppercase on input and blur; handle paste
   document.addEventListener('input', (e) => {
     const t = e.target;
     if (!t || t.tagName !== 'INPUT') return;
-    // Skip email and password fields
-    if (t.type === 'email' || t.type === 'password') return;
+    // Skip email fields and password fields (by type or ID)
+    if (t.type === 'email' || t.type === 'password' || passwordFieldIds.includes(t.id)) return;
     try {
       const pos = t.selectionStart;
       t.value = t.value.toUpperCase();
@@ -84,8 +87,8 @@ window.closeModal = closeModal;
   document.addEventListener('paste', (e) => {
     const t = e.target;
     if (!t || t.tagName !== 'INPUT') return;
-    // Skip email and password fields
-    if (t.type === 'email' || t.type === 'password') return;
+    // Skip email fields and password fields (by type or ID)
+    if (t.type === 'email' || t.type === 'password' || passwordFieldIds.includes(t.id)) return;
     try {
       setTimeout(() => {
         t.value = (t.value || '').toUpperCase();
@@ -96,8 +99,8 @@ window.closeModal = closeModal;
   document.addEventListener('blur', (e) => {
     const t = e.target;
     if (!t || t.tagName !== 'INPUT') return;
-    // Skip email and password fields
-    if (t.type === 'email' || t.type === 'password') return;
+    // Skip email fields and password fields (by type or ID)
+    if (t.type === 'email' || t.type === 'password' || passwordFieldIds.includes(t.id)) return;
     try {
       t.value = (t.value || '').toUpperCase();
     } catch (err) { }
