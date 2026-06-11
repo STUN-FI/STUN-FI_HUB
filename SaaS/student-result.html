@@ -1293,16 +1293,69 @@
           "&term=" + encodeURIComponent(term)
         );
 
-        const data = await response.json();
+        let data = await response.json();
 
         if (!response.ok) {
-          renderLockedState(false, session, term);
-          return;
+          // Try fallback: maybe teacher saved submitted scores (SubmittedScore)
+          try {
+            const subResp = await fetch(CONFIG.API_BASE_URL + '/school-student-scores/' + encodeURIComponent(student.studentId) + '?schoolId=' + encodeURIComponent(student.schoolId) + '&session=' + encodeURIComponent(session) + '&term=' + encodeURIComponent(term));
+            if (subResp.ok) {
+              const subData = await subResp.json();
+              if (Array.isArray(subData) && subData.length > 0) {
+                // Transform SubmittedScore documents into the same shape expected by renderFullResult
+                data = {
+                  student: { studentId: student.studentId, name: student.name, regNumber: student.regNumber, className: student.className, arm: student.arm, schoolId: student.schoolId },
+                  scores: subData.map(s => ({ subject: s.subject, components: s.components || [], total: s.total || 0, grade: s.grade || "" })),
+                  total: subData.reduce((sum, s) => sum + (s.total || 0), 0),
+                  average: subData.length ? (subData.reduce((sum, s) => sum + (s.total || 0), 0) / subData.length) : 0,
+                  position: "--",
+                  ready: true,
+                  unlocked: true
+                };
+              } else {
+                renderLockedState(false, session, term);
+                return;
+              }
+            } else {
+              renderLockedState(false, session, term);
+              return;
+            }
+          } catch (err) {
+            console.log('Fallback score load failed', err);
+            renderLockedState(false, session, term);
+            return;
+          }
         }
 
+        // If official result exists but isn't marked ready, also try submitted scores as a fallback
         if (!data.ready) {
-          renderLockedState(false, session, term);
-          return;
+          try {
+            const subResp = await fetch(CONFIG.API_BASE_URL + '/school-student-scores/' + encodeURIComponent(student.studentId) + '?schoolId=' + encodeURIComponent(student.schoolId) + '&session=' + encodeURIComponent(session) + '&term=' + encodeURIComponent(term));
+            if (subResp.ok) {
+              const subData = await subResp.json();
+              if (Array.isArray(subData) && subData.length > 0) {
+                data = {
+                  student: { studentId: student.studentId, name: student.name, regNumber: student.regNumber, className: student.className, arm: student.arm, schoolId: student.schoolId },
+                  scores: subData.map(s => ({ subject: s.subject, components: s.components || [], total: s.total || 0, grade: s.grade || "" })),
+                  total: subData.reduce((sum, s) => sum + (s.total || 0), 0),
+                  average: subData.length ? (subData.reduce((sum, s) => sum + (s.total || 0), 0) / subData.length) : 0,
+                  position: "--",
+                  ready: true,
+                  unlocked: true
+                };
+              } else {
+                renderLockedState(false, session, term);
+                return;
+              }
+            } else {
+              renderLockedState(false, session, term);
+              return;
+            }
+          } catch (err) {
+            console.log('Fallback score load failed', err);
+            renderLockedState(false, session, term);
+            return;
+          }
         }
 
         // fetch promotion settings to compute suggestion
