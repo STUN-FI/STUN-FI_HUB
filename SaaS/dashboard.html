@@ -4342,20 +4342,20 @@ async function createPost() {
   output.innerText = "";
   output.style.color = "";
 
-  const audience = [];
+  const audiences = [];
   if (document.getElementById("postAudienceStudents").checked) {
-    audience.push("students");
+    audiences.push("students");
   }
   if (document.getElementById("postAudienceTeachers").checked) {
-    audience.push("teachers");
+    audiences.push("teachers");
   }
 
   const text = document.getElementById("postText").value.trim();
   const mediaType = document.getElementById("postMediaType").value;
   const mediaUrl = document.getElementById("mediaUrl").value.trim();
   const fileName = document.getElementById("fileName").value.trim();
-  
-  if (!audience.length) {
+
+  if (!audiences.length) {
     output.style.color = "red";
     output.innerText = "Please choose at least one audience.";
     return;
@@ -4368,39 +4368,49 @@ async function createPost() {
   }
 
   try {
-    const res = await fetch(window.API_BASE + "/create-post", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        schoolId: currentSchoolId,
-        audience: audience.join(","),
-        text,
-        mediaUrl,
-        mediaType,
-        fileName
-      })
-    });
-    
-    const data = await res.json();
+    const payload = {
+      schoolId: currentSchoolId,
+      text,
+      mediaUrl,
+      mediaType,
+      fileName
+    };
 
-    if (res.ok) {
-      output.style.color = "green";
-      output.innerText = "Post created successfully.";
+    const results = await Promise.all(audiences.map(async (audience) => {
+      const res = await fetch(window.API_BASE + "/create-post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ ...payload, audience })
+      });
+      const data = await res.json().catch(() => ({}));
+      return { audience, res, data };
+    }));
 
-      document.getElementById("postText").value = "";
-      document.getElementById("postMediaType").value = "";
-      document.getElementById("postFile").value = "";
-      document.getElementById("mediaUrl").value = "";
-      document.getElementById("fileName").value = "";
-      document.getElementById("selectedFileName").innerText = "No file selected";
-      toggleFileNameField();
+    const failed = results.find((item) => !item.res.ok);
 
-      loadPosts(audience.includes("students") ? "students" : "teachers");
-    } else {
+    if (failed) {
       output.style.color = "red";
-      output.innerText = data.message || "Could not create post.";
+      output.innerText = failed.data.message || `Could not create post for ${failed.audience}.`;
+      return;
+    }
+
+    output.style.color = "green";
+    output.innerText = audiences.length > 1 ? "Posts created successfully." : "Post created successfully.";
+
+    document.getElementById("postText").value = "";
+    document.getElementById("postMediaType").value = "";
+    document.getElementById("postFile").value = "";
+    document.getElementById("mediaUrl").value = "";
+    document.getElementById("fileName").value = "";
+    document.getElementById("selectedFileName").innerText = "No file selected";
+    toggleFileNameField();
+
+    if (audiences.length > 1) {
+      loadPosts("both");
+    } else {
+      loadPosts(audiences[0]);
     }
   } catch (err) {
     console.log(err);
