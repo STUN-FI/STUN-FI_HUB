@@ -1231,7 +1231,11 @@ function setTeacherInfo() {
       "&arm=" +
       encodeURIComponent(teacherArm) +
       "&subject=" +
-      encodeURIComponent(teacherSubject)
+      encodeURIComponent(teacherSubject) +
+      "&session=" +
+      encodeURIComponent(session) +
+      "&term=" +
+      encodeURIComponent(term)
     );
 
     const studentData = await studentRes.json();

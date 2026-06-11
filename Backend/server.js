@@ -2653,18 +2653,25 @@ app.post("/add-teacher-assignment", async (req, res) => {
 
 app.get("/students-by-assignment", async (req, res) => {
   try {
-    const { schoolId, className, arm, subject } = req.query;
+    const { schoolId, className, arm, subject, session = "2025/2026", term = "1st Term" } = req.query;
 
     if (!schoolId || !className || !subject) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const enrollments = await SubjectEnrollment.find({
+    const query = {
       schoolId,
       className,
-      arm,
-      subject
-    });
+      subject,
+      session,
+      term
+    };
+
+    if (arm !== undefined && arm !== null && arm !== "") {
+      query.arm = arm;
+    }
+
+    const enrollments = await SubjectEnrollment.find(query);
 
     const studentIds = enrollments.map(e => e.studentId);
 
