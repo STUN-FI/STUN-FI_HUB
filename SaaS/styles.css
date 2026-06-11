@@ -146,6 +146,8 @@ select:focus {
 
 .modal-overlay.active .modal,
 .modal-overlay.show .modal,
+.modal-overlay.active .modal-card,
+.modal-overlay.show .modal-card,
 .modal.visible,
 .modal-backdrop.visible + .modal,
 .modal-backdrop.visible ~ .modal {
