@@ -426,8 +426,9 @@
             window.location.href = "login.html";
           }, 1800);
         } else {
+          console.error('Registration failed response:', data);
           output.classList.add("error");
-          output.innerText = data.message || "Registration failed.";
+          output.innerText = (data.message || "Registration failed.") + (data.error ? (" - " + data.error) : "");
         }
       } catch (error) {
         console.log(error);
