@@ -10,7 +10,7 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const { GoogleGenAI } = require("@google/genai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const registerAdminRoutes = require("./admin-routes");
 const app = express();
 
@@ -49,7 +49,7 @@ if (!emailUser || !emailPass) {
 }
 
 const geminiApiKey = process.env.GEMINI_API_KEY || "AIzaSyBW_begbhYKhDyHFl8k111Uhhp9JZY_mFE";
-const geminiClient = new GoogleGenAI({ apiKey: geminiApiKey });
+const genAI = new GoogleGenerativeAI({ apiKey: geminiApiKey });
 
 if (!geminiApiKey) {
   console.warn("GEMINI_API_KEY is not configured. AI report comment generation will be disabled.");
@@ -3456,24 +3456,20 @@ app.post("/ai/generate-report-comment", async (req, res) => {
     }
 
     const prompt = buildAIPromptForStudentReport({ student, scores, session, term });
-    const preferredModels = ["gemini-1.5-mini", "gemini-2.0-flash"];
+    const preferredModels = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
     let response = null;
     let lastErr = null;
 
     for (const modelName of preferredModels) {
       try {
-        const model = geminiClient.getGenerativeModel({ model: modelName });
+        const model = genAI.getGenerativeModel({ model: modelName });
         response = await model.generateContent(prompt);
         break; // success
       } catch (err) {
         lastErr = err;
         console.error(`Model ${modelName} error:`, err.message || err);
-        // If it's a 404 about the model not being found, try the next model.
-        if (err.message && /not found|not available/i.test(err.message)) {
-          continue;
-        }
-        // For other errors, stop retrying and surface the error.
-        break;
+        // Try next model if current one failed
+        continue;
       }
     }
 
@@ -3482,25 +3478,20 @@ app.post("/ai/generate-report-comment", async (req, res) => {
       return res.status(500).json({ message: "AI service error or requested model not available. Check GEMINI_API_KEY and model availability." });
     }
 
-    // Extract text from Google Generative AI response
+    // Extract text from Google Generative AI response (official @google/generative-ai library)
     let comment = "";
     try {
-      // Try different response formats
-      if (response.text && typeof response.text === "function") {
+      if (typeof response.text === "function") {
         comment = response.text();
-      } else if (response.text && typeof response.text === "string") {
+      } else if (typeof response.text === "string") {
         comment = response.text;
-      } else if (response.candidates && Array.isArray(response.candidates) && response.candidates[0]) {
-        const firstCandidate = response.candidates[0];
-        if (firstCandidate.content && firstCandidate.content.parts && Array.isArray(firstCandidate.content.parts)) {
-          comment = firstCandidate.content.parts.map(p => p.text || "").join("");
-        }
       }
     } catch (e) {
       console.error("Error extracting text from response:", e);
     }
     
     if (!comment) {
+      console.error("Generated comment is empty");
       return res.status(500).json({ message: "AI service returned an empty comment" });
     }
 
