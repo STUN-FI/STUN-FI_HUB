@@ -1238,15 +1238,44 @@ function setTeacherInfo() {
       encodeURIComponent(term)
     );
 
-    const studentData = await studentRes.json();
-
-    if (!studentRes.ok) {
-      status.innerText = studentData.message || "Error loading students";
-      tableBody.innerHTML = `<tr><td colspan="20" class="empty">Could not load students.</td></tr>`;
-      return;
+    let studentData = [];
+    if (studentRes.ok) {
+      studentData = await studentRes.json();
     }
 
-    students = studentData;
+    if (!Array.isArray(studentData) || studentData.length === 0) {
+      const rosterRes = await fetch(
+        window.API_BASE + "/teacher-students?schoolId=" +
+        encodeURIComponent(teacher.schoolId) +
+        "&className=" +
+        encodeURIComponent(teacherClass) +
+        "&arm=" +
+        encodeURIComponent(teacherArm)
+      );
+
+      if (rosterRes.ok) {
+        const rosterData = await rosterRes.json();
+        if (Array.isArray(rosterData) && rosterData.length > 0) {
+          students = rosterData;
+        } else if (!studentRes.ok) {
+          const errorData = await studentRes.json();
+          status.innerText = errorData.message || "Error loading students";
+          tableBody.innerHTML = `<tr><td colspan="20" class="empty">Could not load students.</td></tr>`;
+          return;
+        } else {
+          students = [];
+        }
+      } else if (!studentRes.ok) {
+        const errorData = await studentRes.json();
+        status.innerText = errorData.message || "Error loading students";
+        tableBody.innerHTML = `<tr><td colspan="20" class="empty">Could not load students.</td></tr>`;
+        return;
+      } else {
+        students = [];
+      }
+    } else {
+      students = studentData;
+    }
 
     try {
       const draftRes = await fetch(
