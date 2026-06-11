@@ -3431,7 +3431,26 @@ app.post("/ai/generate-report-comment", async (req, res) => {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    const scores = await Score.find({ studentId, schoolId, session, term });
+    let scores = await Score.find({ studentId, schoolId, session, term });
+    
+    // Fallback: if no official scores, try submitted/draft scores
+    if (!scores.length) {
+      const submitted = await SubmittedScore.find({ studentId, schoolId, session, term });
+      if (submitted.length > 0) {
+        // Transform SubmittedScore to Score shape for prompt building
+        scores = submitted.map(s => ({
+          studentId: s.studentId,
+          schoolId: s.schoolId,
+          subject: s.subject,
+          total: s.total || 0,
+          grade: s.grade || "",
+          components: s.components || [],
+          session: s.session,
+          term: s.term
+        }));
+      }
+    }
+    
     if (!scores.length) {
       return res.status(400).json({ message: "No submitted scores found for this student in the selected session and term" });
     }
