@@ -1728,7 +1728,12 @@ app.post("/school-register", async (req, res) => {
     });
   } catch (error) {
     console.error("School registration error:", error && error.message ? error.message : error, { body: req.body });
-    res.status(500).json({ message: "Error registering school" });
+    const resp = { message: "Error registering school" };
+    if (process.env.NODE_ENV !== 'production') {
+      resp.error = error && error.message ? error.message : String(error);
+      resp.stack = error && error.stack ? error.stack : null;
+    }
+    res.status(500).json(resp);
   }
 });
 
