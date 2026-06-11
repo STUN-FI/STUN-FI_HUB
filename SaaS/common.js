@@ -66,17 +66,9 @@ document.addEventListener('keydown', function (event) {
 window.openModal = openModal;
 window.closeModal = closeModal;
 
-// Enforce uppercase for school id, student id, and registration inputs across forms
+// Enforce uppercase for all form inputs except email and password
 (function enforceUppercaseInputs(){
-  const selector = [
-    'input[id*="schoolid" i]', 'input[name*="schoolid" i]',
-    'input[id*="studentid" i]', 'input[name*="studentid" i]',
-    'input[id*="regno" i]', 'input[name*="regno" i]',
-    'input[id*="reg-number" i]', 'input[name*="reg-number" i]',
-    'input[id*="regnumber" i]', 'input[name*="regnumber" i]',
-    'input[id*="registration" i]', 'input[name*="registration" i]',
-    'input[id*="reg" i]', 'input[name*="reg" i]'
-  ].join(',');
+  const selector = 'input:not([type="email"]):not([type="password"])';
 
   // Convert value to uppercase on input and blur; handle paste
   document.addEventListener('input', (e) => {
@@ -96,8 +88,9 @@ window.closeModal = closeModal;
     if (!t || t.tagName !== 'INPUT') return;
     try {
       if (t.matches && t.matches(selector)) {
-        // Allow paste then uppercase in next tick
-        setTimeout(() => t.value = (t.value || '').toUpperCase(), 0);
+        setTimeout(() => {
+          t.value = (t.value || '').toUpperCase();
+        }, 0);
       }
     } catch (err) { }
   }, true);
