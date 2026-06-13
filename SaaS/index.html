@@ -229,6 +229,7 @@
       margin: 0 0 12px;
       font-size: 3rem;
       line-height: 1.06;
+      text-align: center;
     }
 
     .hero-copy p {
@@ -333,11 +334,12 @@
 
     .section-head {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       gap: 12px;
-      align-items: end;
-      flex-wrap: wrap;
+      align-items: center;
+      flex-direction: column;
       margin-bottom: 18px;
+      text-align: center;
     }
 
     /* center section headers */
@@ -357,6 +359,12 @@
     }
 
     .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .pricing-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 18px;
@@ -612,6 +620,10 @@
         font-size: 2.25rem;
       }
 
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+
       .brand img {
         width: 46px;
         height: 46px;
@@ -852,7 +864,7 @@
           <p>Choose a plan that fits your school size.</p>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1100px;margin:0 auto;">
+      <div class="pricing-grid" style="max-width:1100px;margin:0 auto;">
         <div class="role-card">
           <h4>Small School</h4>
           <p>Basic tier for small schools (student limit applies).</p>
