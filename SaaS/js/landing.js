@@ -51,4 +51,65 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = mailto;
     });
   }
+
+  // Load pricing plans from data/plans.json and populate pricing cards
+  (async function loadPlans(){
+    try {
+      const res = await fetch('data/plans.json');
+      if (!res.ok) throw new Error('Could not load plans');
+      const json = await res.json();
+      const plans = json.plans || {};
+      document.querySelectorAll('[data-plan]').forEach(card => {
+        const key = card.getAttribute('data-plan');
+        const info = plans[key];
+        if (!info) return;
+        const priceEl = card.querySelector('.plan-price');
+        const limitEl = card.querySelector('.plan-limit');
+        const nameEl = card.querySelector('.plan-name');
+        if (nameEl && info.name) nameEl.textContent = info.name;
+        if (priceEl) {
+          if (info.price == null) priceEl.textContent = info.price === null ? 'Contact us' : info.price;
+          else {
+            // format in naira with thousand separators
+            const formatted = info.price.toLocaleString(undefined);
+            priceEl.textContent = `₦${formatted}`;
+          }
+        }
+        if (limitEl) {
+          if (info.limit == null) limitEl.textContent = info.limit === null ? 'Unlimited' : info.limit;
+          else limitEl.textContent = `${info.limit.toLocaleString()} Students`;
+        }
+      });
+    } catch (err) {
+      console.warn('Failed to load plans.json', err);
+    }
+  })();
+
+  const testimonialTrack = document.querySelector('.testimonial-track');
+  const testimonialCards = document.querySelectorAll('.testimonial-card');
+  const prevTestimonial = document.getElementById('prevTestimonial');
+  const nextTestimonial = document.getElementById('nextTestimonial');
+
+  if (testimonialTrack && testimonialCards.length > 0 && prevTestimonial && nextTestimonial) {
+    let currentTestimonial = 0;
+
+    const updateTestimonial = () => {
+      testimonialTrack.style.transform = `translateX(-${currentTestimonial * 100}%)`;
+    };
+
+    prevTestimonial.addEventListener('click', () => {
+      currentTestimonial = (currentTestimonial - 1 + testimonialCards.length) % testimonialCards.length;
+      updateTestimonial();
+    });
+
+    nextTestimonial.addEventListener('click', () => {
+      currentTestimonial = (currentTestimonial + 1) % testimonialCards.length;
+      updateTestimonial();
+    });
+
+    setInterval(() => {
+      currentTestimonial = (currentTestimonial + 1) % testimonialCards.length;
+      updateTestimonial();
+    }, 6500);
+  }
 });

@@ -1,0 +1,8 @@
+{
+  "plans": {
+    "small": { "name": "Small School", "limit": 300, "price": 15000, "currency": "NGN" },
+    "medium": { "name": "Medium School", "limit": 1000, "price": 35000, "currency": "NGN" },
+    "large": { "name": "Large School", "limit": 3000, "price": 75000, "currency": "NGN" },
+    "enterprise": { "name": "Enterprise", "limit": null, "price": null, "currency": "NGN" }
+  }
+}
