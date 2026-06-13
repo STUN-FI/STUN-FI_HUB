@@ -502,6 +502,8 @@
         return;
       }
 
+      window.showLoader();
+
       try {
         const response = await fetch(window.API_BASE + "/login", {
           method: "POST",
@@ -517,11 +519,13 @@
 
           window.location.href = "dashboard.html";
         } else {
+          window.hideLoader();
           output.innerText = data.message || "Login failed";
           output.className = "output error";
         }
       } catch (error) {
         console.log(error);
+        window.hideLoader();
         output.innerText = "Error connecting to server";
         output.className = "output error";
       }
