@@ -358,7 +358,7 @@
 
       <div class="form-group">
         <label for="email">School Email</label>
-        <input type="email" id="email" placeholder="School email address" autocomplete="email" oninput="detectSchool()">
+        <input type="email" id="email" placeholder="School email address" autocomplete="email" oninput="debouncedDetectSchool()">
       </div>
 
       <div class="form-group">
@@ -477,6 +477,17 @@
         resetBrand();
       }
     }
+
+    // Debounce detectSchool so it doesn't run on every keystroke
+    function debounce(fn, delay = 500) {
+      let timer;
+      return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+      };
+    }
+
+    window.debouncedDetectSchool = debounce(detectSchool, 600);
 
     async function login() {
       const email = document.getElementById("email").value.trim();

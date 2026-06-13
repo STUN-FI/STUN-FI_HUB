@@ -46,11 +46,6 @@
     window.showLoader = show;
     window.hideLoader = hide;
 
-    const origFetch = window.fetch.bind(window);
-    window.fetch = function(...args) {
-      try { if (activeCount === 0) show(); activeCount++; } catch (e) {}
-      return origFetch(...args).finally(() => { try { activeCount = Math.max(0, activeCount - 1); if (activeCount === 0) hide(); } catch (e) {} });
-    };
   }
 
   if (document.readyState === 'loading') {
