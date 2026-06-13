@@ -3148,15 +3148,16 @@ function renderStudents() {
     const header = document.createElement("li");
     header.className = "class-group";
     header.dataset.groupKey = encodeURIComponent(groupKey);
+    const initialIcon = expandedStudentGroups.has(groupKey) ? 'chevron-down-outline' : 'chevron-forward-outline';
     header.innerHTML = `
-      <div class="class-group-header" role="button" aria-expanded="false">
+      <div class="class-group-header" role="button" aria-expanded="${expandedStudentGroups.has(groupKey) ? 'true' : 'false'}">
         <div>
           <div class="item-title">${group.displayName}${group.arm ? ` ${group.arm}` : ""}</div>
           <div class="class-group-summary">
             <span class="class-pill">${group.students.length} students</span>
           </div>
         </div>
-        <div class="group-toggle">▶</div>
+        <div class="group-toggle"><ion-icon class="group-toggle-icon" name="${initialIcon}"></ion-icon></div>
       </div>
     `;
 
@@ -3180,12 +3181,14 @@ function toggleStudentGroup(groupKey, headerEl, childrenEl, studentsArray) {
     expandedStudentGroups.delete(groupKey);
     childrenEl.style.display = 'none';
     headerEl.querySelector('.class-group-header').setAttribute('aria-expanded', 'false');
-    const toggle = headerEl.querySelector('.group-toggle'); if (toggle) toggle.textContent = '▶';
+    const icon = headerEl.querySelector('.group-toggle ion-icon.group-toggle-icon');
+    if (icon) icon.setAttribute('name', 'chevron-forward-outline');
     childrenEl.innerHTML = '';
   } else {
     expandedStudentGroups.add(groupKey);
     headerEl.querySelector('.class-group-header').setAttribute('aria-expanded', 'true');
-    const toggle = headerEl.querySelector('.group-toggle'); if (toggle) toggle.textContent = '▼';
+    const icon = headerEl.querySelector('.group-toggle ion-icon.group-toggle-icon');
+    if (icon) icon.setAttribute('name', 'chevron-down-outline');
     childrenEl.style.display = 'block';
     // render students into childrenEl
     childrenEl.innerHTML = '';
