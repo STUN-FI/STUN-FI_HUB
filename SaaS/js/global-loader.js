@@ -53,19 +53,32 @@
     const originalFetch = window.fetch;
     window.fetch = function(...args) {
       const url = args[0];
-      // Only show loader for API calls, not for resources like images, css, etc
-      if (typeof url === 'string' && (url.includes('/api') || url.includes('localhost:3000') || url.includes('onrender.com'))) {
-        show();
-      }
-      return originalFetch.apply(this, args).then(response => {
-        if (typeof url === 'string' && (url.includes('/api') || url.includes('localhost:3000') || url.includes('onrender.com'))) {
-          hide();
+      const init = args[1] || {};
+
+      // Helper to check for explicit skip header (case-insensitive)
+      function hasSkipHeader(headers) {
+        if (!headers) return false;
+        // Headers can be Headers instance, array, or plain object
+        if (typeof Headers !== 'undefined' && headers instanceof Headers) {
+          return headers.has('X-Skip-Loader') || headers.has('x-skip-loader');
         }
+        if (Array.isArray(headers)) {
+          return headers.some(h => (h[0] && String(h[0]).toLowerCase() === 'x-skip-loader'));
+        }
+        if (typeof headers === 'object') {
+          return Object.keys(headers).some(k => k.toLowerCase() === 'x-skip-loader');
+        }
+        return false;
+      }
+
+      const shouldShow = (typeof url === 'string' && (url.includes('/api') || url.includes('localhost:3000') || url.includes('onrender.com') || url.includes(window.API_BASE || ''))) && !hasSkipHeader(init.headers);
+      if (shouldShow) show();
+
+      return originalFetch.apply(this, args).then(response => {
+        if (shouldShow) hide();
         return response;
       }).catch(error => {
-        if (typeof url === 'string' && (url.includes('/api') || url.includes('localhost:3000') || url.includes('onrender.com'))) {
-          hide();
-        }
+        if (shouldShow) hide();
         throw error;
       });
     };

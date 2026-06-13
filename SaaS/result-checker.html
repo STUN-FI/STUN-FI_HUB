@@ -291,7 +291,8 @@
 
     try {
       const response = await fetch(
-        window.API_BASE + "/school-lookup?schoolId=" + encodeURIComponent(schoolId)
+        window.API_BASE + "/school-lookup?schoolId=" + encodeURIComponent(schoolId),
+        { headers: { 'X-Skip-Loader': '1' } }
       );
 
       if (!response.ok) {

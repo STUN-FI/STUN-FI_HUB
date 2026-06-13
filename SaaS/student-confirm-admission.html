@@ -440,7 +440,9 @@
       if (!val) return resetBrand();
 
       try {
-        const response = await fetch(window.API_BASE + `/school-lookup?email=${encodeURIComponent(val)}`);
+        const response = await fetch(window.API_BASE + `/school-lookup?email=${encodeURIComponent(val)}`, {
+          headers: { 'X-Skip-Loader': '1' }
+        });
         const data = await response.json();
         if (response.ok && data) applyBrand(data);
         else resetBrand();
