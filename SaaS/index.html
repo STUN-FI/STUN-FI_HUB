@@ -332,18 +332,118 @@
       padding: 10px 28px 40px;
     }
 
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .stats-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .stats-card .stat {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .stats-card span {
+      display: block;
+      color: var(--muted);
+      margin-top: 8px;
+      font-size: 0.98rem;
+    }
+
+    .testimonial-carousel {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .testimonial-track {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(280px, 1fr);
+      gap: 18px;
+      transition: transform 300ms ease;
+      will-change: transform;
+    }
+
+    .testimonial-card {
+      min-width: 0;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .testimonial-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .testimonial-controls button {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .testimonial-controls button:hover {
+      background: rgba(255,255,255,0.12);
+      transform: translateY(-1px);
+    }
+
+    .testimonial-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .testimonial-card .attribution {
+      font-weight: 700;
+      color: var(--text);
+    }
+
     .section-head {
       display: flex;
       justify-content: center;
       gap: 12px;
       align-items: center;
       flex-direction: column;
-      margin-bottom: 18px;
+      margin: 0 auto 18px;
       text-align: center;
+      max-width: 760px;
     }
 
-    /* center section headers */
-    .section-head h3, .section-head p {
+    .section-head > div {
+      width: 100%;
+    }
+
+    .section-head h3,
+    .section-head p {
       text-align: center;
     }
 
@@ -364,10 +464,66 @@
       gap: 18px;
     }
 
-    .pricing-grid {
+    .pricing-grid,
+    .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 18px;
+    }
+
+    .testimonial-carousel {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .testimonial-track {
+      display: flex;
+      gap: 18px;
+      transition: transform 0.35s ease;
+      will-change: transform;
+    }
+
+    .testimonial-card {
+      flex: 0 0 100%;
+      min-width: 100%;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .testimonial-card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .carousel-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .carousel-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 180ms ease, transform 180ms ease;
+    }
+
+    .carousel-btn:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-1px);
     }
 
     .role-card {
@@ -600,6 +756,7 @@
       }
 
       .roles-grid,
+      .pricing-grid,
       .login-grid {
         grid-template-columns: 1fr;
       }
@@ -616,11 +773,24 @@
         padding-right: 16px;
       }
 
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .testimonial-track {
+        min-width: 100%;
+      }
+
+      .carousel-actions {
+        gap: 8px;
+      }
+
       .hero-copy h2 {
         font-size: 2.25rem;
       }
 
-      .pricing-grid {
+      .pricing-grid,
+      .stats-grid {
         grid-template-columns: 1fr;
       }
 
@@ -785,7 +955,7 @@
 
         <div class="hero-actions">
           <a class="primary-btn" href="school-register.html">Register School</a>
-          <button class="secondary-btn" onclick="openLoginModal()">Choose Login Path</button>
+          <button class="secondary-btn" onclick="openLoginModal()">Login <ion-icon name="log-in-outline" style="margin-left:8px;"></ion-icon></button>
         </div>
       </div>
 
@@ -840,18 +1010,18 @@
           <p>Numbers that show our reach and impact.</p>
         </div>
       </div>
-      <div style="display:flex;gap:18px;max-width:900px;margin:0 auto;">
-        <div style="flex:1;background:var(--card);padding:20px;border-radius:12px;text-align:center;border:1px solid var(--line);">
-          <div class="stat" data-target="2000" style="font-size:28px;font-weight:700;">0</div>
-          <div style="color:var(--muted);margin-top:6px;">Schools</div>
+      <div class="stats-grid" style="max-width:900px;margin:0 auto;">
+        <div class="stat-card">
+          <div class="stat" data-target="2000">0</div>
+          <span>Schools</span>
         </div>
-        <div style="flex:1;background:var(--card);padding:20px;border-radius:12px;text-align:center;border:1px solid var(--line);">
-          <div class="stat" data-target="120000" style="font-size:28px;font-weight:700;">0</div>
-          <div style="color:var(--muted);margin-top:6px;">Students</div>
+        <div class="stat-card">
+          <div class="stat" data-target="120000">0</div>
+          <span>Students</span>
         </div>
-        <div style="flex:1;background:var(--card);padding:20px;border-radius:12px;text-align:center;border:1px solid var(--line);">
-          <div class="stat" data-target="150" style="font-size:28px;font-weight:700;">0</div>
-          <div style="color:var(--muted);margin-top:6px;">Active Schools</div>
+        <div class="stat-card">
+          <div class="stat" data-target="150">0</div>
+          <span>Active Schools</span>
         </div>
       </div>
     </section>
@@ -866,17 +1036,17 @@
       </div>
       <div class="pricing-grid" style="max-width:1100px;margin:0 auto;">
         <div class="role-card">
-          <h4>Small School</h4>
+          <h4><ion-icon name="school-outline" style="vertical-align:middle;margin-right:8px;font-size:1rem;"></ion-icon>Small School</h4>
           <p>Basic tier for small schools (student limit applies).</p>
           <div style="margin-top:12px;font-weight:700;font-size:18px;">$800 / year</div>
         </div>
         <div class="role-card">
-          <h4>Medium School</h4>
+          <h4><ion-icon name="bar-chart-outline" style="vertical-align:middle;margin-right:8px;font-size:1rem;"></ion-icon>Medium School</h4>
           <p>For growing schools with higher student capacity.</p>
           <div style="margin-top:12px;font-weight:700;font-size:18px;">$1400 / year</div>
         </div>
         <div class="role-card">
-          <h4>Large School</h4>
+          <h4><ion-icon name="business-outline" style="vertical-align:middle;margin-right:8px;font-size:1rem;"></ion-icon>Large School</h4>
           <p>Extended capacity and priority support for large institutions.</p>
           <div style="margin-top:12px;font-weight:700;font-size:18px;">$2400 / year</div>
         </div>
@@ -891,15 +1061,33 @@
           <p>Short testimonials from our partners.</p>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:1100px;margin:0 auto;">
-        <div class="role-card">
-          <p>“STUN-FI helped us streamline results distribution and reduced queries by 70%.”</p>
-          <div style="margin-top:10px;color:var(--muted);font-weight:700;">Greenfield Academy</div>
+      <div class="testimonial-carousel" style="max-width:1100px;margin:0 auto;">
+        <div class="testimonial-track">
+          <div class="testimonial-card">
+            <p>“STUN-FI helped us streamline results distribution and reduced queries by 70%. The portal is now our daily administrative hub.”</p>
+            <div class="attribution">Greenfield Academy</div>
+          </div>
+          <div class="testimonial-card">
+            <p>“Simple setup and our teachers adapted quickly to the portal. Communication and result release have become seamless.”</p>
+            <div class="attribution">St. Mary’s High</div>
+          </div>
+          <div class="testimonial-card">
+            <p>“The subscription dashboard gives us clear insight into student limits and renewal dates. It saves us time every week.”</p>
+            <div class="attribution">Riverstone International</div>
+          </div>
+          <div class="testimonial-card">
+            <p>“Results and announcements now reach parents faster. The mobile-friendly interface is perfect for our entire school community.”</p>
+            <div class="attribution">Hillcrest Preparatory</div>
+          </div>
+          <div class="testimonial-card">
+            <p>“STUN-FI reduced our manual reporting by half. We use the platform to manage student activations and attendance effortlessly.”</p>
+            <div class="attribution">Lakeside Secondary</div>
+          </div>
         </div>
-        <div class="role-card">
-          <p>“Simple setup and our teachers adapted quickly to the portal.”</p>
-          <div style="margin-top:10px;color:var(--muted);font-weight:700;">St. Mary’s High</div>
-        </div>
+      </div>
+      <div class="carousel-actions">
+        <button class="carousel-btn" id="prevTestimonial" aria-label="Previous testimonial"><ion-icon name="chevron-back-outline"></ion-icon></button>
+        <button class="carousel-btn" id="nextTestimonial" aria-label="Next testimonial"><ion-icon name="chevron-forward-outline"></ion-icon></button>
       </div>
     </section>
 
