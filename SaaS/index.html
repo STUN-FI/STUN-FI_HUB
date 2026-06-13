@@ -288,6 +288,18 @@
       line-height: 1.7;
     }
 
+    /* in-view animation */
+    .roles-section, .hero, .role-card, #logoQuote, #testimonials {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 420ms ease, transform 420ms ease;
+    }
+
+    .in-view {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+
     .hero-list {
       display: grid;
       gap: 12px;
@@ -721,6 +733,7 @@
   </style>
   <script src="js/config.js"></script>
   <script src="js/global-loader.js"></script>
+  <script src="js/landing.js"></script>
 </head>
 <body>
   <div id="preloader">
@@ -741,7 +754,7 @@
       </div>
 
       <div class="nav-actions">
-        <button class="secondary-btn explore-btn" onclick="scrollToRoles()">Explore Roles</button>
+        <a class="secondary-btn" href="#pricingSection">Pricing</a>
         <button class="nav-btn" onclick="openLoginModal()">Login</button>
       </div>
     </nav>
@@ -854,6 +867,128 @@
             <a class="role-link" href="student-forgot-password.html">Forgot Password <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- Animated stats -->
+    <section class="roles-section" id="statsSection" style="padding-top:28px;">
+      <div class="section-head">
+        <div>
+          <h3>Trusted by schools</h3>
+          <p>Numbers that show our reach and impact.</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:18px;max-width:900px;margin:0 auto;">
+        <div style="flex:1;background:var(--card);padding:20px;border-radius:12px;text-align:center;border:1px solid var(--line);">
+          <div class="stat" data-target="2000" style="font-size:28px;font-weight:700;">0</div>
+          <div style="color:var(--muted);margin-top:6px;">Schools</div>
+        </div>
+        <div style="flex:1;background:var(--card);padding:20px;border-radius:12px;text-align:center;border:1px solid var(--line);">
+          <div class="stat" data-target="120000" style="font-size:28px;font-weight:700;">0</div>
+          <div style="color:var(--muted);margin-top:6px;">Students</div>
+        </div>
+        <div style="flex:1;background:var(--card);padding:20px;border-radius:12px;text-align:center;border:1px solid var(--line);">
+          <div class="stat" data-target="150" style="font-size:28px;font-weight:700;">0</div>
+          <div style="color:var(--muted);margin-top:6px;">Active Schools</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="roles-section" id="pricingSection">
+      <div class="section-head">
+        <div>
+          <h3>Pricing Plans</h3>
+          <p>Choose a plan that fits your school size.</p>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1100px;margin:0 auto;">
+        <div class="role-card">
+          <h4>Starter</h4>
+          <p>Basic features for small schools.</p>
+          <div style="margin-top:12px;font-weight:700;font-size:18px;">Free</div>
+        </div>
+        <div class="role-card">
+          <h4>Growth</h4>
+          <p>All essential features and support.</p>
+          <div style="margin-top:12px;font-weight:700;font-size:18px;">$49 / month</div>
+        </div>
+        <div class="role-card">
+          <h4>Enterprise</h4>
+          <p>Custom integrations and priority support.</p>
+          <div style="margin-top:12px;font-weight:700;font-size:18px;">Contact us</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="roles-section" id="testimonials">
+      <div class="section-head">
+        <div>
+          <h3>What schools say about us</h3>
+          <p>Short testimonials from our partners.</p>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:1100px;margin:0 auto;">
+        <div class="role-card">
+          <p>“STUN-FI helped us streamline results distribution and reduced queries by 70%.”</p>
+          <div style="margin-top:10px;color:var(--muted);font-weight:700;">Greenfield Academy</div>
+        </div>
+        <div class="role-card">
+          <p>“Simple setup and our teachers adapted quickly to the portal.”</p>
+          <div style="margin-top:10px;color:var(--muted);font-weight:700;">St. Mary’s High</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Logo & Quote strip -->
+    <section class="roles-section" id="logoQuote" style="padding:18px 28px;">
+      <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:18px;">
+        <img src="img/stunfi-logo-white.png" alt="logo" style="width:68px;height:68px;border-radius:12px;">
+        <div>
+          <div style="font-weight:700;font-size:18px;">STUN-FI HUB</div>
+          <div style="color:var(--muted);">"Connecting schools, teachers, and students — seamlessly."</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="roles-section" id="faq">
+      <div class="section-head">
+        <div>
+          <h3>Frequently Asked Questions</h3>
+          <p>Answers to common questions from schools and teachers.</p>
+        </div>
+      </div>
+      <div style="max-width:900px;margin:0 auto;">
+        <details style="background:var(--card);padding:12px;border-radius:10px;margin-bottom:10px;">
+          <summary style="font-weight:700;">How do I register my school?</summary>
+          <div style="color:var(--muted);margin-top:8px;">Use the Register School button at the top and follow the onboarding steps.</div>
+        </details>
+        <details style="background:var(--card);padding:12px;border-radius:10px;margin-bottom:10px;">
+          <summary style="font-weight:700;">Can teachers enter results?</summary>
+          <div style="color:var(--muted);margin-top:8px;">Yes — teachers can confirm their account and submit subject scores from their dashboard.</div>
+        </details>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="roles-section" id="contact">
+      <div class="section-head">
+        <div>
+          <h3>Contact Us</h3>
+          <p>Send us a message and we'll respond to your email.</p>
+        </div>
+      </div>
+      <div style="max-width:700px;margin:0 auto;">
+        <form id="contactForm" style="display:grid;gap:10px;">
+          <input type="text" name="name" placeholder="Your name" required style="padding:10px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--text)">
+          <input type="email" name="email" placeholder="Your email" required style="padding:10px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--text)">
+          <textarea name="message" placeholder="Message" rows="5" required style="padding:10px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--text)"></textarea>
+          <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button type="submit" class="primary-btn">Send Message</button>
+          </div>
+        </form>
       </div>
     </section>
 
