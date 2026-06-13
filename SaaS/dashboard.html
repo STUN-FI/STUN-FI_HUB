@@ -2939,6 +2939,7 @@ async function addStudent() {
       await loadStudents();
       addActivity("Student Added", `${name} (${regNumber}) was added.`);
       toast("Student added successfully", "success");
+      window.hideLoader?.();
     } else {
       window.hideLoader?.();
       toast(data.message || "Could not add student", "error");
@@ -3481,6 +3482,7 @@ async function addTeacher() {
         "Teacher added successfully",
         "success"
       );
+      window.hideLoader?.();
 
     } else {
       window.hideLoader?.();
