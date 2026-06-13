@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>STUN-FI HUB | Super Admin Dashboard</title>
+  <title>STUN-FI HUB | Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="img/Favicon.png?v=2" type="image/png" sizes="any">
   <link rel="shortcut icon" href="img/Favicon.png?v=2" type="image/x-icon">
@@ -22,11 +22,13 @@
       --danger: #ef4444;
       --success: #22c55e;
       --warning: #f59e0b;
+      --sidebar-width: 280px;
+      --topbar-height: 80px;
     }
 
     * {
       box-sizing: border-box;
-      font-family: Inter, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Arial, sans-serif;
     }
 
     body {
@@ -35,455 +37,507 @@
       background: radial-gradient(circle at top, rgba(102,204,204,0.18), transparent 35%),
                   linear-gradient(180deg, #081026 0%, #0f172a 100%);
       color: var(--text);
-      padding: 24px;
+      display: grid;
+      grid-template-columns: var(--sidebar-width) 1fr;
+      grid-template-rows: var(--topbar-height) 1fr;
+      gap: 0;
     }
 
-    .topbar {
-      width: 100%;
-      max-width: 1400px;
-      margin: 0 auto;
+    /* SIDEBAR */
+    .sidebar {
+      grid-column: 1;
+      grid-row: 1 / -1;
+      background: rgba(15,23,42,0.6);
+      border-right: 1px solid var(--line);
+      backdrop-filter: blur(10px);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 22px;
+      flex-direction: column;
+      padding: 24px 0;
+      overflow-y: auto;
+      z-index: 100;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 18px;
-      padding: 14px 18px;
-      min-width: 0;
+    .sidebar::-webkit-scrollbar {
+      width: 6px;
     }
 
-    .top-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      justify-content: flex-end;
-      align-items: center;
-      min-width: 0;
-    }
-
-    .top-actions button,
-    .top-actions .danger-btn {
-      min-width: 140px;
-    }
-
-    .brand-logo {
-      width: 50px;
-      height: 50px;
-      object-fit: contain;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.08);
-      padding: 8px;
-      flex-shrink: 0;
-    }
-
-    .brand h2 {
-      margin: 0 0 6px;
-      font-size: 2rem;
-      letter-spacing: -0.03em;
-    }
-
-    .brand p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .preloader-logo,
-    .school-logo {
-      width: 120px;
-      max-width: 100%;
-      margin-bottom: 18px;
-      animation: pulseLogo 1.4s ease-in-out infinite;
-    }
-
-    #preloader {
-      position: fixed;
-      inset: 0;
-      background: #081224;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-      transition: opacity 0.45s ease, visibility 0.45s ease;
-    }
-
-    #preloader.hide {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    .loader-wrap {
-      text-align: center;
-      padding: 20px;
-    }
-
-    .spinner {
-      width: 52px;
-      height: 52px;
-      margin: 0 auto 14px;
-      border-radius: 50%;
-      border: 4px solid rgba(255,255,255,0.15);
-      border-top: 4px solid var(--accent);
-      animation: spin 0.9s linear infinite;
-    }
-
-    .loader-wrap p {
-      margin: 0;
-      color: #cbd5e1;
-      font-size: 15px;
-      letter-spacing: 0.3px;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    @keyframes pulseLogo {
-      0%, 100% {
-        transform: scale(1);
-        opacity: 0.92;
-      }
-      50% {
-        transform: scale(1.06);
-        opacity: 1;
-      }
-    }
-
-    .collapse-btn {
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.16);
-      color: var(--text);
-      box-shadow: none;
-    }
-
-    .collapse-btn:hover {
+    .sidebar::-webkit-scrollbar-thumb {
       background: rgba(255,255,255,0.1);
-      transform: translateY(-1px);
+      border-radius: 3px;
     }
 
-    button,
-    .pill-button {
-      border: none;
-      background: var(--accent);
-      color: white;
-      padding: 12px 16px;
-      border-radius: 14px;
-      cursor: pointer;
-      font-weight: 700;
-      transition: transform 0.18s ease, background 0.18s ease;
-      display: inline-flex;
+    .sidebar-brand {
+      padding: 0 20px 24px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
       align-items: center;
-      gap: 8px;
-    }
-
-    button:hover,
-    .pill-button:hover {
-      background: var(--accent-hover);
-      transform: translateY(-1px);
-    }
-
-    .danger-btn {
-      background: var(--danger);
-    }
-
-    .danger-btn:hover {
-      filter: brightness(0.95);
-    }
-
-    .layout {
-      width: 100%;
-      max-width: 1400px;
-      margin: 0 auto 40px;
-      display: grid;
-      grid-template-columns: minmax(320px, 380px) 1fr;
-      gap: 24px;
-      align-items: start;
-      transition: grid-template-columns 0.3s ease;
-    }
-
-    .layout.collapsed {
-      grid-template-columns: 0px 1fr;
-    }
-
-    .layout.collapsed aside {
-      width: 0;
-      max-width: 0;
-      overflow: hidden;
-    }
-
-    aside {
-      min-width: 0;
-      transition: width 0.3s ease, max-width 0.3s ease;
-    }
-
-    @media (min-width: 1121px) {
-      aside {
-        position: sticky;
-        top: 24px;
-        align-self: start;
-        max-height: calc(100vh) ;
-        overflow-y: auto;
-      }
-
-      aside::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      aside::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.12);
-        border-radius: 999px;
-      }
-    }
-
-    .card {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 26px;
-      backdrop-filter: blur(22px);
-      padding: 24px;
-      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.18);
+      gap: 12px;
       margin-bottom: 24px;
     }
 
-    .card:last-child {
-      margin-bottom: 0;
+    .sidebar-brand img {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      object-fit: contain;
     }
 
-    .card h3 {
-      margin: 0 0 18px;
-      font-size: 1.25rem;
-    }
-
-    .small-stat-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
-      margin-bottom: 24px;
-    }
-
-    .small-stat {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 22px;
-      padding: 18px;
-    }
-
-    .small-stat h4 {
-      margin: 0 0 10px;
-      color: var(--muted);
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
-
-    .small-stat p {
+    .sidebar-brand h3 {
       margin: 0;
-      font-size: 2rem;
-      font-weight: 800;
+      font-size: 1.1rem;
       line-height: 1;
     }
 
-    .form-group {
-      margin-bottom: 16px;
+    .sidebar-nav {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 0 12px;
     }
 
-    input,
-    select,
-    textarea {
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      color: var(--muted);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      font-size: 0.95rem;
+      border: none;
+      background: none;
+      text-align: left;
       width: 100%;
-      padding: 14px 16px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.04);
+    }
+
+    .nav-item ion-icon {
+      font-size: 1.3rem;
+    }
+
+    .nav-item:hover {
+      background: rgba(102,204,204,0.1);
+      color: var(--accent);
+    }
+
+    .nav-item.active {
+      background: rgba(102,204,204,0.16);
+      color: var(--accent);
+      border-left: 3px solid var(--accent);
+    }
+
+    .sidebar-bottom {
+      padding: 24px 12px 0;
+      border-top: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* TOP NAVIGATION */
+    .topbar {
+      grid-column: 2;
+      grid-row: 1;
+      background: rgba(15,23,42,0.4);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      gap: 24px;
+    }
+
+    .search-box {
+      flex: 1;
+      max-width: 400px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px 16px 10px 40px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--line);
+      border-radius: 12px;
       color: var(--text);
       outline: none;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-      color: rgba(255,255,255,0.52);
-    }
-
-    .status {
-      margin-top: 12px;
-      min-height: 20px;
+    .search-box input::placeholder {
       color: var(--muted);
-      font-size: 0.95rem;
     }
 
-    .toolbar {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 18px;
+    .search-box ion-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 1.1rem;
+      pointer-events: none;
     }
 
-    .toolbar input,
-    .toolbar select {
-      width: 100%;
-    }
-
-    .school-list {
-      display: grid;
-      gap: 14px;
-    }
-
-    .school-item {
-      display: grid;
-      gap: 14px;
-      background: rgba(255,255,255,0.04);
-      border-radius: 22px;
-      padding: 20px;
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .school-top {
-      display: grid;
-      grid-template-columns: 72px 1fr;
-      gap: 14px;
+    .topbar-actions {
+      display: flex;
       align-items: center;
+      gap: 16px;
     }
 
-    .school-logo {
-      width: 72px;
-      height: 72px;
-      border-radius: 18px;
-      object-fit: cover;
-      background: rgba(255,255,255,0.08);
+    .topbar-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      font-size: 1.2rem;
+    }
+
+    .topbar-btn:hover {
+      background: rgba(255,255,255,0.1);
+      color: var(--text);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-left: 16px;
+      border-left: 1px solid var(--line);
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .user-info p {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .user-info span {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* MAIN CONTENT */
+    .main {
+      grid-column: 2;
+      grid-row: 2;
+      padding: 32px;
+      overflow-y: auto;
+    }
+
+    .main::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .main::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+    }
+
+    .page {
       display: block;
     }
 
-    .school-name {
-      font-size: 1.05rem;
-      font-weight: 700;
+    .page.hidden {
+      display: none;
+    }
+
+    .page-header {
+      margin-bottom: 28px;
+    }
+
+    .page-header h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .page-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* STATS GRID */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      background: var(--card-2);
+      border-color: rgba(102,204,204,0.3);
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+
+    .stat-icon.blue {
+      background: rgba(59,130,246,0.2);
+      color: #60a5fa;
+    }
+
+    .stat-icon.green {
+      background: rgba(34,197,94,0.2);
+      color: #4ade80;
+    }
+
+    .stat-icon.orange {
+      background: rgba(245,158,11,0.2);
+      color: #fbbf24;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
       margin-bottom: 8px;
     }
 
-    .meta {
-      color: var(--muted);
-      line-height: 1.7;
-      font-size: 0.91rem;
+    .stat-change {
+      font-size: 0.85rem;
+      color: var(--success);
     }
 
-    .accent-chip {
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      vertical-align: middle;
-      margin-left: 6px;
-      border: 2px solid rgba(255,255,255,0.3);
+    .stat-change.down {
+      color: var(--danger);
     }
 
-    .school-actions,
-    .action-group {
+    /* CONTENT CARDS */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(10px);
+      margin-bottom: 24px;
+    }
+
+    .card-header {
       display: flex;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 16px;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .card-header-actions {
+      display: flex;
       gap: 10px;
     }
 
-    .mini-btn {
+    .btn-sm {
       padding: 10px 14px;
-      font-size: 0.9rem;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.08);
-      color: var(--text);
+      background: rgba(102,204,204,0.1);
+      border: 1px solid rgba(102,204,204,0.3);
+      border-radius: 10px;
+      color: var(--accent);
       cursor: pointer;
-      border: 1px solid rgba(255,255,255,0.1);
-      transition: background 0.18s ease;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
     }
 
-    .mini-btn:hover {
-      background: rgba(255,255,255,0.14);
+    .btn-sm:hover {
+      background: rgba(102,204,204,0.2);
     }
 
-    .empty {
-      text-align: center;
-      padding: 28px 14px;
-      color: var(--muted);
-      background: rgba(255,255,255,0.04);
-      border-radius: 18px;
-    }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-    }
-
-    .pill-active { background: rgba(92,255,168,0.14); color: #8df9bd; }
-    .pill-trial { background: rgba(129,140,248,0.16); color: #c7d2fe; }
-    .pill-cancelled,
-    .pill-suspended { background: rgba(239,68,68,0.16); color: #fda4af; }
-
-    .table-wrap {
+    /* TABLES */
+    .table-wrapper {
       overflow-x: auto;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 900px;
-    }
-
-    th,
-    td {
-      padding: 14px 12px;
-      text-align: left;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      vertical-align: middle;
-      font-size: 0.92rem;
     }
 
     th {
+      padding: 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
       color: var(--muted);
       font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.92rem;
     }
 
     tr:hover {
-      background: rgba(255,255,255,0.04);
+      background: rgba(255,255,255,0.03);
     }
 
-    .table-actions button {
-      padding: 10px 14px;
-      font-size: 0.85rem;
-      border-radius: 14px;
-      min-width: 120px;
+    .school-name-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
+    .school-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .status-active {
+      background: rgba(34,197,94,0.15);
+      color: #4ade80;
+    }
+
+    .status-trial {
+      background: rgba(59,130,246,0.15);
+      color: #60a5fa;
+    }
+
+    .status-expired {
+      background: rgba(245,158,11,0.15);
+      color: #fbbf24;
+    }
+
+    .status-suspended {
+      background: rgba(239,68,68,0.15);
+      color: #fca5a5;
+    }
+
+    /* CHARTS/GRAPHS */
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .chart-card h3 {
+      margin: 0 0 20px;
+      font-size: 1.1rem;
+    }
+
+    .mini-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 120px;
+    }
+
+    .mini-bar {
+      flex: 1;
+      background: linear-gradient(180deg, var(--accent), rgba(102,204,204,0.3));
+      border-radius: 4px 4px 0 0;
+      min-height: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .mini-bar:hover {
+      opacity: 0.8;
+    }
+
+    /* MODALS */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.65);
-      z-index: 998;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s ease;
     }
 
-    .modal-backdrop.visible {
+    .modal-backdrop.active {
       opacity: 1;
       pointer-events: auto;
     }
@@ -493,391 +547,254 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.96);
-      width: min(1120px, calc(100vw - 32px));
+      width: min(500px, calc(100vw - 40px));
       max-height: calc(100vh - 60px);
-      overflow-y: auto;
-      background: rgba(15,23,42,0.98);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 28px;
-      box-shadow: 0 40px 120px rgba(0,0,0,0.4);
-      padding: 24px;
-      z-index: 999;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 28px;
+      z-index: 1001;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.18s ease, transform 0.18s ease;
+      transition: all 0.2s ease;
+      overflow-y: auto;
     }
 
-    .modal.visible {
+    .modal.active {
       opacity: 1;
       pointer-events: auto;
       transform: translate(-50%, -50%) scale(1);
     }
 
     .modal-header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 18px;
-      align-items: flex-start;
+      margin-bottom: 20px;
     }
 
-    .modal-title {
+    .modal-header h2 {
+      margin: 0 0 8px;
+      font-size: 1.35rem;
+    }
+
+    .modal-header p {
       margin: 0;
-      font-size: 1.45rem;
-    }
-
-    .modal-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    .modal-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 22px;
-      padding: 18px;
-    }
-
-    .modal-tabs {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .tab {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 12px 14px;
-      cursor: pointer;
-      text-align: center;
-      font-weight: 700;
       color: var(--muted);
+      font-size: 0.9rem;
     }
 
-    .tab.active {
-      background: rgba(102,204,204,0.16);
-      color: white;
-      border-color: rgba(102,204,204,0.45);
+    .form-group {
+      margin-bottom: 16px;
     }
 
-    .tab-content {
-      margin-top: 20px;
-      display: none;
-    }
-
-    .tab-content.active {
+    .form-group label {
       display: block;
-    }
-
-    .section-title {
-      font-size: 1rem;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.05em;
     }
 
-    .field-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
-    .field-row p {
-      margin: 0;
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--text);
+      outline: none;
       font-size: 0.95rem;
-      line-height: 1.6;
     }
 
-    .field-label {
+    input::placeholder, textarea::placeholder {
       color: var(--muted);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 6px;
-      display: block;
     }
 
-    .chip-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin: 12px 0 0;
-    }
-
-    .chart-bar {
-      height: 10px;
-      border-radius: 999px;
-      margin-top: 6px;
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
       background: rgba(255,255,255,0.08);
-      overflow: hidden;
     }
 
-    .chart-bar > span {
-      display: block;
-      height: 100%;
-      border-radius: inherit;
-      background: var(--accent);
-    }
-
-    .sparkline {
+    .modal-actions {
       display: flex;
-      align-items: flex-end;
-      gap: 8px;
-      min-height: 100px;
-      margin-top: 14px;
-      padding-bottom: 8px;
-    }
-
-    .sparkline-bar {
-      flex: 1;
-      border-radius: 999px 999px 0 0;
-      background: linear-gradient(180deg, rgba(102,204,204,0.7), rgba(102,204,204,0.16));
-    }
-
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
       gap: 12px;
-      flex-wrap: wrap;
       margin-top: 24px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      filter: brightness(0.95);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+    }
+
+    .empty-state ion-icon {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 16px;
+      opacity: 0.4;
     }
 
     .hidden {
       display: none !important;
     }
 
-    .rule {
-      height: 1px;
-      background: rgba(255,255,255,0.08);
-      margin: 24px 0;
-    }
+    /* RESPONSIVE */
+    @media (max-width: 1200px) {
+      :root {
+        --sidebar-width: 240px;
+      }
 
-    .activity-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .activity-item {
-      border-radius: 16px;
-      background: rgba(255,255,255,0.04);
-      padding: 14px;
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .activity-item p {
-      margin: 0;
-      line-height: 1.5;
-      font-size: 0.92rem;
-    }
-
-    .activity-item span {
-      color: var(--muted);
-      font-size: 0.82rem;
-    }
-
-    @media (max-width: 1120px) {
-      .layout {
+      .chart-row {
         grid-template-columns: 1fr;
-      }
-
-      .layout.collapsed {
-        grid-template-columns: 1fr;
-      }
-
-      .layout.collapsed aside {
-        width: auto;
-        max-width: none;
-        overflow: visible;
-      }
-
-      .collapse-btn {
-        display: none;
-      }
-
-      .small-stat-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .school-top {
-        grid-template-columns: 1fr;
-      }
-
-      .modal-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .toolbar {
-        grid-template-columns: 1fr;
-      }
-
-      .field-row {
-        grid-template-columns: 1fr;
-      }
-
-      .modal-tabs {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 720px) {
-      body {
-        padding: 12px;
       }
 
       .topbar {
-        align-items: flex-start;
-        gap: 12px;
+        padding: 0 24px;
       }
 
-      .top-actions {
-        width: 100%;
-        justify-content: space-between;
-        gap: 10px;
+      .main {
+        padding: 24px;
       }
+    }
 
-      .top-actions button,
-      .top-actions .danger-btn {
-        flex: 1;
-        min-width: 0;
-      }
-
-      .topbar,
-      .modal,
-      .card {
-        padding: 18px;
-      }
-
-      .layout {
-        gap: 18px;
-      }
-
-      .small-stat-grid,
-      .toolbar,
-      .modal-tabs,
-      .field-row {
+    @media (max-width: 768px) {
+      body {
         grid-template-columns: 1fr;
+        grid-template-rows: var(--topbar-height) 1fr;
       }
 
-      .toolbar input,
-      .toolbar select {
-        min-width: 0;
-      }
-
-      .school-top {
-        grid-template-columns: 1fr;
-        align-items: start;
-      }
-
-      .school-logo {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: var(--topbar-height);
         width: 100%;
-        max-width: 100%;
-        height: auto;
+        max-width: 280px;
+        height: calc(100vh - var(--topbar-height));
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 99;
       }
 
-      .modal {
-        width: calc(100vw - 24px);
+      .sidebar.open {
+        transform: translateX(0);
       }
 
-      .table-wrap table {
-        min-width: auto;
+      .topbar {
+        grid-column: 1;
+        padding: 0 16px;
       }
 
-      th,
-      td {
-        padding: 12px 10px;
+      #sidebarToggle {
+        display: flex;
       }
 
-      .table-actions button {
-        min-width: auto;
+      .search-box {
+        display: none;
+      }
+
+      .user-info {
+        display: none;
+      }
+
+      .main {
+        grid-column: 1;
+        padding: 20px 16px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .chart-row {
+        gap: 16px;
+      }
+
+      .page-header h1 {
+        font-size: 1.5rem;
       }
     }
 
     @media (max-width: 480px) {
-      body {
-        padding: 10px;
-      }
-
-      .brand h2 {
-        font-size: 1.5rem;
-      }
-
-      .brand p {
-        font-size: 0.9rem;
+      :root {
+        --topbar-height: 70px;
       }
 
       .topbar {
-        gap: 10px;
+        padding: 0 12px;
+        gap: 12px;
       }
 
-      .top-actions {
-        flex-direction: column;
-        align-items: stretch;
+      .topbar-actions {
+        gap: 8px;
       }
 
-      .top-actions button,
-      .top-actions .danger-btn,
-      .mini-btn,
-      .pill-button {
-        width: 100%;
-        justify-content: center;
+      .user-avatar {
+        width: 36px;
+        height: 36px;
+      }
+
+      .main {
+        padding: 16px 12px;
       }
 
       .card {
         padding: 16px;
       }
 
-      .layout {
-        gap: 16px;
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
       }
 
-      .modal {
-        width: calc(100vw - 16px);
-        padding: 16px;
+      .page-header h1 {
+        font-size: 1.3rem;
       }
 
-      .modal-header {
-        gap: 12px;
+      table {
+        font-size: 0.85rem;
       }
 
-      .modal-title {
-        font-size: 1.2rem;
-      }
-
-      .table-wrap table {
-        font-size: 0.88rem;
-      }
-
-      .table-wrap th,
-      .table-wrap td {
+      th, td {
         padding: 10px 8px;
-      }
-    }
-
-    @media (max-width: 720px) {
-      .modal {
-        position: fixed;
-        top: 8px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: calc(100vw - 24px) !important;
-        max-height: calc(100vh - 16px);
-        border-radius: 12px;
-        overflow-y: auto;
-        padding: 14px;
-      }
-
-      .modal.visible {
-        transform: translateX(-50%) !important;
-      }
-
-      .modal-backdrop {
-        inset: 0;
       }
     }
   </style>
@@ -885,877 +802,503 @@
   <script src="js/global-loader.js"></script>
 </head>
 <body>
-  <div id="preloader">
-    <div class="loader-wrap">
-      <img src="img/stunfi-logo-white.png" alt="STUN-FI Logo" class="preloader-logo">
-      <!-- <div class="spinner"></div> -->
-      <!-- <p>Loading portal...</p> -->
-    </div>
-  </div>
-
-  <div class="topbar">
-    <div class="brand">
-      <img src="img/stunfi-logo-white.png" alt="STUN-FI Logo" class="brand-logo">
-      <div>
-        <h2 id="welcomeTitle">Super Admin Dashboard</h2>
-        <p>Manage schools, subscriptions, analytics, support and platform health from one unified portal.</p>
-      </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <img src="img/stunfi-logo-white.png" alt="STUN-FI Logo">
+      <h3>STUN-FI</h3>
     </div>
 
-    <div class="top-actions">
-      <button id="sidebarToggle" class="collapse-btn" onclick="toggleSidebar()"><ion-icon name="close-outline"></ion-icon> Hide sidebar</button>
-      <button id="toggleMinimalUI" class="theme-btn" title="Toggle minimal UI"><ion-icon name="contrast-outline"></ion-icon> Minimal</button>
-      <button onclick="loadEverything()"><ion-icon name="refresh-outline"></ion-icon> Refresh</button>
-      <button class="danger-btn" onclick="logout()"><ion-icon name="log-out-outline"></ion-icon> Logout</button>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="showPage('dashboard')">
+        <ion-icon name="grid-outline"></ion-icon>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-item" onclick="showPage('schools')">
+        <ion-icon name="school-outline"></ion-icon>
+        <span>Schools</span>
+      </button>
+      <button class="nav-item" onclick="showPage('subscriptions')">
+        <ion-icon name="card-outline"></ion-icon>
+        <span>Subscriptions</span>
+      </button>
+      <button class="nav-item" onclick="showPage('analytics')">
+        <ion-icon name="bar-chart-outline"></ion-icon>
+        <span>Analytics</span>
+      </button>
+      <button class="nav-item" onclick="showPage('reports')">
+        <ion-icon name="document-text-outline"></ion-icon>
+        <span>Reports</span>
+      </button>
+      <button class="nav-item" onclick="showPage('support')">
+        <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+        <span>Support</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <button class="nav-item" onclick="showPage('settings')">
+        <ion-icon name="settings-outline"></ion-icon>
+        <span>Settings</span>
+      </button>
+      <button class="nav-item" onclick="logout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+        <span>Logout</span>
+      </button>
     </div>
-  </div>
+  </aside>
 
-  <div class="layout">
-    <aside>
-      <div class="card">
-        <h3>Quick School Management</h3>
-        <div class="form-group">
-          <label class="field-label" for="schoolName">School Name</label>
-          <input type="text" id="schoolName" placeholder="E.g. Oakbridge Academy">
-        </div>
-        <div class="form-group">
-          <label class="field-label" for="schoolEmail">School Email</label>
-          <input type="email" id="schoolEmail" placeholder="admin@schooldomain.com">
-        </div>
-        <div class="form-group">
-          <label class="field-label" for="schoolPassword">School Password</label>
-          <input type="password" id="schoolPassword" placeholder="Strong admin password">
-        </div>
-        <button onclick="addSchool()"><ion-icon name="add-circle-outline"></ion-icon> Create School</button>
-        <div class="status" id="addStatus"></div>
+  <!-- TOP NAVIGATION -->
+  <header class="topbar">
+    <button class="topbar-btn hidden" id="sidebarToggle" onclick="toggleSidebar()">
+      <ion-icon name="menu-outline"></ion-icon>
+    </button>
+
+    <div class="search-box">
+      <ion-icon name="search-outline"></ion-icon>
+      <input type="text" placeholder="Search schools, transactions..." id="globalSearch" oninput="renderSchools()">
+    </div>
+
+    <div class="topbar-actions">
+      <button class="topbar-btn" title="Notifications">
+        <ion-icon name="notifications-outline"></ion-icon>
+      </button>
+      <button class="topbar-btn" title="Settings" onclick="showPage('settings')">
+        <ion-icon name="settings-outline"></ion-icon>
+      </button>
+    </div>
+
+    <div class="user-profile">
+      <div class="user-avatar">SA</div>
+      <div class="user-info">
+        <p id="adminName">Super Admin</p>
+        <span>Administrator</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="mainContent">
+    <!-- DASHBOARD PAGE -->
+    <div id="dashboardPage" class="page">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>Platform overview and key metrics at a glance</p>
       </div>
 
-      <div class="card">
-        <h3>Search & Filters</h3>
-        <div class="form-group">
-          <label class="field-label" for="globalSearch">School Lookup</label>
-          <input type="text" id="globalSearch" placeholder="Search schools by name, id, or email" oninput="renderSchools()">
+      <!-- STATS CARDS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div>
+              <div class="stat-label">Total Schools</div>
+              <div class="stat-value" id="totalSchools">0</div>
+              <div class="stat-change">↑ 12% this month</div>
+            </div>
+            <div class="stat-icon blue"><ion-icon name="school-outline"></ion-icon></div>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="field-label" for="filterStatus">Account Status</label>
-          <select id="filterStatus" onchange="renderSchools()">
-            <option value="">All statuses</option>
-            <option value="active">Active</option>
-            <option value="pending">Pending</option>
-            <option value="suspended">Suspended</option>
-          </select>
-        </div>
-        <div class="action-group">
-          <button onclick="loadEverything()"><ion-icon name="refresh-outline"></ion-icon> Refresh Data</button>
-        </div>
-      </div>
 
-      <div class="card">
-        <h3>Recent Activity</h3>
-        <div id="recentActivity" class="activity-list">
-          <div class="empty">Loading events...</div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <div>
+              <div class="stat-label">Active Subscriptions</div>
+              <div class="stat-value" id="activeSchools">0</div>
+              <div class="stat-change">↑ 8% this month</div>
+            </div>
+            <div class="stat-icon green"><ion-icon name="checkmark-circle-outline"></ion-icon></div>
+          </div>
         </div>
-      </div>
-    </aside>
 
-    <main>
-      <div class="small-stat-grid">
-        <div class="small-stat">
-          <h4>Total Schools</h4>
-          <p id="totalSchools">0</p>
-        </div>
-        <div class="small-stat">
-          <h4>Active Schools</h4>
-          <p id="activeSchools">0</p>
-        </div>
-        <div class="small-stat">
-          <h4>Trial Schools</h4>
-          <p id="trialSchools">0</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Platform Analytics</h3>
-        <div class="form-group">
-          <span class="field-label">Subscription distribution</span>
-          <div class="chart-bar"><span id="distributionActive" style="width:20%"></span></div>
-          <div class="chart-bar" style="margin-top:8px"><span id="distributionTrial" style="width:10%; background: #8b5cf6"></span></div>
-          <div class="chart-bar" style="margin-top:8px"><span id="distributionExpired" style="width:5%; background: #f59e0b"></span></div>
-        </div>
-        <div class="rule"></div>
-        <div>
-          <div class="field-label">30-day growth trend</div>
-          <div id="growthChart" class="sparkline"></div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <div>
+              <div class="stat-label">Monthly Revenue</div>
+              <div class="stat-value" id="totalRevenue">₦0</div>
+              <div class="stat-change">↑ 5% this month</div>
+            </div>
+            <div class="stat-icon orange"><ion-icon name="cash-outline"></ion-icon></div>
+          </div>
         </div>
       </div>
 
-      <div class="card">
-        <h3>Registered Schools</h3>
-        <div class="toolbar">
-          <input type="text" id="searchInput" placeholder="Search by school name, ID or email" oninput="renderSchools()">
-          <input type="text" id="filterIdInput" placeholder="Filter by School ID" oninput="renderSchools()">
+      <!-- CHARTS ROW -->
+      <div class="chart-row">
+        <div class="chart-card">
+          <h3>Schools Growth (30 days)</h3>
+          <div id="growthChart" class="mini-chart">
+            <div class="mini-bar" style="height: 30%"></div>
+            <div class="mini-bar" style="height: 45%"></div>
+            <div class="mini-bar" style="height: 38%"></div>
+            <div class="mini-bar" style="height: 52%"></div>
+            <div class="mini-bar" style="height: 60%"></div>
+            <div class="mini-bar" style="height: 55%"></div>
+            <div class="mini-bar" style="height: 70%"></div>
+          </div>
         </div>
-        <div id="schoolList" class="school-list"></div>
-        <div class="table-wrap">
+
+        <div class="chart-card">
+          <h3>Subscription Distribution</h3>
+          <div style="padding: 20px 0;">
+            <div style="margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="font-size: 0.9rem;">Active Plans</span>
+                <span style="color: var(--accent); font-weight: 700;">65%</span>
+              </div>
+              <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                <div style="height: 100%; width: 65%; background: var(--accent);"></div>
+              </div>
+            </div>
+            <div style="margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="font-size: 0.9rem;">Trial Plans</span>
+                <span style="color: #60a5fa; font-weight: 700;">25%</span>
+              </div>
+              <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                <div style="height: 100%; width: 25%; background: #60a5fa;"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="font-size: 0.9rem;">Expired Plans</span>
+                <span style="color: #fbbf24; font-weight: 700;">10%</span>
+              </div>
+              <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                <div style="height: 100%; width: 10%; background: #fbbf24;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCHOOLS TABLE -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Registered Schools</h2>
+          <div class="card-header-actions">
+            <button class="btn-sm" onclick="openCreateSchoolModal()">+ Add School</button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
           <table>
             <thead>
               <tr>
-                <th>School</th>
+                <th>School Name</th>
+                <th>Email</th>
                 <th>Plan</th>
                 <th>Status</th>
                 <th>Students</th>
-                <th>Teachers</th>
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody id="schoolTable"></tbody>
+            <tbody id="schoolsTableBody">
+              <tr>
+                <td colspan="6" class="empty-state">
+                  <ion-icon name="cloud-download-outline"></ion-icon>
+                  <div>Loading schools...</div>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- SCHOOLS PAGE -->
+    <div id="schoolsPage" class="page hidden">
+      <div class="page-header">
+        <h1>Schools Management</h1>
+        <p>Manage all registered schools on the platform</p>
       </div>
 
       <div class="card">
-        <h3>Platform Activity Log</h3>
-        <div class="table-wrap">
+        <div class="card-header">
+          <h2>All Schools</h2>
+          <div class="card-header-actions">
+            <button class="btn-sm" onclick="openCreateSchoolModal()">+ Add School</button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
           <table>
             <thead>
               <tr>
-                <th>School / Action</th>
-                <th>Performed By</th>
-                <th>Date</th>
+                <th>School Name</th>
+                <th>Email</th>
+                <th>Plan</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
               </tr>
             </thead>
-            <tbody id="activityTable"></tbody>
+            <tbody id="schoolsTableBody2">
+              <tr>
+                <td colspan="6" class="empty-state">
+                  <ion-icon name="cloud-download-outline"></ion-icon>
+                  <div>Loading schools...</div>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
-    </main>
+    </div>
+
+    <!-- PLACEHOLDER PAGES -->
+    <div id="subscriptionsPage" class="page hidden">
+      <div class="page-header">
+        <h1>Subscriptions</h1>
+        <p>Manage school subscriptions and billing</p>
+      </div>
+      <div class="card">
+        <div class="empty-state">
+          <ion-icon name="card-outline"></ion-icon>
+          <div>Subscriptions management coming soon</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="analyticsPage" class="page hidden">
+      <div class="page-header">
+        <h1>Analytics</h1>
+        <p>Detailed platform analytics and insights</p>
+      </div>
+      <div class="card">
+        <div class="empty-state">
+          <ion-icon name="bar-chart-outline"></ion-icon>
+          <div>Advanced analytics coming soon</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="reportsPage" class="page hidden">
+      <div class="page-header">
+        <h1>Reports</h1>
+        <p>Generate and view platform reports</p>
+      </div>
+      <div class="card">
+        <div class="empty-state">
+          <ion-icon name="document-text-outline"></ion-icon>
+          <div>Reports coming soon</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="supportPage" class="page hidden">
+      <div class="page-header">
+        <h1>Support</h1>
+        <p>School support tickets and assistance</p>
+      </div>
+      <div class="card">
+        <div class="empty-state">
+          <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+          <div>Support tickets coming soon</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="settingsPage" class="page hidden">
+      <div class="page-header">
+        <h1>Settings</h1>
+        <p>Platform configuration and preferences</p>
+      </div>
+      <div class="card">
+        <div class="empty-state">
+          <ion-icon name="settings-outline"></ion-icon>
+          <div>Settings coming soon</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODALS -->
+  <div class="modal-backdrop" id="modalBackdrop" onclick="closeModals()"></div>
+
+  <div class="modal" id="createSchoolModal">
+    <div class="modal-header">
+      <h2>Create New School</h2>
+      <p>Add a new school to the platform</p>
+    </div>
+
+    <div class="form-group">
+      <label>School Name</label>
+      <input type="text" id="schoolName" placeholder="e.g. Oakbridge Academy">
+    </div>
+
+    <div class="form-group">
+      <label>School Email</label>
+      <input type="email" id="schoolEmail" placeholder="admin@school.com">
+    </div>
+
+    <div class="form-group">
+      <label>Admin Password</label>
+      <input type="password" id="schoolPassword" placeholder="Strong password">
+    </div>
+
+    <div class="form-group">
+      <label>School Motto (Optional)</label>
+      <input type="text" id="schoolMotto" placeholder="School motto or tagline">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-primary" onclick="addSchool()">Create School</button>
+    </div>
   </div>
 
-  <div class="modal-backdrop" id="schoolModalBackdrop" onclick="closeSchoolModal()"></div>
-  <div class="modal" id="schoolModal">
-    <div class="modal-content">
-    <div class="modal-header">
-      <div>
-        <h3 class="modal-title" id="detailName">School details</h3>
-        <p class="meta" id="detailSubtitle">Loading school summary...</p>
-      </div>
-      <div class="action-group">
-        <button onclick="closeSchoolModal()"><ion-icon name="close-outline"></ion-icon> Close</button>
-      </div>
-    </div>
-
-    <div class="modal-grid">
-      <div class="modal-card">
-        <div class="field-row">
-          <div>
-            <span class="field-label">School ID</span>
-            <p id="detailSchoolId"></p>
-          </div>
-          <div>
-            <span class="field-label">Account status</span>
-            <p><span id="detailStatus" class="status-pill"></span></p>
-          </div>
-        </div>
-
-        <div class="field-row">
-          <div>
-            <span class="field-label">Subscription</span>
-            <p id="detailPlan"></p>
-          </div>
-          <div>
-            <span class="field-label">Expires</span>
-            <p id="detailExpiry"></p>
-          </div>
-        </div>
-
-        <div class="field-row">
-          <div>
-            <span class="field-label">Students</span>
-            <p id="detailStudents"></p>
-          </div>
-          <div>
-            <span class="field-label">Teachers</span>
-            <p id="detailTeachers"></p>
-          </div>
-        </div>
-
-        <div class="field-row">
-          <div>
-            <span class="field-label">Results published</span>
-            <p id="detailResults"></p>
-          </div>
-          <div>
-            <span class="field-label">Storage used</span>
-            <p id="detailStorage"></p>
-          </div>
-        </div>
-
-        <div class="field-row">
-          <div style="grid-column: span 2;">
-            <span class="field-label">Recent sessions</span>
-            <p id="detailSessions"></p>
-          </div>
-        </div>
-
-        <div class="action-group" style="margin-top: 16px;">
-          <button id="statusButton" onclick="toggleSchoolStatus()"></button>
-          <button class="danger-btn" onclick="resetSchoolPassword()">Reset Password</button>
-          <button onclick="exportSchoolStudents()">Export Students</button>
-          <button onclick="exportSchoolTeachers()">Export Teachers</button>
-        </div>
-      </div>
-
-      <div class="modal-card">
-        <div class="field-row">
-          <div>
-            <span class="field-label">Upgrade plan</span>
-            <select id="upgradePlanSelect" onchange="updatePlanPreview()">
-              <option value="Small School">Small School</option>
-              <option value="Medium School">Medium School</option>
-              <option value="Large School">Large School</option>
-              <option value="Enterprise">Enterprise</option>
-            </select>
-          </div>
-          <div>
-            <span class="field-label">Student limit</span>
-            <input type="number" id="upgradeLimit" min="50" placeholder="Max students">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="field-label" for="upgradePrice">Price (USD)</label>
-          <input type="number" id="upgradePrice" min="0" placeholder="e.g. 1200">
-        </div>
-
-        <div class="action-group">
-          <button onclick="upgradeSchoolPlan()">Upgrade Plan</button>
-          <button onclick="renewSchoolSubscription()">Renew Subscription</button>
-        </div>
-
-        <div class="rule"></div>
-
-        <div class="form-group">
-          <label class="field-label" for="notificationMessage">Broadcast notification</label>
-          <textarea id="notificationMessage" placeholder="Enter message for school staff"></textarea>
-        </div>
-        <button onclick="sendSchoolNotification()">Send Notification</button>
-
-        <div class="rule"></div>
-
-        <button onclick="impersonateSchool()">Impersonate School</button>
-      </div>
-    </div>
-
-    <div class="modal-tabs">
-      <div class="tab active" data-tab="overview" onclick="setModalTab('overview')">Overview</div>
-      <div class="tab" data-tab="students" onclick="setModalTab('students')">Students</div>
-      <div class="tab" data-tab="teachers" onclick="setModalTab('teachers')">Teachers</div>
-      <div class="tab" data-tab="activity" onclick="setModalTab('activity')">Activity</div>
-    </div>
-
-    <div class="tab-content active" id="tab-overview">
-      <div class="modal-card">
-        <h4 class="section-title">Subscription History</h4>
-        <div id="subscriptionHistory" class="activity-list">
-          <div class="empty">Loading subscription history...</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="tab-content" id="tab-students">
-      <div class="modal-card">
-        <h4 class="section-title">Recent Students</h4>
-        <div id="recentStudents" class="activity-list">
-          <div class="empty">Loading students...</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="tab-content" id="tab-teachers">
-      <div class="modal-card">
-        <h4 class="section-title">Recent Teachers</h4>
-        <div id="recentTeachers" class="activity-list">
-          <div class="empty">Loading teachers...</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="tab-content" id="tab-activity">
-      <div class="modal-card">
-        <h4 class="section-title">School Activity Log</h4>
-        <div id="schoolActivityLog" class="activity-list">
-          <div class="empty">Loading activity...</div>
-        </div>
-      </div>
-    </div>
-    </div>
-
   <script>
-    const adminName = localStorage.getItem("adminName") || "Super Admin";
-    const isAdmin = localStorage.getItem("isAdmin");
-    let schools = [];
-    let activityLog = [];
-    let currentSchoolId = null;
+    let schoolsData = [];
 
-    const planConfig = {
-      "Small School": { limit: 200, price: 800 },
-      "Medium School": { limit: 500, price: 1400 },
-      "Large School": { limit: 1200, price: 2400 },
-      Enterprise: { limit: 2500, price: 4200 }
-    };
+    function showPage(pageName) {
+      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+      document.getElementById(pageName + 'Page').classList.remove('hidden');
 
-    const API_BASE = window.API_BASE;
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      event.target.closest('.nav-item').classList.add('active');
 
-    function api(path) {
-      if (!path.startsWith("/")) path = "/" + path;
-      return (window.API_BASE || "").replace(/\/$/, "") + path;
-    }
-
-    function formatDate(value) {
-      if (!value) return "-";
-      const date = new Date(value);
-      return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
-    }
-
-    function statusClass(status) {
-      if (!status) return "pill-trial";
-      if (status === "active") return "pill-active";
-      if (status === "trial") return "pill-trial";
-      return "pill-cancelled";
-    }
-
-    function createFallbackLogo(name, color) {
-      const initials = (name || "School")
-        .split(" ")
-        .filter(Boolean)
-        .slice(0, 2)
-        .map(part => part[0].toUpperCase())
-        .join("");
-
-      const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
-          <rect width="100%" height="100%" fill="${color}" />
-          <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="72" fill="white" font-weight="700">${initials}</text>
-        </svg>
-      `;
-
-      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-    }
-
-    async function loadPlatformOverview() {
-      try {
-        const response = await fetch(api("/admin/platform-overview"));
-        const payload = await response.json();
-        if (!response.ok) return;
-
-        document.getElementById("totalSchools").innerText = payload.data.totalSchools || 0;
-        document.getElementById("activeSchools").innerText = payload.data.activeSchools || 0;
-        document.getElementById("trialSchools").innerText = payload.data.trialSchools || 0;
-      } catch (error) {
-        console.error(error);
+      if (window.innerWidth <= 768) {
+        toggleSidebar();
       }
-    }
-
-    async function loadPlatformAnalytics() {
-      try {
-        const [distRes, growthRes] = await Promise.all([
-          fetch(api("/admin/analytics/subscription-distribution")),
-          fetch(api("/admin/analytics/growth?days=30"))
-        ]);
-
-        const dist = await distRes.json();
-        const growth = await growthRes.json();
-
-        if (dist.success) {
-          const totals = dist.data.reduce((sum, item) => sum + item.count, 0);
-          const active = dist.data.find(i => i._id === "active")?.count || 0;
-          const trial = dist.data.find(i => i._id === "trial")?.count || 0;
-          const expired = dist.data.find(i => i._id === "expired")?.count || 0;
-          document.getElementById("distributionActive").style.width = totals ? `${Math.round((active / totals) * 100)}%` : "0%";
-          document.getElementById("distributionTrial").style.width = totals ? `${Math.round((trial / totals) * 100)}%` : "0%";
-          document.getElementById("distributionExpired").style.width = totals ? `${Math.round((expired / totals) * 100)}%` : "0%";
-        }
-
-        if (growth.success) {
-          const container = document.getElementById("growthChart");
-          container.innerHTML = "";
-          const maxCount = Math.max(...growth.data.map(p => p.totalSchools || 0), 1);
-          growth.data.forEach(point => {
-            const bar = document.createElement("div");
-            bar.className = "sparkline-bar";
-            bar.style.height = `${Math.max(18, (point.totalSchools / maxCount) * 100)}px`;
-            bar.title = `${formatDate(point.date)} — ${point.totalSchools || 0} schools`;
-            container.appendChild(bar);
-          });
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    async function loadSchools() {
-      const list = document.getElementById("schoolList");
-      if (list) {
-        list.innerHTML = `<div class="empty">Loading schools...</div>`;
-      }
-      try {
-        const response = await fetch(api("/admin/schools?limit=50"));
-        const payload = await response.json();
-
-        if (!response.ok) {
-          const errorMessage = payload?.message || response.statusText || "Could not load schools.";
-          console.error("Admin schools fetch failed:", errorMessage);
-          if (list) {
-            list.innerHTML = `<div class="empty">${errorMessage}</div>`;
-          }
-          return;
-        }
-
-        schools = payload.data || [];
-        renderSchools();
-      } catch (error) {
-        console.error(error);
-        if (list) {
-          list.innerHTML = `<div class="empty">Could not load schools. ${error.message}</div>`;
-        }
-      }
-    }
-
-    function renderSchools() {
-      const schoolList = document.getElementById("schoolList");
-      const tableBody = document.getElementById("schoolTable");
-      const search = document.getElementById("searchInput").value.trim().toLowerCase();
-      const filterId = document.getElementById("filterIdInput").value.trim().toLowerCase();
-      const globalSearch = document.getElementById("globalSearch").value.trim().toLowerCase();
-      const statusFilter = document.getElementById("filterStatus").value;
-
-      const filtered = schools.filter((school) => {
-        const schoolName = (school.name || "").toString().toLowerCase();
-        const schoolId = (school.id || school.schoolId || "").toString().toLowerCase();
-        const schoolEmail = (school.email || "").toString().toLowerCase();
-        const byName = schoolName.includes(search) || schoolId.includes(search) || schoolEmail.includes(search);
-        const byGlobal = globalSearch === "" || schoolName.includes(globalSearch) || schoolId.includes(globalSearch) || schoolEmail.includes(globalSearch);
-        const byId = !filterId || schoolId.includes(filterId);
-        const byStatus = !statusFilter || (school.accountStatus || school.subscription?.status || "pending") === statusFilter;
-        return byName && byGlobal && byId && byStatus;
-      });
-
-      schoolList.innerHTML = "";
-      tableBody.innerHTML = "";
-
-      if (!filtered.length) {
-        schoolList.innerHTML = `<div class="empty">No schools found.</div>`;
-        tableBody.innerHTML = `<tr><td colspan="6" class="empty">No schools match current filters.</td></tr>`;
-        return;
-      }
-
-      filtered.forEach((school) => {
-        const logo = school.logo || createFallbackLogo(school.name, school.accentColor || "#66cccc");
-        const schoolStatus = school.accountStatus || "pending";
-
-        const item = document.createElement("div");
-        item.className = "school-item";
-        item.innerHTML = `
-          <div class="school-top">
-            <img class="school-logo" src="${logo}" alt="${school.name}">
-            <div>
-              <div class="school-name">${school.name}</div>
-              <div class="meta">
-                ID: ${school.id}<br>
-                Email: ${school.email}<br>
-                Plan: ${school.planName || "trial"}<br>
-                Students: ${school.studentCount || 0} · Teachers: ${school.teacherCount || 0}
-              </div>
-            </div>
-          </div>
-          <div class="school-actions">
-            <button class="mini-btn" onclick="openSchoolDetails('${school.id}')">Details</button>
-            <button class="mini-btn" onclick="copySchoolId('${school.id}')">Copy ID</button>
-          </div>
-        `;
-        schoolList.appendChild(item);
-
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>
-            <div style="display:flex; align-items:center; gap:12px;">
-              <img src="${logo}" alt="${school.name}" style="width:36px;height:36px;border-radius:12px;object-fit:cover;">
-              <div>
-                <strong>${school.name}</strong><br>
-                <span style="color: var(--muted);">${school.id}</span>
-              </div>
-            </div>
-          </td>
-          <td>${school.planName || "trial"}</td>
-          <td><span class="status-pill ${statusClass(schoolStatus)}">${schoolStatus}</span></td>
-          <td>${school.studentCount || 0}</td>
-          <td>${school.teacherCount || 0}</td>
-          <td class="table-actions">
-            <button onclick="openSchoolDetails('${school.id}')">Details</button>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
     }
 
     function toggleSidebar() {
-      const layout = document.querySelector(".layout");
-      const toggleBtn = document.getElementById("sidebarToggle");
-      if (!layout || !toggleBtn) return;
-      const collapsed = layout.classList.toggle("collapsed");
-      toggleBtn.innerHTML = collapsed
-        ? '<ion-icon name="menu-outline"></ion-icon> Show sidebar'
-        : '<ion-icon name="close-outline"></ion-icon> Hide sidebar';
+      document.getElementById('sidebar').classList.toggle('open');
     }
 
-    async function loadActivityLog() {
+    function openCreateSchoolModal() {
+      document.getElementById('modalBackdrop').classList.add('active');
+      document.getElementById('createSchoolModal').classList.add('active');
+    }
+
+    function closeModals() {
+      document.getElementById('modalBackdrop').classList.remove('active');
+      document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+    }
+
+    async function addSchool() {
+      const name = document.getElementById('schoolName').value.trim();
+      const email = document.getElementById('schoolEmail').value.trim();
+      const password = document.getElementById('schoolPassword').value.trim();
+
+      if (!name || !email || !password) {
+        alert('Please fill required fields');
+        return;
+      }
+
+      window.showLoader?.();
       try {
-        const response = await fetch(api("/admin/activity-log?limit=10"));
-        const payload = await response.json();
-        if (!response.ok) return;
-        activityLog = payload.data || [];
-        renderActivityLog();
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    function renderActivityLog() {
-      const recentContainer = document.getElementById("recentActivity");
-      const tableBody = document.getElementById("activityTable");
-
-      if (!activityLog.length) {
-        recentContainer.innerHTML = `<div class="empty">No activity yet.</div>`;
-        tableBody.innerHTML = `<tr><td colspan="3" class="empty">No activity available.</td></tr>`;
-        return;
-      }
-
-      recentContainer.innerHTML = "";
-      tableBody.innerHTML = "";
-
-      activityLog.slice(0, 5).forEach((item) => {
-        const card = document.createElement("div");
-        card.className = "activity-item";
-        card.innerHTML = `<p>${item.action}</p><span>${item.schoolName || item.schoolId} · ${formatDate(item.createdAt)}</span>`;
-        recentContainer.appendChild(card);
-
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td><strong>${item.schoolName || item.schoolId}</strong><div style="color: var(--muted); font-size:0.85rem;">${item.action}</div></td>
-          <td>${item.performedBy || "system"}</td>
-          <td>${formatDate(item.createdAt)}</td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
-
-    async function openSchoolDetails(schoolId) {
-      currentSchoolId = schoolId;
-      document.getElementById("schoolModalBackdrop").classList.add("visible");
-      document.getElementById("schoolModal").classList.add("visible");
-      setModalTab("overview");
-      try {
-        const [schoolRes, storageRes, historyRes] = await Promise.all([
-          fetch(api(`/admin/school/${schoolId}`)),
-          fetch(api(`/admin/school/${schoolId}/storage`)),
-          fetch(api(`/admin/school/${schoolId}/subscription-history`))
-        ]);
-        const schoolPayload = await schoolRes.json();
-        const storagePayload = await storageRes.json();
-        const historyPayload = await historyRes.json();
-        if (!schoolPayload.success) throw new Error(schoolPayload.message || "School details unavailable");
-        const school = schoolPayload.school;
-        const statusText = school.accountStatus || "pending";
-        document.getElementById("detailName").innerText = school.name;
-        document.getElementById("detailSubtitle").innerText = `${school.id} · ${school.email}`;
-        document.getElementById("detailSchoolId").innerText = school.id;
-        document.getElementById("detailStatus").innerText = statusText;
-        document.getElementById("detailStatus").className = `status-pill ${statusClass(statusText)}`;
-        document.getElementById("detailPlan").innerText = school.subscription?.planName || "trial";
-        document.getElementById("detailExpiry").innerText = school.subscription?.endDate ? formatDate(school.subscription.endDate) : "Not set";
-        document.getElementById("detailStudents").innerText = school.studentCount || 0;
-        document.getElementById("detailTeachers").innerText = school.teacherCount || 0;
-        document.getElementById("detailResults").innerText = school.resultCount || 0;
-        document.getElementById("detailSessions").innerText = school.sessions?.length ? `${school.sessions.length} sessions` : "No sessions";
-        document.getElementById("detailStorage").innerText = storagePayload.success ? `${storagePayload.data.used}GB / ${storagePayload.data.limit}GB` : "N/A";
-        const statusButton = document.getElementById("statusButton");
-        statusButton.innerText = statusText === "active" ? "Suspend School" : "Activate School";
-        statusButton.className = statusText === "active" ? "danger-btn" : "";
-        const planSettings = planConfig[document.getElementById("upgradePlanSelect").value] || { limit: 200, price: 800 };
-        document.getElementById("upgradeLimit").value = school.subscription?.studentLimit || planSettings.limit;
-        document.getElementById("upgradePrice").value = school.subscription?.amountPaid || planSettings.price;
-        renderSubscriptionHistory(historyPayload.data || []);
-        renderRecentStudents(school.recentStudents || []);
-        renderRecentTeachers(school.recentTeachers || []);
-      } catch (error) {
-        console.error(error);
-        alert(error.message || "Unable to load school details.");
-        closeSchoolModal();
-      }
-    }
-
-    function renderSubscriptionHistory(history) {
-      const container = document.getElementById("subscriptionHistory");
-      container.innerHTML = "";
-      if (!history.length) {
-        container.innerHTML = `<div class="empty">No subscription activity found.</div>`;
-        return;
-      }
-      history.forEach((item) => {
-        const row = document.createElement("div");
-        row.className = "activity-item";
-        row.innerHTML = `<p>${item.action}</p><span>${formatDate(item.createdAt)}</span>`;
-        container.appendChild(row);
-      });
-    }
-
-    function renderRecentStudents(students) {
-      const container = document.getElementById("recentStudents");
-      container.innerHTML = "";
-      if (!students.length) {
-        container.innerHTML = `<div class="empty">No recent students yet.</div>`;
-        return;
-      }
-      students.forEach((student) => {
-        const card = document.createElement("div");
-        card.className = "activity-item";
-        card.innerHTML = `<p>${student.name}</p><span>${student.studentId || student.regNumber || "no id"}</span>`;
-        container.appendChild(card);
-      });
-    }
-
-    function renderRecentTeachers(teachers) {
-      const container = document.getElementById("recentTeachers");
-      container.innerHTML = "";
-      if (!teachers.length) {
-        container.innerHTML = `<div class="empty">No recent teachers yet.</div>`;
-        return;
-      }
-      teachers.forEach((teacher) => {
-        const card = document.createElement("div");
-        card.className = "activity-item";
-        card.innerHTML = `<p>${teacher.name}</p><span>${teacher.email || teacher.teacherId || "no contact"}</span>`;
-        container.appendChild(card);
-      });
-    }
-
-    async function renderSchoolActivity() {
-      if (!currentSchoolId) return;
-      try {
-        const response = await fetch(api(`/admin/activity-log?schoolId=${encodeURIComponent(currentSchoolId)}&limit=10`));
-        const payload = await response.json();
-        const container = document.getElementById("schoolActivityLog");
-        container.innerHTML = "";
-        if (!payload.success || !payload.data.length) {
-          container.innerHTML = `<div class="empty">No activity entries found.</div>`;
-          return;
-        }
-        payload.data.forEach((entry) => {
-          const card = document.createElement("div");
-          card.className = "activity-item";
-          card.innerHTML = `<p>${entry.action}</p><span>${formatDate(entry.createdAt)} · ${entry.performedBy || "system"}</span>`;
-          container.appendChild(card);
+        const response = await fetch(window.API_BASE + '/add-school', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
         });
-      } catch (error) {
-        console.error(error);
-      }
-    }
 
-    function closeSchoolModal() {
-      currentSchoolId = null;
-      document.getElementById("schoolModalBackdrop").classList.remove("visible");
-      document.getElementById("schoolModal").classList.remove("visible");
-    }
-
-    function setModalTab(tabKey) {
-      document.querySelectorAll(".tab").forEach((tab) => {
-        tab.classList.toggle("active", tab.dataset.tab === tabKey);
-      });
-      document.querySelectorAll(".tab-content").forEach((panel) => {
-        panel.classList.toggle("active", panel.id === `tab-${tabKey}`);
-      });
-      if (tabKey === "activity") {
-        renderSchoolActivity();
-      }
-    }
-
-    async function toggleSchoolStatus() {
-      if (!currentSchoolId) return;
-      window.showLoader?.();
-      const statusText = document.getElementById("detailStatus").innerText;
-      const action = statusText === "active" ? "suspend" : "activate";
-      const response = await fetch(api(`/admin/school/${currentSchoolId}/${action}`), {
-        method: "POST"
-      });
-      const payload = await response.json();
-      if (response.ok && payload.success) {
-        await loadEverything();
-        await openSchoolDetails(currentSchoolId);
-      } else {
+        if (response.ok) {
+          alert('School created successfully');
+          closeModals();
+          document.getElementById('schoolName').value = '';
+          document.getElementById('schoolEmail').value = '';
+          document.getElementById('schoolPassword').value = '';
+          loadEverything();
+        } else {
+          alert('Failed to create school');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error creating school');
+      } finally {
         window.hideLoader?.();
-        alert(payload.message || `Could not ${action} school`);
       }
-    }
-
-    function updatePlanPreview() {
-      const plan = document.getElementById("upgradePlanSelect").value;
-      const settings = planConfig[plan];
-      if (!settings) return;
-      document.getElementById("upgradeLimit").value = settings.limit;
-      document.getElementById("upgradePrice").value = settings.price;
-    }
-
-    async function upgradeSchoolPlan() {
-      if (!currentSchoolId) return;
-      const planName = document.getElementById("upgradePlanSelect").value;
-      const studentLimit = Number(document.getElementById("upgradeLimit").value);
-      const price = Number(document.getElementById("upgradePrice").value);
-      if (!planName || !studentLimit || !price) {
-        alert("Select a plan and enter valid limit and price.");
-        return;
-      }
-      const response = await fetch(api(`/admin/school/${currentSchoolId}/upgrade-plan`), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planName, studentLimit, price })
-      });
-      const payload = await response.json();
-      if (response.ok && payload.success) {
-        alert(payload.message);
-        await loadEverything();
-        await openSchoolDetails(currentSchoolId);
-      } else {
-        alert(payload.message || "Could not upgrade plan.");
-      }
-    }
-
-    async function renewSchoolSubscription() {
-      if (!currentSchoolId) return;
-      const response = await fetch(api("/renew-subscription"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ schoolId: currentSchoolId })
-      });
-      const payload = await response.json();
-      if (response.ok) {
-        alert(payload.message || "Subscription renewed.");
-        await loadEverything();
-        await openSchoolDetails(currentSchoolId);
-      } else {
-        alert(payload.message || "Could not renew subscription.");
-      }
-    }
-
-    async function sendSchoolNotification() {
-      if (!currentSchoolId) return;
-      const message = document.getElementById("notificationMessage").value.trim();
-      if (!message) {
-        alert("Enter a notification message first.");
-        return;
-      }
-      const response = await fetch(api(`/admin/school/${currentSchoolId}/send-notification`), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, subject: "Admin Update" })
-      });
-      const payload = await response.json();
-      if (response.ok && payload.success) {
-        alert(payload.message);
-        document.getElementById("notificationMessage").value = "";
-      } else {
-        alert(payload.message || "Could not send notification.");
-      }
-    }
-
-    async function resetSchoolPassword() {
-      if (!currentSchoolId) return;
-      const confirmed = confirm("Reset this school's password and generate a temporary password?");
-      if (!confirmed) return;
-      window.showLoader?.();
-      const response = await fetch(api(`/admin/school/${currentSchoolId}/reset-password`), {
-        method: "POST"
-      });
-      const payload = await response.json();
-      window.hideLoader?.();
-      if (response.ok && payload.success) {
-        alert(`Temporary password: ${payload.tempPassword}`);
-      } else {
-        alert(payload.message || "Could not reset password.");
-      }
-    }
-
-    function exportSchoolStudents() {
-      if (!currentSchoolId) return;
-      window.open(api(`/admin/school/${currentSchoolId}/students/export`), "_blank");
-    }
-
-    function exportSchoolTeachers() {
-      if (!currentSchoolId) return;
-      window.open(api(`/admin/school/${currentSchoolId}/teachers/export`), "_blank");
-    }
-
-    async function impersonateSchool() {
-      if (!currentSchoolId) return;
-      const response = await fetch(api(`/admin/school/${currentSchoolId}/impersonate`), {
-        method: "POST"
-      });
-      const payload = await response.json();
-      if (response.ok && payload.success) {
-        alert(`Impersonation token generated. Expires in 2 hours.`);
-      } else {
-        alert(payload.message || "Could not impersonate school.");
-      }
-    }
-
-    function logout() {
-      localStorage.removeItem("isAdmin");
-      localStorage.removeItem("adminName");
-      window.location.href = "admin-login.html";
     }
 
     async function loadEverything() {
-      await Promise.all([loadPlatformOverview(), loadPlatformAnalytics(), loadSchools(), loadActivityLog()]);
+      window.showLoader?.();
+      try {
+        const response = await fetch(window.API_BASE + '/admin/schools', {
+          headers: { 'X-Skip-Loader': '1' }
+        });
+        if (!response.ok) throw new Error('Failed to load schools');
+
+        schoolsData = await response.json();
+        renderDashboard();
+      } catch (err) {
+        console.error('Error loading schools:', err);
+      } finally {
+        window.hideLoader?.();
+      }
     }
 
-    window.addEventListener("load", async () => {
-      if (isAdmin !== "true") {
-        window.location.href = "admin-login.html";
+    function renderDashboard() {
+      const total = schoolsData.length;
+      const active = schoolsData.filter(s => s.status === 'active').length;
+      const revenue = schoolsData.reduce((sum, s) => sum + (s.monthlyRevenue || 0), 0);
+
+      document.getElementById('totalSchools').textContent = total;
+      document.getElementById('activeSchools').textContent = active;
+      document.getElementById('totalRevenue').textContent = '₦' + revenue.toLocaleString();
+
+      renderSchools();
+    }
+
+    function renderSchools() {
+      const search = document.getElementById('globalSearch')?.value.toLowerCase() || '';
+      const filtered = schoolsData.filter(s =>
+        s.name.toLowerCase().includes(search) ||
+        s.email.toLowerCase().includes(search)
+      );
+
+      const tbody = document.getElementById('schoolsTableBody');
+      if (!tbody) return;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><ion-icon name="school-outline"></ion-icon><div>No schools found</div></td></tr>';
         return;
       }
-      document.getElementById("welcomeTitle").innerText = `${adminName} Dashboard`;
-      await loadEverything();
-      const preloader = document.getElementById("preloader");
-      setTimeout(() => {
-        preloader.classList.add("hide");
-        setTimeout(() => preloader.remove(), 400);
-      }, 600);
+
+      tbody.innerHTML = filtered.map(school => `
+        <tr>
+          <td><div class="school-name-cell"><div class="school-avatar">${school.name.substring(0, 2).toUpperCase()}</div><strong>${school.name}</strong></div></td>
+          <td>${school.email}</td>
+          <td><strong>${school.plan || 'Free'}</strong></td>
+          <td><span class="status-badge status-${school.status || 'active'}">${(school.status || 'active').toUpperCase()}</span></td>
+          <td>${school.studentCount || 0}</td>
+          <td><button class="btn-sm" onclick="alert('View ${school.name}')">View</button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('token');
+        window.location.href = 'admin-login.html';
+      }
+    }
+
+    // Show menu toggle on mobile
+    window.addEventListener('resize', () => {
+      const toggle = document.getElementById('sidebarToggle');
+      if (window.innerWidth <= 768) {
+        toggle.classList.remove('hidden');
+      } else {
+        toggle.classList.add('hidden');
+      }
+    });
+
+    // Initialize
+    window.addEventListener('load', () => {
+      if (window.innerWidth <= 768) {
+        document.getElementById('sidebarToggle').classList.remove('hidden');
+      }
+
+      loadEverything();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadEverything();
     });
   </script>
 
   <script src="common.js"></script>
-  <script>
-    // Minimal UI toggle for admin dashboard — persists choice in localStorage
-    (function() {
-      const key = 'adminMinimalUI';
-      const btn = document.getElementById('toggleMinimalUI');
-      function apply(state) {
-        if (state) document.documentElement.classList.add('minimal-ui');
-        else document.documentElement.classList.remove('minimal-ui');
-        if (btn) btn.classList.toggle('active', !!state);
-      }
-      // init after load
-      window.addEventListener('load', () => {
-        const val = localStorage.getItem(key) === 'true';
-        apply(val);
-      });
-      if (btn) btn.addEventListener('click', () => {
-        const current = document.documentElement.classList.contains('minimal-ui');
-        const next = !current;
-        apply(next);
-        localStorage.setItem(key, next ? 'true' : 'false');
-      });
-    })();
-  </script>
 </body>
 </html>
-
