@@ -1631,14 +1631,8 @@
     padding: 14px;
   }
 </style>
-  <style>
-  /* Global loader styles */
-  .global-loader { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); z-index: 99999; }
-  .global-loader.active { display: flex; }
-  .loader-spinner { width: 60px; height: 60px; border-radius: 50%; border: 6px solid rgba(255,255,255,0.18); border-top-color: #fff; animation: spin 1s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  </style>
   <script src="js/config.js"></script>
+  <script src="js/global-loader.js"></script>
 </head>
 <body>
   <div id="preloader">
@@ -1680,10 +1674,7 @@
   </div>
 </div>
 
-  <!-- Global loader overlay (shows during network activity) -->
-  <div id="globalLoader" class="global-loader" aria-hidden="true">
-    <div class="loader-spinner" role="status" aria-label="Loading"></div>
-  </div>
+  <!-- global loader provided by js/global-loader.js -->
 
 <div class="modal-overlay" id="teacherEditModal">
   <div class="modal">
@@ -4512,44 +4503,7 @@ async function loadPosts(audience) {
   }
 }
 
-// --- Global loader helper: automatically shows when fetch() is active ---
-(function(){
-  try {
-    let activeCount = 0;
-    const loader = document.getElementById('globalLoader');
-    function show() {
-      if (loader) loader.classList.add('active');
-      // optionally prevent pointer events so UI becomes inert
-      document.documentElement.style.pointerEvents = 'none';
-      document.body.style.pointerEvents = 'none';
-    }
-    function hide() {
-      if (loader) loader.classList.remove('active');
-      document.documentElement.style.pointerEvents = '';
-      document.body.style.pointerEvents = '';
-    }
-
-    window.showLoader = show;
-    window.hideLoader = hide;
-
-    const origFetch = window.fetch.bind(window);
-    window.fetch = function(...args) {
-      try {
-        if (activeCount === 0) show();
-        activeCount++;
-      } catch (e) {}
-
-      return origFetch(...args).finally(() => {
-        try {
-          activeCount = Math.max(0, activeCount - 1);
-          if (activeCount === 0) hide();
-        } catch (e) {}
-      });
-    };
-  } catch (err) {
-    console.error('Loader init error', err);
-  }
-})();
+// loader provided by js/global-loader.js
 
 async function deletePost(postId, audience) {
   if (!confirm("Delete this post?")) return;
