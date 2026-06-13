@@ -375,6 +375,8 @@
         return;
       }
 
+      window.showLoader?.();
+
       try {
         const response = await fetch(window.API_BASE + "/teacher-login", {
           method: "POST",
@@ -401,11 +403,13 @@
             window.location.href = "teacher-dashboard.html";
           }, 1000);
         } else {
+          window.hideLoader?.();
           output.classList.add("error");
           output.innerText = data.message || "Login failed.";
         }
       } catch (error) {
         console.log(error);
+        window.hideLoader?.();
         output.classList.add("error");
         output.innerText = "Server error. Please try again.";
       }

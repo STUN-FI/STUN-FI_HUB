@@ -403,6 +403,8 @@
         return;
       }
 
+      window.showLoader?.();
+
       try {
         const response = await fetch(window.API_BASE + "/school-register", {
           method: "POST",
@@ -427,11 +429,13 @@
             window.location.href = "login.html";
           }, 1800);
         } else {
+          window.hideLoader?.();
           console.error('Registration failed response:', data);
           output.classList.add("error");
           output.innerText = (data.message || "Registration failed.") + (data.error ? (" - " + data.error) : "");
         }
       } catch (error) {
+        window.hideLoader?.();
         console.log(error);
         output.classList.add("error");
         output.innerText = "Server error. Please try again.";

@@ -1580,6 +1580,7 @@
 
     async function toggleSchoolStatus() {
       if (!currentSchoolId) return;
+      window.showLoader?.();
       const statusText = document.getElementById("detailStatus").innerText;
       const action = statusText === "active" ? "suspend" : "activate";
       const response = await fetch(api(`/admin/school/${currentSchoolId}/${action}`), {
@@ -1590,6 +1591,7 @@
         await loadEverything();
         await openSchoolDetails(currentSchoolId);
       } else {
+        window.hideLoader?.();
         alert(payload.message || `Could not ${action} school`);
       }
     }
@@ -1668,10 +1670,12 @@
       if (!currentSchoolId) return;
       const confirmed = confirm("Reset this school's password and generate a temporary password?");
       if (!confirmed) return;
+      window.showLoader?.();
       const response = await fetch(api(`/admin/school/${currentSchoolId}/reset-password`), {
         method: "POST"
       });
       const payload = await response.json();
+      window.hideLoader?.();
       if (response.ok && payload.success) {
         alert(`Temporary password: ${payload.tempPassword}`);
       } else {

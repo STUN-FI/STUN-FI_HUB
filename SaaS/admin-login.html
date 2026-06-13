@@ -230,6 +230,8 @@
       return;
     }
 
+    window.showLoader?.();
+
     try {
       const response = await fetch(api("/admin-login"), {
         method: "POST",
@@ -244,10 +246,12 @@
         localStorage.setItem("adminName", data.admin?.name || "Super Admin");
         window.location.href = "admin-dashboard.html";
       } else {
+        window.hideLoader?.();
         status.innerText = data.message || "Login failed";
       }
     } catch (error) {
       console.log(error);
+      window.hideLoader?.();
       status.innerText = "Error connecting to server";
     }
   }

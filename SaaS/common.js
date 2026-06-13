@@ -66,6 +66,20 @@ document.addEventListener('keydown', function (event) {
 window.openModal = openModal;
 window.closeModal = closeModal;
 
+// Helper to wrap async functions with loader
+window.withLoader = function(asyncFn) {
+  return async function(...args) {
+    window.showLoader?.();
+    try {
+      const result = await asyncFn.apply(this, args);
+      return result;
+    } catch (error) {
+      window.hideLoader?.();
+      throw error;
+    }
+  };
+};
+
 // Enforce uppercase for all form inputs except email and password
 (function enforceUppercaseInputs(){
   // List of password field IDs to exclude from uppercase

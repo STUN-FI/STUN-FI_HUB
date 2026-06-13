@@ -2914,6 +2914,8 @@ async function addStudent() {
 
   const regNumber = "STU" + regNumberSuffix;
 
+  window.showLoader?.();
+
   try {
     const response = await fetch(window.API_BASE + "/add-student", {
       method: "POST",
@@ -2938,9 +2940,11 @@ async function addStudent() {
       addActivity("Student Added", `${name} (${regNumber}) was added.`);
       toast("Student added successfully", "success");
     } else {
+      window.hideLoader?.();
       toast(data.message || "Could not add student", "error");
     }
   } catch (error) {
+    window.hideLoader?.();
     console.log(error);
     toast("Error adding student", "error");
   }
@@ -3446,6 +3450,8 @@ async function addTeacher() {
     return;
   }
 
+  window.showLoader?.();
+
   try {
     const response = await fetch(
       window.API_BASE + "/add-teacher",
@@ -3477,10 +3483,12 @@ async function addTeacher() {
       );
 
     } else {
+      window.hideLoader?.();
       toast(data.message, "error");
     }
 
   } catch (err) {
+    window.hideLoader?.();
     console.log(err);
   }
 }
@@ -3755,6 +3763,8 @@ async function submitStartSession() {
     return;
   }
 
+  window.showLoader?.();
+
   try {
     const response = await fetch(window.API_BASE + "/create-academic-session", {
       method: "POST",
@@ -3771,6 +3781,7 @@ async function submitStartSession() {
 
     const data = await response.json();
     if (!response.ok) {
+      window.hideLoader?.();
       toast(data.message || "Could not start new session", "error");
       return;
     }
@@ -3782,6 +3793,7 @@ async function submitStartSession() {
     await loadResultStatuses();
     renderStudents();
   } catch (error) {
+    window.hideLoader?.();
     console.log(error);
     toast("Error starting new session", "error");
   }
@@ -4370,6 +4382,8 @@ async function createPost() {
     return;
   }
 
+  window.showLoader?.();
+
   try {
     const payload = {
       schoolId: currentSchoolId,
@@ -4394,6 +4408,7 @@ async function createPost() {
     const failed = results.find((item) => !item.res.ok);
 
     if (failed) {
+      window.hideLoader?.();
       output.style.color = "red";
       output.innerText = failed.data.message || `Could not create post for ${failed.audience}.`;
       return;
@@ -4416,6 +4431,7 @@ async function createPost() {
       loadPosts(audiences[0]);
     }
   } catch (err) {
+    window.hideLoader?.();
     console.log(err);
     output.style.color = "red";
     output.innerText = "Server error.";
