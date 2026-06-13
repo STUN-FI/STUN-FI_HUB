@@ -2371,6 +2371,7 @@ const school = JSON.parse(localStorage.getItem("school") || "null");
 const currentSchoolId = school?.schoolId || school?.id || "";
 let students = [];
 let selectedStudentGroup = "";
+let expandedStudentGroups = new Set();
 let currentViewSubjectStudentId = "";
 let currentSubjectStudentId = "";
 let teachers = [];
@@ -3148,19 +3149,48 @@ function renderStudents() {
     header.className = "class-group";
     header.dataset.groupKey = encodeURIComponent(groupKey);
     header.innerHTML = `
-      <div class="class-group-header">
+      <div class="class-group-header" role="button" aria-expanded="false">
         <div>
           <div class="item-title">${group.displayName}${group.arm ? ` ${group.arm}` : ""}</div>
           <div class="class-group-summary">
             <span class="class-pill">${group.students.length} students</span>
           </div>
         </div>
+        <div class="group-toggle">▶</div>
       </div>
     `;
-    studentList.appendChild(header);
 
-    group.students.forEach((student) => {
-      const li = document.createElement("li");
+    // container for children (students) — hidden by default
+    const children = document.createElement("ul");
+    children.className = "group-children";
+    children.style.display = expandedStudentGroups.has(groupKey) ? "block" : "none";
+
+    header.querySelector('.class-group-header').addEventListener('click', () => {
+      toggleStudentGroup(groupKey, header, children, group.students);
+    });
+
+    studentList.appendChild(header);
+    studentList.appendChild(children);
+  });
+}
+
+function toggleStudentGroup(groupKey, headerEl, childrenEl, studentsArray) {
+  const isExpanded = expandedStudentGroups.has(groupKey);
+  if (isExpanded) {
+    expandedStudentGroups.delete(groupKey);
+    childrenEl.style.display = 'none';
+    headerEl.querySelector('.class-group-header').setAttribute('aria-expanded', 'false');
+    const toggle = headerEl.querySelector('.group-toggle'); if (toggle) toggle.textContent = '▶';
+    childrenEl.innerHTML = '';
+  } else {
+    expandedStudentGroups.add(groupKey);
+    headerEl.querySelector('.class-group-header').setAttribute('aria-expanded', 'true');
+    const toggle = headerEl.querySelector('.group-toggle'); if (toggle) toggle.textContent = '▼';
+    childrenEl.style.display = 'block';
+    // render students into childrenEl
+    childrenEl.innerHTML = '';
+    studentsArray.forEach((student) => {
+      const li = document.createElement('li');
       li.innerHTML = `
         <div class="item-row">
           <div class="avatar">${getInitials(student.name)}</div>
@@ -3186,9 +3216,10 @@ function renderStudents() {
           </div>
         </div>
       `;
-      studentList.appendChild(li);
+      childrenEl.appendChild(li);
     });
-  });
+  }
+}
 }
 
 function openStudentEdit(reg, name, className, arm) {
