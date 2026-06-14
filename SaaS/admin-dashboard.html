@@ -559,9 +559,16 @@
 
     .modal.active,
     .modal.visible {
-      display: block;
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
+      display: block !important;
+      opacity: 1 !important;
+      transform: translate(-50%, -50%) scale(1) !important;
+      top: 50% !important;
+      left: 50% !important;
+      right: auto !important;
+      bottom: auto !important;
+      margin: 0 !important;
+      position: fixed !important;
+      transform-origin: center center !important;
     }
 
     .modal::-webkit-scrollbar {
