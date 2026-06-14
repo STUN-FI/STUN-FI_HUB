@@ -206,7 +206,7 @@ module.exports = function registerAdminRoutes(app, { School, Student, Teacher, R
       // Generate a simple school id
       const id = `SCH${Date.now().toString().slice(-6)}`;
 
-      const newSchool = await School.create({ id, name, email, motto, accountStatus: 'active', createdAt: new Date() });
+      const newSchool = await School.create({ id, name, email, password, motto, accountStatus: 'active', createdAt: new Date() });
 
       // Optionally create a basic subscription record if Subscription model exists
       try {
