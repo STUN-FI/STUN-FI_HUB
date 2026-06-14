@@ -992,28 +992,28 @@
             <div style="margin-bottom: 16px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
                 <span style="font-size: 0.9rem;">Active Plans</span>
-                <span style="color: var(--accent); font-weight: 700;">65%</span>
+                <span id="distActivePercent" style="color: var(--accent); font-weight: 700;">0%</span>
               </div>
               <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                <div style="height: 100%; width: 65%; background: var(--accent);"></div>
+                <div id="distActiveBar" style="height: 100%; width: 0%; background: var(--accent);"></div>
               </div>
             </div>
             <div style="margin-bottom: 16px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
                 <span style="font-size: 0.9rem;">Trial Plans</span>
-                <span style="color: #60a5fa; font-weight: 700;">25%</span>
+                <span id="distTrialPercent" style="color: #60a5fa; font-weight: 700;">0%</span>
               </div>
               <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                <div style="height: 100%; width: 25%; background: #60a5fa;"></div>
+                <div id="distTrialBar" style="height: 100%; width: 0%; background: #60a5fa;"></div>
               </div>
             </div>
             <div>
               <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
                 <span style="font-size: 0.9rem;">Expired Plans</span>
-                <span style="color: #fbbf24; font-weight: 700;">10%</span>
+                <span id="distExpiredPercent" style="color: #fbbf24; font-weight: 700;">0%</span>
               </div>
               <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                <div style="height: 100%; width: 10%; background: #fbbf24;"></div>
+                <div id="distExpiredBar" style="height: 100%; width: 0%; background: #fbbf24;"></div>
               </div>
             </div>
           </div>
@@ -1343,13 +1343,58 @@
     }
 
     function openCreateSchoolModal() {
-      // TODO: Implement modal for creating school
-      alert('School creation modal will be implemented');
+      document.getElementById('modalBackdrop').classList.add('visible');
+      document.getElementById('createSchoolModal').classList.add('visible');
+      // clear fields
+      ['schoolName','schoolEmail','schoolPassword','schoolMotto'].forEach(id=>{
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      setTimeout(()=>{
+        const first = document.getElementById('schoolName');
+        if (first) first.focus();
+      }, 100);
     }
 
     function closeModals() {
-      document.getElementById('modalBackdrop').style.display = 'none';
-      document.getElementById('createSchoolModal').style.display = 'none';
+      const backdrop = document.getElementById('modalBackdrop');
+      const modal = document.getElementById('createSchoolModal');
+      if (backdrop) backdrop.classList.remove('visible');
+      if (modal) modal.classList.remove('visible');
+    }
+
+    async function addSchool() {
+      const name = document.getElementById('schoolName')?.value.trim();
+      const email = document.getElementById('schoolEmail')?.value.trim();
+      const password = document.getElementById('schoolPassword')?.value;
+      const motto = document.getElementById('schoolMotto')?.value.trim();
+
+      if (!name || !email || !password) {
+        alert('Please enter name, email and password');
+        return;
+      }
+
+      window.showLoader?.();
+      try {
+        const response = await fetch(api('/admin/schools'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, motto })
+        });
+        const payload = await response.json();
+        if (response.ok && payload.success) {
+          alert('School created successfully');
+          closeModals();
+          await loadSchools();
+        } else {
+          alert(payload.message || 'Could not create school');
+        }
+      } catch (err) {
+        console.error('Error creating school', err);
+        alert('Error creating school');
+      } finally {
+        window.hideLoader?.();
+      }
     }
 
     async function loadPlatformOverview() {
@@ -1376,12 +1421,27 @@
         const growth = await growthRes.json();
 
         if (dist.success && dist.data) {
-          const totals = dist.data.reduce((sum, item) => sum + (item.count || 0), 0);
+          const totals = dist.data.reduce((sum, item) => sum + (item.count || 0), 0) || 1;
           const active = dist.data.find(i => i._id === "active")?.count || 0;
           const trial = dist.data.find(i => i._id === "trial")?.count || 0;
           const expired = dist.data.find(i => i._id === "expired")?.count || 0;
-          
-          // Update distribution chart (if needed)
+
+          const activePct = Math.round((active / totals) * 100);
+          const trialPct = Math.round((trial / totals) * 100);
+          const expiredPct = Math.round((expired / totals) * 100);
+
+          const setWidth = (id, pct) => {
+            const el = document.getElementById(id);
+            if (el) el.style.width = pct + '%';
+          };
+
+          if (document.getElementById('distActivePercent')) document.getElementById('distActivePercent').innerText = activePct + '%';
+          if (document.getElementById('distTrialPercent')) document.getElementById('distTrialPercent').innerText = trialPct + '%';
+          if (document.getElementById('distExpiredPercent')) document.getElementById('distExpiredPercent').innerText = expiredPct + '%';
+
+          setWidth('distActiveBar', activePct);
+          setWidth('distTrialBar', trialPct);
+          setWidth('distExpiredBar', expiredPct);
         }
 
         if (growth.success && growth.data) {
