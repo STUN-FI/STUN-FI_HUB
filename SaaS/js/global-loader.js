@@ -6,7 +6,13 @@
       div.id = 'globalLoader';
       div.className = 'global-loader';
       div.setAttribute('aria-hidden', 'true');
-      div.innerHTML = '<div class="loader-spinner" role="status" aria-label="Loading"></div>';
+      // loader-inner contains the logo and a ring that rotates around it
+      div.innerHTML = `
+        <div class="loader-inner" role="status" aria-label="Loading">
+          <img src="img/stunfi-logo-white.png" alt="logo" class="loader-logo"/>
+          <div class="loader-ring" aria-hidden="true"></div>
+        </div>
+      `;
       document.body.appendChild(div);
     }
 
@@ -17,8 +23,23 @@
       s.textContent = `
         .global-loader { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); z-index: 99999; pointer-events: auto; }
         .global-loader.active { display: flex; pointer-events: auto; }
-        .loader-spinner { width: 60px; height: 60px; border-radius: 50%; border: 6px solid rgba(255,255,255,0.18); border-top-color: #fff; animation: spin 1s linear infinite; }
+
+        /* inner container */
+        .loader-inner { position: relative; width: 140px; height: 140px; display:flex; align-items:center; justify-content:center; }
+
+        /* logo */
+        .loader-logo { width: 72px; height: 72px; object-fit:contain; border-radius:12px; z-index:2; box-shadow: 0 18px 40px rgba(0,0,0,0.6); background: rgba(255,255,255,0.02); padding:8px; }
+
+        /* rotating ring */
+        .loader-ring { position: absolute; width: 140px; height: 140px; border-radius: 50%; border: 8px solid rgba(255,255,255,0.06); border-top-color: var(--accent, #66cccc); box-shadow: 0 8px 30px rgba(0,0,0,0.45), inset 0 0 18px rgba(102,204,204,0.06); animation: spin 1.2s linear infinite; z-index:1; }
+
+        /* a subtle inner halo pulse */
+        .loader-ring::after { content: ''; position: absolute; inset: 8px; border-radius: 50%; box-shadow: 0 0 0 6px rgba(102,204,204,0.02); opacity: 0.9; }
+
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* accessibility: hide page focus when loader active */
+        .global-loader[aria-hidden="false"] { outline: none; }
       `;
       document.head.appendChild(s);
     }
