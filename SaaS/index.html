@@ -49,6 +49,21 @@
       flex-direction: column;
     }
 
+    .typed-text {
+      position: relative;
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid rgba(255,255,255,0.75);
+      padding-right: 4px;
+      animation: blinkCaret 1s step-end infinite;
+    }
+
+    @keyframes blinkCaret {
+      from, to { border-color: transparent; }
+      50% { border-color: rgba(255,255,255,0.75); }
+    }
+
     .nav {
       position: sticky;
       top: 0;
@@ -949,7 +964,7 @@
 
     <section class="hero">
       <div class="hero-copy">
-        <h2>One portal. Different users. Clear access paths.</h2>
+        <h2>One portal. Different users. <span id="typedHeadline">Clear access paths.</span></h2>
         <p>
           This platform lets schools register and manage their portal, teachers confirm and activate their accounts, and students confirm admission before accessing their dashboard and result services.
         </p>
@@ -1224,6 +1239,62 @@
       if (e.key === "Escape") {
         closeLoginModal();
       }
+    });
+
+    function startTypedHeadline() {
+      const element = document.getElementById('typedHeadline');
+      if (!element) return;
+
+      const phrases = [
+        'Clear access paths.',
+        'Fast login for schools.',
+        'Secure result delivery.',
+        'Smart school workflows.'
+      ];
+      let index = 0;
+      let charIndex = 0;
+      let isDeleting = false;
+      const typingSpeed = 80;
+      const deletingSpeed = 40;
+      const holdDelay = 1600;
+
+      function updateText() {
+        const currentPhrase = phrases[index];
+        if (isDeleting) {
+          charIndex -= 1;
+        } else {
+          charIndex += 1;
+        }
+
+        element.textContent = currentPhrase.slice(0, charIndex);
+        element.classList.add('typed-text');
+
+        let timeout = isDeleting ? deletingSpeed : typingSpeed;
+
+        if (!isDeleting && charIndex === currentPhrase.length) {
+          timeout = holdDelay;
+          isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+          isDeleting = false;
+          index = (index + 1) % phrases.length;
+          timeout = typingSpeed;
+        }
+
+        setTimeout(updateText, timeout);
+      }
+
+      updateText();
+    }
+
+    window.addEventListener('load', () => {
+      startTypedHeadline();
+      const preloader = document.getElementById("preloader");
+      if (!preloader) return;
+
+      setTimeout(() => {
+        preloader.classList.add("hide");
+        setTimeout(() => preloader.remove(), 500);
+      }, 700);
     });
   </script>
   <script src="common.js"></script>
