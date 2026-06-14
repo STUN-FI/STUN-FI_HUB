@@ -605,14 +605,29 @@ module.exports = function registerAdminRoutes(app, { School, Student, Teacher, R
   app.get("/admin/analytics/growth", async (req, res) => {
     try {
       const days = parseInt(req.query.days) || 30;
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - days);
+      const result = [];
 
-      const analytics = await PlatformAnalytics.find({ date: { $gte: startDate } })
-        .sort({ date: 1 })
-        .lean();
+      // Generate growth data for each day in the past N days
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        date.setHours(0, 0, 0, 0);
 
-      res.json({ success: true, data: analytics });
+        const endOfDay = new Date(date);
+        endOfDay.setDate(endOfDay.getDate() + 1);
+
+        // Count schools created up to this date
+        const totalSchools = await School.countDocuments({
+          createdAt: { $lt: endOfDay }
+        });
+
+        result.push({
+          date: date.toISOString().split('T')[0],
+          totalSchools: totalSchools
+        });
+      }
+
+      res.json({ success: true, data: result });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "Error fetching analytics", error: error.message });

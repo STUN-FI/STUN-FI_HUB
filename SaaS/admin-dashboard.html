@@ -1162,9 +1162,9 @@
   </main>
 
   <!-- MODALS -->
-  <div class="modal-backdrop" id="modalBackdrop" onclick="closeModals()"></div>
+  <div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target.id==='modalBackdrop')closeModals()"></div>
 
-  <div class="modal" id="createSchoolModal" style="padding: 28px;">
+  <div class="modal" id="createSchoolModal" style="padding: 28px;" onclick="event.stopPropagation()">
     <div class="modal-header" style="border: none; margin-bottom: 20px; padding: 0; margin-bottom: 0;">
       <h2 style="margin: 0;">Create New School</h2>
       <p style="margin: 8px 0 0; color: var(--muted); font-size: 0.9rem;">Add a new school to the platform</p>
@@ -1197,8 +1197,8 @@
   </div>
 
   <!-- SCHOOL DETAILS MODAL -->
-  <div class="modal-backdrop" id="schoolModalBackdrop" onclick="closeSchoolModal()"></div>
-  <div class="modal" id="schoolModal" style="padding: 0;">
+  <div class="modal-backdrop" id="schoolModalBackdrop" onclick="if(event.target.id==='schoolModalBackdrop')closeSchoolModal()"></div>
+  <div class="modal" id="schoolModal" style="padding: 0;" onclick="event.stopPropagation()">
     <div class="modal-header">
       <div>
         <h2 id="detailName">School Details</h2>
@@ -1304,8 +1304,8 @@
   </div>
 
   <!-- ALERT MODAL -->
-  <div class="modal-backdrop" id="alertBackdrop" onclick="closeAlert()"></div>
-  <div class="modal" id="alertModal" style="max-width: 400px; padding: 28px; text-align: center;">
+  <div class="modal-backdrop" id="alertBackdrop" onclick="if(event.target.id==='alertBackdrop')closeAlert()"></div>
+  <div class="modal" id="alertModal" style="max-width: 400px; padding: 28px; text-align: center;" onclick="event.stopPropagation()">
     <p id="alertMessage" style="margin: 0 0 20px; font-size: 1rem; line-height: 1.5;"></p>
     <button class="btn btn-primary" onclick="closeAlert()" style="width: 100%; margin: 0;">OK</button>
   </div>
