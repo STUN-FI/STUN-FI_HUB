@@ -2070,6 +2070,13 @@ app.post("/create-post", async (req, res) => {
       return res.status(400).json({ message: "Post must contain text or media" });
     }
 
+    // Ensure subscription exists and is active. If missing, create a short trial so schools
+    // can publish an announcement without being blocked by missing subscription records.
+    const existingSubscription = await getSchoolSubscription(schoolId);
+    if (!existingSubscription) {
+      await createTrialSubscription(schoolId);
+    }
+
     // Check subscription status
     const subscriptionCheck = await checkSubscriptionStatus(schoolId);
     if (!subscriptionCheck.isActive) {
