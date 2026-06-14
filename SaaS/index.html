@@ -51,22 +51,28 @@
 
     .typed-text {
       position: relative;
-      display: block !important;
+      display: block;
+      width: fit-content;
       white-space: nowrap;
       overflow: hidden;
       border-right: 2px solid rgba(255,255,255,0.75);
       padding-right: 4px;
-      margin-top: 0.5rem;
+      margin: 0.8rem auto 0;
       color: var(--accent);
       font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-      font-weight: 700;
-      font-size: 1.05em;
+      font-weight: 800;
+      font-size: 1.5rem;
       line-height: 1.2;
+      text-align: center;
       animation: blinkCaret 1s step-end infinite;
     }
 
     .hero-copy h2 + .typed-text {
-      margin-top: 0.6rem;
+      margin-top: 0.8rem;
+    }
+
+    .hero-copy {
+      text-align: center;
     }
 
     @media (max-width: 768px) {
