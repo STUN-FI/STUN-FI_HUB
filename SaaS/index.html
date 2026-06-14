@@ -51,12 +51,39 @@
 
     .typed-text {
       position: relative;
-      display: inline-block;
+      display: block !important;
       white-space: nowrap;
       overflow: hidden;
       border-right: 2px solid rgba(255,255,255,0.75);
       padding-right: 4px;
+      margin-top: 0.5rem;
+      color: var(--accent);
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      font-weight: 700;
+      font-size: 1.05em;
+      line-height: 1.2;
       animation: blinkCaret 1s step-end infinite;
+    }
+
+    .hero-copy h2 + .typed-text {
+      margin-top: 0.6rem;
+    }
+
+    @media (max-width: 768px) {
+      .typed-text {
+        font-size: 1rem;
+        white-space: normal;
+      }
+    }
+
+    .hero-copy h2 {
+      line-height: 1.16;
+    }
+
+    @media (max-width: 768px) {
+      .typed-text {
+        font-size: 1rem;
+      }
     }
 
     @keyframes blinkCaret {
@@ -964,7 +991,8 @@
 
     <section class="hero">
       <div class="hero-copy">
-        <h2>One portal. Different users. <span id="typedHeadline">Clear access paths.</span></h2>
+        <h2>One portal. Different users.</h2>
+        <span id="typedHeadline" class="typed-text">Clear access paths.</span>
         <p>
           This platform lets schools register and manage their portal, teachers confirm and activate their accounts, and students confirm admission before accessing their dashboard and result services.
         </p>
