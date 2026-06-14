@@ -1295,10 +1295,35 @@
     </div>
   </div>
 
+  <!-- ALERT MODAL -->
+  <div class="modal-backdrop" id="alertBackdrop" onclick="closeAlert()"></div>
+  <div class="modal" id="alertModal" style="max-width: 400px; padding: 28px; text-align: center;">
+    <p id="alertMessage" style="margin: 0 0 20px; font-size: 1rem; line-height: 1.5;"></p>
+    <button class="btn btn-primary" onclick="closeAlert()" style="width: 100%; margin: 0;">OK</button>
+  </div>
+
   <script>
     let schoolsData = [];
     let activityLog = [];
     let currentSchoolId = null;
+
+    // Alert Modal Functions
+    function showAlert(message, type = 'success') {
+      const backdrop = document.getElementById('alertBackdrop');
+      const modal = document.getElementById('alertModal');
+      const messageEl = document.getElementById('alertMessage');
+      
+      messageEl.textContent = message;
+      messageEl.style.color = type === 'error' ? 'var(--danger)' : 'var(--success)';
+      
+      backdrop?.classList.add('visible');
+      modal?.classList.add('visible');
+    }
+
+    function closeAlert() {
+      document.getElementById('alertBackdrop')?.classList.remove('visible');
+      document.getElementById('alertModal')?.classList.remove('visible');
+    }
 
     const planConfig = {
       "Small School": { limit: 200, price: 800 },
@@ -1370,7 +1395,7 @@
       const motto = document.getElementById('schoolMotto')?.value.trim();
 
       if (!name || !email || !password) {
-        alert('Please enter name, email and password');
+        showAlert('Please enter name, email and password', 'error');
         return;
       }
 
@@ -1383,15 +1408,15 @@
         });
         const payload = await response.json();
         if (response.ok && payload.success) {
-          alert('School created successfully');
+          showAlert('School created successfully', 'success');
           closeModals();
           await loadSchools();
         } else {
-          alert(payload.message || 'Could not create school');
+          showAlert(payload.message || 'Could not create school', 'error');
         }
       } catch (err) {
         console.error('Error creating school', err);
-        alert('Error creating school');
+        showAlert('Error creating school', 'error');
       } finally {
         window.hideLoader?.();
       }
@@ -1599,7 +1624,7 @@
 
       } catch (error) {
         console.error('Error loading school details:', error);
-        alert(error.message || 'Unable to load school details');
+        showAlert(error.message || 'Unable to load school details', 'error');
         closeSchoolModal();
       }
     }
@@ -1640,13 +1665,13 @@
 
     async function sendSchoolNotification() {
       if (!currentSchoolId) {
-        alert('No school selected');
+        showAlert('No school selected', 'error');
         return;
       }
 
       const message = document.getElementById("notificationMessage").value.trim();
       if (!message) {
-        alert("Enter a message first.");
+        showAlert("Enter a message first.", 'error');
         return;
       }
 
@@ -1660,14 +1685,14 @@
 
         const payload = await response.json();
         if (response.ok && payload.success) {
-          alert("Message sent successfully to school!");
+          showAlert("Message sent successfully to school!", 'success');
           document.getElementById("notificationMessage").value = "";
         } else {
-          alert(payload.message || "Could not send message.");
+          showAlert(payload.message || "Could not send message.", 'error');
         }
       } catch (error) {
         console.error('Error sending notification:', error);
-        alert('Error sending message');
+        showAlert('Error sending message', 'error');
       } finally {
         window.hideLoader?.();
       }
@@ -1687,15 +1712,15 @@
 
         const payload = await response.json();
         if (response.ok && payload.success) {
-          alert(`School ${action}d successfully`);
+          showAlert(`School ${action}d successfully`, 'success');
           await openSchoolDetails(currentSchoolId);
           renderSchools();
         } else {
-          alert(payload.message || `Could not ${action} school`);
+          showAlert(payload.message || `Could not ${action} school`, 'error');
         }
       } catch (error) {
         console.error('Error:', error);
-        alert('Error updating school status');
+        showAlert('Error updating school status', 'error');
       } finally {
         window.hideLoader?.();
       }
@@ -1717,14 +1742,14 @@
         window.hideLoader?.();
         
         if (response.ok && payload.success) {
-          alert(`Temporary password: ${payload.tempPassword || 'Check email for password'}`);
+          showAlert(`Temporary password: ${payload.tempPassword || 'Check email for password'}`, 'success');
         } else {
-          alert(payload.message || "Could not reset password");
+          showAlert(payload.message || "Could not reset password", 'error');
         }
       } catch (error) {
         window.hideLoader?.();
         console.error('Error:', error);
-        alert('Error resetting password');
+        showAlert('Error resetting password', 'error');
       }
     }
 
