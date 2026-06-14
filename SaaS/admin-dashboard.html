@@ -557,8 +557,11 @@
       padding: 0;
     }
 
-    .modal.active {
+    .modal.active,
+    .modal.visible {
       display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
     }
 
     .modal::-webkit-scrollbar {
@@ -1476,8 +1479,8 @@
 
     async function openSchoolDetails(schoolId) {
       currentSchoolId = schoolId;
-      document.getElementById("schoolModalBackdrop").style.display = "block";
-      document.getElementById("schoolModal").style.display = "block";
+      document.getElementById("schoolModalBackdrop").classList.add("visible");
+      document.getElementById("schoolModal").classList.add("visible");
       
       try {
         const response = await fetch(api(`/admin/schools`));
@@ -1536,8 +1539,8 @@
 
     function closeSchoolModal() {
       currentSchoolId = null;
-      document.getElementById("schoolModalBackdrop").style.display = "none";
-      document.getElementById("schoolModal").style.display = "none";
+      document.getElementById("schoolModalBackdrop").classList.remove("visible");
+      document.getElementById("schoolModal").classList.remove("visible");
       document.getElementById("notificationMessage").value = "";
     }
 
