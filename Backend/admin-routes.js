@@ -192,6 +192,38 @@ module.exports = function registerAdminRoutes(app, { School, Student, Teacher, R
     }
   });
 
+  // Create a new school (minimal implementation)
+  app.post("/admin/schools", async (req, res) => {
+    try {
+      const { name, email, password, motto } = req.body || {};
+      if (!name || !email || !password) {
+        return res.status(400).json({ success: false, message: "Missing required fields" });
+      }
+
+      const exists = await School.findOne({ email });
+      if (exists) return res.status(409).json({ success: false, message: "Email already registered" });
+
+      // Generate a simple school id
+      const id = `SCH${Date.now().toString().slice(-6)}`;
+
+      const newSchool = await School.create({ id, name, email, motto, accountStatus: 'active', createdAt: new Date() });
+
+      // Optionally create a basic subscription record if Subscription model exists
+      try {
+        if (Subscription) {
+          await Subscription.create({ schoolId: id, planName: 'trial', status: 'trial', startDate: new Date(), endDate: null });
+        }
+      } catch (e) {
+        console.log('Warning: could not create subscription for new school', e.message);
+      }
+
+      res.json({ success: true, data: newSchool });
+    } catch (error) {
+      console.log('Error creating school', error);
+      res.status(500).json({ success: false, message: 'Error creating school', error: error.message });
+    }
+  });
+
   app.get("/admin/school/:schoolId", async (req, res) => {
     try {
       const { schoolId } = req.params;
