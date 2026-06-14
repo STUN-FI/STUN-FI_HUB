@@ -4467,6 +4467,8 @@ async function createPost() {
     } else {
       loadPosts(audiences[0]);
     }
+
+    window.hideLoader?.();
   } catch (err) {
     window.hideLoader?.();
     console.log(err);
