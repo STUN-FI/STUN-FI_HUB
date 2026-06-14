@@ -1149,13 +1149,41 @@
 
   <script>
     let schoolsData = [];
+    let activityLog = [];
+    let currentSchoolId = null;
+
+    const planConfig = {
+      "Small School": { limit: 200, price: 800 },
+      "Medium School": { limit: 500, price: 1400 },
+      "Large School": { limit: 1200, price: 2400 },
+      "Enterprise": { limit: 2500, price: 4200 }
+    };
+
+    function api(path) {
+      if (!path.startsWith("/")) path = "/" + path;
+      return (window.API_BASE || "").replace(/\/$/, "") + path;
+    }
+
+    function formatDate(value) {
+      if (!value) return "-";
+      const date = new Date(value);
+      return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    }
+
+    function statusClass(status) {
+      if (!status) return "status-trial";
+      if (status === "active") return "status-active";
+      if (status === "trial") return "status-trial";
+      return "status-expired";
+    }
 
     function showPage(pageName) {
       document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-      document.getElementById(pageName + 'Page').classList.remove('hidden');
+      const page = document.getElementById(pageName + 'Page');
+      if (page) page.classList.remove('hidden');
 
       document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      event.target.closest('.nav-item').classList.add('active');
+      event.target.closest('.nav-item')?.classList.add('active');
 
       if (window.innerWidth <= 768) {
         toggleSidebar();
@@ -1167,110 +1195,169 @@
     }
 
     function openCreateSchoolModal() {
-      document.getElementById('modalBackdrop').classList.add('active');
-      document.getElementById('createSchoolModal').classList.add('active');
+      // TODO: Implement modal for creating school
+      alert('School creation modal will be implemented');
     }
 
-    function closeModals() {
-      document.getElementById('modalBackdrop').classList.remove('active');
-      document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+    async function loadPlatformOverview() {
+      try {
+        const response = await fetch(api("/admin/platform-overview"));
+        const payload = await response.json();
+        if (!response.ok) return;
+
+        document.getElementById("totalSchools").innerText = payload.data?.totalSchools || 0;
+        document.getElementById("activeSchools").innerText = payload.data?.activeSchools || 0;
+      } catch (error) {
+        console.error("Error loading platform overview:", error);
+      }
     }
 
-    async function addSchool() {
-      const name = document.getElementById('schoolName').value.trim();
-      const email = document.getElementById('schoolEmail').value.trim();
-      const password = document.getElementById('schoolPassword').value.trim();
+    async function loadPlatformAnalytics() {
+      try {
+        const [distRes, growthRes] = await Promise.all([
+          fetch(api("/admin/analytics/subscription-distribution")),
+          fetch(api("/admin/analytics/growth?days=30"))
+        ]);
 
-      if (!name || !email || !password) {
-        alert('Please fill required fields');
-        return;
+        const dist = await distRes.json();
+        const growth = await growthRes.json();
+
+        if (dist.success && dist.data) {
+          const totals = dist.data.reduce((sum, item) => sum + (item.count || 0), 0);
+          const active = dist.data.find(i => i._id === "active")?.count || 0;
+          const trial = dist.data.find(i => i._id === "trial")?.count || 0;
+          const expired = dist.data.find(i => i._id === "expired")?.count || 0;
+          
+          // Update distribution chart (if needed)
+        }
+
+        if (growth.success && growth.data) {
+          const container = document.getElementById("growthChart");
+          if (container) {
+            container.innerHTML = "";
+            const maxCount = Math.max(...growth.data.map(p => p.totalSchools || 0), 1);
+            growth.data.forEach(point => {
+              const bar = document.createElement("div");
+              bar.className = "mini-bar";
+              bar.style.height = `${Math.max(18, (point.totalSchools / maxCount) * 100)}px`;
+              bar.title = `${formatDate(point.date)} — ${point.totalSchools || 0} schools`;
+              container.appendChild(bar);
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error loading analytics:", error);
+      }
+    }
+
+    async function loadSchools() {
+      try {
+        const response = await fetch(api("/admin/schools?limit=100"), {
+          headers: { 'X-Skip-Loader': '1' }
+        });
+        if (!response.ok) throw new Error('Failed to load schools');
+
+        const payload = await response.json();
+        schoolsData = payload.data || [];
+        renderDashboard();
+        renderSchools();
+      } catch (error) {
+        console.error('Error loading schools:', error);
+      }
+    }
+
+    function renderDashboard() {
+      const total = schoolsData.length;
+      const active = schoolsData.filter(s => s.accountStatus === 'active').length;
+      const revenue = schoolsData.reduce((sum, s) => sum + (s.monthlyRevenue || 0), 0);
+
+      document.getElementById('totalSchools').textContent = total;
+      document.getElementById('activeSchools').textContent = active;
+      document.getElementById('totalRevenue').textContent = '₦' + revenue.toLocaleString();
+    }
+
+    function renderSchools() {
+      const search = document.getElementById('globalSearch')?.value.toLowerCase() || '';
+      const filtered = schoolsData.filter(s =>
+        (s.name?.toLowerCase() || '').includes(search) ||
+        (s.email?.toLowerCase() || '').includes(search) ||
+        (s.id?.toLowerCase() || '').includes(search)
+      );
+
+      // Render in dashboard table
+      const tbody1 = document.getElementById('schoolsTableBody');
+      if (tbody1) {
+        if (filtered.length === 0) {
+          tbody1.innerHTML = '<tr><td colspan="6" class="empty-state"><ion-icon name="school-outline"></ion-icon><div>No schools found</div></td></tr>';
+        } else {
+          tbody1.innerHTML = filtered.slice(0, 10).map(school => `
+            <tr>
+              <td><div class="school-name-cell"><div class="school-avatar">${(school.name || 'S').substring(0, 2).toUpperCase()}</div><strong>${school.name || 'Unknown'}</strong></div></td>
+              <td>${school.email || '-'}</td>
+              <td><strong>${school.planName || 'Free'}</strong></td>
+              <td><span class="status-badge ${statusClass(school.accountStatus)}">${(school.accountStatus || 'pending').toUpperCase()}</span></td>
+              <td>${school.studentCount || 0}</td>
+              <td><button class="btn-sm" onclick="viewSchoolDetails('${school.id || ''}')">View</button></td>
+            </tr>
+          `).join('');
+        }
       }
 
-      window.showLoader?.();
-      try {
-        const response = await fetch(window.API_BASE + '/add-school', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password })
-        });
-
-        if (response.ok) {
-          alert('School created successfully');
-          closeModals();
-          document.getElementById('schoolName').value = '';
-          document.getElementById('schoolEmail').value = '';
-          document.getElementById('schoolPassword').value = '';
-          loadEverything();
+      // Render in schools page table
+      const tbody2 = document.getElementById('schoolsTableBody2');
+      if (tbody2) {
+        if (filtered.length === 0) {
+          tbody2.innerHTML = '<tr><td colspan="6" class="empty-state"><ion-icon name="school-outline"></ion-icon><div>No schools found</div></td></tr>';
         } else {
-          alert('Failed to create school');
+          tbody2.innerHTML = filtered.map(school => `
+            <tr>
+              <td><div class="school-name-cell"><div class="school-avatar">${(school.name || 'S').substring(0, 2).toUpperCase()}</div><strong>${school.name || 'Unknown'}</strong></div></td>
+              <td>${school.email || '-'}</td>
+              <td><strong>${school.planName || 'Free'}</strong></td>
+              <td><span class="status-badge ${statusClass(school.accountStatus)}">${(school.accountStatus || 'pending').toUpperCase()}</span></td>
+              <td>${formatDate(school.createdAt)}</td>
+              <td><button class="btn-sm" onclick="viewSchoolDetails('${school.id || ''}')">Details</button></td>
+            </tr>
+          `).join('');
         }
-      } catch (err) {
-        console.error(err);
-        alert('Error creating school');
-      } finally {
-        window.hideLoader?.();
+      }
+    }
+
+    function viewSchoolDetails(schoolId) {
+      alert(`View details for school: ${schoolId}`);
+      // TODO: Implement detailed school view modal
+    }
+
+    async function loadActivityLog() {
+      try {
+        const response = await fetch(api("/admin/activity-log?limit=10"));
+        const payload = await response.json();
+        if (!response.ok) return;
+        activityLog = payload.data || [];
+      } catch (error) {
+        console.error("Error loading activity log:", error);
       }
     }
 
     async function loadEverything() {
       window.showLoader?.();
       try {
-        const response = await fetch(window.API_BASE + '/admin/schools', {
-          headers: { 'X-Skip-Loader': '1' }
-        });
-        if (!response.ok) throw new Error('Failed to load schools');
-
-        schoolsData = await response.json();
-        renderDashboard();
-      } catch (err) {
-        console.error('Error loading schools:', err);
+        await Promise.all([
+          loadPlatformOverview(),
+          loadPlatformAnalytics(),
+          loadSchools(),
+          loadActivityLog()
+        ]);
       } finally {
         window.hideLoader?.();
       }
     }
 
-    function renderDashboard() {
-      const total = schoolsData.length;
-      const active = schoolsData.filter(s => s.status === 'active').length;
-      const revenue = schoolsData.reduce((sum, s) => sum + (s.monthlyRevenue || 0), 0);
-
-      document.getElementById('totalSchools').textContent = total;
-      document.getElementById('activeSchools').textContent = active;
-      document.getElementById('totalRevenue').textContent = '₦' + revenue.toLocaleString();
-
-      renderSchools();
-    }
-
-    function renderSchools() {
-      const search = document.getElementById('globalSearch')?.value.toLowerCase() || '';
-      const filtered = schoolsData.filter(s =>
-        s.name.toLowerCase().includes(search) ||
-        s.email.toLowerCase().includes(search)
-      );
-
-      const tbody = document.getElementById('schoolsTableBody');
-      if (!tbody) return;
-
-      if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><ion-icon name="school-outline"></ion-icon><div>No schools found</div></td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = filtered.map(school => `
-        <tr>
-          <td><div class="school-name-cell"><div class="school-avatar">${school.name.substring(0, 2).toUpperCase()}</div><strong>${school.name}</strong></div></td>
-          <td>${school.email}</td>
-          <td><strong>${school.plan || 'Free'}</strong></td>
-          <td><span class="status-badge status-${school.status || 'active'}">${(school.status || 'active').toUpperCase()}</span></td>
-          <td>${school.studentCount || 0}</td>
-          <td><button class="btn-sm" onclick="alert('View ${school.name}')">View</button></td>
-        </tr>
-      `).join('');
-    }
 
     async function logout() {
       if (confirm('Are you sure you want to logout?')) {
-        localStorage.removeItem('token');
+        localStorage.removeItem('isAdmin');
+        localStorage.removeItem('adminName');
         window.location.href = 'admin-login.html';
       }
     }
@@ -1287,6 +1374,15 @@
 
     // Initialize
     window.addEventListener('load', () => {
+      const isAdmin = localStorage.getItem('isAdmin');
+      if (isAdmin !== 'true') {
+        window.location.href = 'admin-login.html';
+        return;
+      }
+
+      const adminName = localStorage.getItem('adminName') || 'Super Admin';
+      document.getElementById('adminName').textContent = adminName;
+
       if (window.innerWidth <= 768) {
         document.getElementById('sidebarToggle').classList.remove('hidden');
       }
@@ -1295,9 +1391,13 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-      loadEverything();
+      const isAdmin = localStorage.getItem('isAdmin');
+      if (isAdmin === 'true') {
+        loadEverything();
+      }
     });
   </script>
+  <script src="common.js"></script>
 
   <script src="common.js"></script>
 </body>
