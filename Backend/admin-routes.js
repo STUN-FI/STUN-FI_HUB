@@ -344,6 +344,34 @@ module.exports = function registerAdminRoutes(app, { School, Student, Teacher, R
     }
   });
 
+  app.delete("/admin/school/:schoolId", async (req, res) => {
+    try {
+      const { schoolId } = req.params;
+
+      // Delete the school
+      const deleteResult = await School.deleteOne({ id: schoolId });
+      if (deleteResult.deletedCount === 0) {
+        return res.status(404).json({ success: false, message: "School not found" });
+      }
+
+      // Delete related subscriptions
+      await Subscription.deleteMany({ schoolId });
+
+      // Log the action
+      await ActivityLog.create({
+        schoolId,
+        action: "School deleted",
+        performedBy: "admin",
+        performedByRole: "super_admin"
+      });
+
+      res.json({ success: true, message: "School deleted successfully" });
+    } catch (error) {
+      console.log("Error deleting school:", error);
+      res.status(500).json({ success: false, message: "Error deleting school", error: error.message });
+    }
+  });
+
   app.post("/admin/school/:schoolId/upgrade-plan", async (req, res) => {
     try {
       const { schoolId } = req.params;
