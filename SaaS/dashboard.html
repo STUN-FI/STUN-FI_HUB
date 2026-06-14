@@ -2172,11 +2172,11 @@
           <div class="post-form-grid">
             <div class="audience-control">
               <label class="audience-pill">
-                <input type="checkbox" id="postAudienceStudents" checked />
+                <input type="radio" name="postAudience" id="postAudienceStudents" value="students" checked />
                 <span>Students</span>
               </label>
               <label class="audience-pill">
-                <input type="checkbox" id="postAudienceTeachers" checked />
+                <input type="radio" name="postAudience" id="postAudienceTeachers" value="teachers" />
                 <span>Teachers</span>
               </label>
             </div>
@@ -4394,22 +4394,15 @@ async function createPost() {
   output.innerText = "";
   output.style.color = "";
 
-  const audiences = [];
-  if (document.getElementById("postAudienceStudents").checked) {
-    audiences.push("students");
-  }
-  if (document.getElementById("postAudienceTeachers").checked) {
-    audiences.push("teachers");
-  }
-
+  const audience = document.querySelector('input[name="postAudience"]:checked')?.value;
   const text = document.getElementById("postText").value.trim();
   const mediaType = document.getElementById("postMediaType").value;
   const mediaUrl = document.getElementById("mediaUrl").value.trim();
   const fileName = document.getElementById("fileName").value.trim();
 
-  if (!audiences.length) {
+  if (!audience) {
     output.style.color = "red";
-    output.innerText = "Please choose at least one audience.";
+    output.innerText = "Please choose an audience.";
     return;
   }
 
@@ -4427,32 +4420,29 @@ async function createPost() {
       text,
       mediaUrl,
       mediaType,
-      fileName
+      fileName,
+      audience
     };
 
-    const results = await Promise.all(audiences.map(async (audience) => {
-      const res = await fetch(window.API_BASE + "/create-post", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ ...payload, audience })
-      });
-      const data = await res.json().catch(() => ({}));
-      return { audience, res, data };
-    }));
+    const res = await fetch(window.API_BASE + "/create-post", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
 
-    const failed = results.find((item) => !item.res.ok);
+    const data = await res.json().catch(() => ({}));
 
-    if (failed) {
+    if (!res.ok) {
       window.hideLoader?.();
       output.style.color = "red";
-      output.innerText = failed.data.message || `Could not create post for ${failed.audience}.`;
+      output.innerText = data.message || "Could not create post.";
       return;
     }
 
     output.style.color = "green";
-    output.innerText = audiences.length > 1 ? "Posts created successfully." : "Post created successfully.";
+    output.innerText = "Post created successfully.";
 
     document.getElementById("postText").value = "";
     document.getElementById("postMediaType").value = "";
@@ -4462,12 +4452,7 @@ async function createPost() {
     document.getElementById("selectedFileName").innerText = "No file selected";
     toggleFileNameField();
 
-    if (audiences.length > 1) {
-      loadPosts("both");
-    } else {
-      loadPosts(audiences[0]);
-    }
-
+    loadPosts(audience);
     window.hideLoader?.();
   } catch (err) {
     window.hideLoader?.();
