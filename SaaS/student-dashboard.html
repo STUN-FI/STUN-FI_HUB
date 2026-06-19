@@ -331,7 +331,8 @@
     .card,
     .quick-card,
     .announcement-card,
-    .status-box {
+    .status-box,
+    .progress-card {
       background: var(--card);
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
@@ -340,6 +341,71 @@
 
     .stat-card {
       padding: 20px;
+    }
+
+    .progress-card {
+      padding: 22px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .progress-chart {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .progress-chart svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+
+    .progress-chart circle {
+      fill: none;
+      stroke-width: 12;
+      stroke-linecap: round;
+    }
+
+    .progress-chart .track {
+      stroke: rgba(102, 204, 204, 0.14);
+    }
+
+    .progress-chart .indicator {
+      stroke: var(--accent);
+      transition: stroke-dashoffset 0.6s ease;
+    }
+
+    .progress-chart-label {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text);
+      text-align: center;
+      line-height: 1.25;
+      padding: 4px;
+    }
+
+    .progress-labels {
+      display: grid;
+      gap: 6px;
+      text-align: center;
+    }
+
+    .progress-labels h4 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 900;
+    }
+
+    .progress-labels p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
     }
 
     .stat-card h4 {
@@ -779,7 +845,23 @@
         </div>
 
         <div class="right-column">
-          <div class="card">
+          <div class="card progress-card">
+          <div class="progress-chart" aria-label="Result progress" role="img">
+            <svg viewBox="0 0 120 120">
+              <circle class="track" cx="60" cy="60" r="52"></circle>
+              <circle class="indicator" cx="60" cy="60" r="52" stroke-dasharray="326.72" stroke-dashoffset="326.72"></circle>
+            </svg>
+            <div class="progress-chart-label" id="resultProgressLabel">
+              0%<br>Ready
+            </div>
+          </div>
+          <div class="progress-labels">
+            <h4>Result Readiness</h4>
+            <p id="resultProgressText">Waiting for result status to be checked.</p>
+          </div>
+        </div>
+
+        <div class="card">
             <h3>Academic Status</h3>
 
             <div class="status-box status-pending">
@@ -1044,6 +1126,8 @@ async function loadStudentResultCardStatus() {
       document.getElementById("resultStatusText").innerText =
         "Your result is ready, but access is currently locked.";
 
+      updateResultProgress(70, "Result ready, access locked.");
+
       let paymentMessage = "Result access is currently locked.";
 
       if (data.paymentRequired) {
@@ -1080,6 +1164,8 @@ async function loadStudentResultCardStatus() {
     document.getElementById("resultStatusText").innerText =
       "Your result is unlocked and ready to be viewed.";
 
+    updateResultProgress(100, "Result unlocked and ready.");
+
     wrap.innerHTML = `
       <div class="status-box status-ready">
         <h4>Result Unlocked</h4>
@@ -1095,6 +1181,27 @@ async function loadStudentResultCardStatus() {
     console.log(error);
     document.getElementById("statResultStatus").innerText = "Unknown";
     wrap.innerHTML = `<div class="empty-state">Could not load result status right now.</div>`;
+  }
+}
+
+function updateResultProgress(percent, statusText) {
+  const circle = document.querySelector('.progress-chart .indicator');
+  const label = document.getElementById('resultProgressLabel');
+  const text = document.getElementById('resultProgressText');
+  const radius = 52;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (percent / 100) * circumference;
+
+  if (circle) {
+    circle.style.strokeDashoffset = `${offset}`;
+  }
+
+  if (label) {
+    label.innerHTML = `${percent}%<br>${percent === 100 ? 'Ready' : statusText}`;
+  }
+
+  if (text) {
+    text.innerText = statusText;
   }
 }
 
