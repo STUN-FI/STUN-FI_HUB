@@ -29,6 +29,12 @@ function openModal(id) {
   const overlay = document.getElementById(id);
   if (!overlay) return;
   const modal = overlay.querySelector('.modal, .modal-card');
+  
+  // Count currently open modals to stack z-index properly
+  const openModals = document.querySelectorAll('.modal-overlay.active, .modal-overlay.show').length;
+  const baseZIndex = 9998;
+  overlay.style.zIndex = baseZIndex + (openModals * 10);
+  
   overlay.classList.add('active');
   // allow CSS to pick up initial state
   requestAnimationFrame(() => overlay.classList.add('show'));
