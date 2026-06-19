@@ -1906,6 +1906,19 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="classStudentsModal">
+  <div class="modal" style="max-width:720px;">
+    <div class="modal-content">
+    <h3 id="classStudentsTitle">Class Students</h3>
+    <p id="classStudentsSubtitle">Students in this class</p>
+    <div id="classStudentsBody" style="margin-top:12px; max-height:480px; overflow-y:auto;"></div>
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeModal('classStudentsModal')">Close</button>
+    </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="upgradeModal">
   <div class="modal" style="max-width:520px;">
     <div class="modal-content">
@@ -3091,7 +3104,7 @@ function renderClassGroupSummary(groups) {
     viewBtn.className = "secondary-btn";
     viewBtn.type = "button";
     viewBtn.innerText = "View students";
-    viewBtn.addEventListener("click", () => selectStudentGroup(key));
+    viewBtn.addEventListener("click", () => openClassStudentsModal(group.className, group.arm, group.students));
 
     const assignBtn = document.createElement("button");
     assignBtn.className = "mini-btn assign-btn";
@@ -4159,6 +4172,41 @@ function getClassStatusCounts(studentList) {
   });
 
   return counts;
+}
+
+function openClassStudentsModal(className, arm, studentList) {
+  const classLabel = `${className || "Unassigned"}${arm ? ` ${arm}` : ""}`;
+  document.getElementById("classStudentsTitle").innerText = `Students in ${classLabel}`;
+  document.getElementById("classStudentsSubtitle").innerText = `Total: ${studentList.length} students`;
+
+  if (!studentList.length) {
+    document.getElementById("classStudentsBody").innerHTML = `<div class="empty-state">No students found in this class.</div>`;
+    openModal("classStudentsModal");
+    return;
+  }
+
+  const html = `
+    <div style="display: grid; gap: 12px;">
+      ${studentList.map((student) => `
+        <div style="border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--card);">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px;">
+            <div>
+              <strong>${student.name || "-"}</strong>
+              <div style="font-size: 0.85rem; color: var(--muted);">Reg: ${student.regNumber || "-"}</div>
+              <div style="font-size: 0.85rem; color: var(--muted);">ID: ${student.studentId || "-"}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.85rem; color: var(--muted);">Email: ${student.email || "Not activated"}</div>
+              <div style="font-size: 0.85rem; color: var(--muted);">Phone: ${student.phone || "Not provided"}</div>
+            </div>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  document.getElementById("classStudentsBody").innerHTML = html;
+  openModal("classStudentsModal");
 }
 
 async function openBulkPromotionModal(className, arm) {
