@@ -1646,7 +1646,7 @@
 <body>
   <div id="preloader">
     <div class="loader-wrap">
-      <img id="preloaderLogo" src="img/BLACK%20PNG%20STUNFI.png" alt="STUN-FI Logo" class="preloader-logo">
+      <img id="preloaderLogo" src="img" alt="STUN-FI Logo" class="preloader-logo">
       <!-- <div class="spinner"></div> -->
       <!-- <p>Loading portal...</p> -->
     </div>
@@ -3030,10 +3030,11 @@ function selectStudentGroup(key) {
   const studentToggle = document.getElementById("studentSectionToggle");
 
   if (studentSection) {
-    if (studentToggle && studentToggle.classList.contains("collapsed")) {
+    // Always open the toggle and display the section
+    if (studentToggle) {
       studentToggle.classList.remove("collapsed");
-      studentSection.style.display = "block";
     }
+    studentSection.style.display = "block";
 
     const groupKey = encodeURIComponent(key);
     const selectedGroup = document.querySelector(`#studentList .class-group[data-group-key="${groupKey}"]`);
