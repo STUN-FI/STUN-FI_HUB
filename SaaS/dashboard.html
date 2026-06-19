@@ -4085,7 +4085,7 @@ function openClassStudentsModal(className, arm, studentList) {
     <div style="display: grid; gap: 12px;">
       ${studentList.map((student) => `
         <div style="border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--card);">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
             <div>
               <strong>${student.name || "-"}</strong>
               <div style="font-size: 0.85rem; color: var(--muted);">Reg: ${student.regNumber || "-"}</div>
@@ -4096,6 +4096,15 @@ function openClassStudentsModal(className, arm, studentList) {
               <div style="font-size: 0.85rem; color: var(--muted);">Phone: ${student.phone || "Not provided"}</div>
             </div>
           </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button class="mini-btn btn-edit" onclick="openStudentEdit('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}', '${(student.className || "").replace(/'/g, "\\'")}', '${(student.arm || "").replace(/'/g, "\\'")}')">Edit</button>
+            <button class="mini-btn btn-view" onclick="openScoreModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Scores</button>
+            <button class="mini-btn btn-unlock" onclick="quickUnlockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Unlock</button>
+            <button class="mini-btn btn-lock" onclick="quickLockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Lock</button>
+            <button class="mini-btn btn-subjects" onclick="openSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Assign Subj</button>
+            <button class="mini-btn btn-view" onclick="openViewSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Subj</button>
+            <button class="mini-btn btn-unpaid" onclick="openStudentDelete('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}')">Delete</button>
+          </div>
         </div>
       `).join("")}
     </div>
@@ -4104,6 +4113,7 @@ function openClassStudentsModal(className, arm, studentList) {
   document.getElementById("classStudentsBody").innerHTML = html;
   openModal("classStudentsModal");
 }
+
 
 async function openBulkPromotionModal(className, arm) {
   const session = document.getElementById("mainSessionSelect")?.value || "2025/2026";
