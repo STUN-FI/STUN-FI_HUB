@@ -3024,6 +3024,7 @@ async function loadStudents() {
 
 function selectStudentGroup(key) {
   selectedStudentGroup = key;
+  expandedStudentGroups.add(key);
   renderStudents();
 
   const studentSection = document.getElementById("studentSectionContent");

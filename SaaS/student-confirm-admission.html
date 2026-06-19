@@ -377,7 +377,8 @@
         <button class="btn secondary" onclick="checkStudentRecord()">Confirm Admission</button>
       </div>
 
-      <div id="output" class="output"></div>
+      <div id="output" class="output" style="display:none;"></div>
+      <div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true"></div>
 
       <div id="recordCard" class="record-card">
         <h3>Admission Record Found</h3>
@@ -434,6 +435,40 @@
       input.type = input.type === "password" ? "text" : "password";
     }
 
+    function toast(message, type = "info") {
+      const wrap = document.getElementById("toastWrap");
+      if (!wrap) return;
+
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      toast.style.padding = "14px 18px";
+      toast.style.borderRadius = "14px";
+      toast.style.color = "white";
+      toast.style.fontWeight = "700";
+      toast.style.boxShadow = "0 18px 42px rgba(0,0,0,0.16)";
+      toast.style.display = "flex";
+      toast.style.alignItems = "center";
+      toast.style.justifyContent = "space-between";
+      toast.style.gap = "10px";
+      toast.style.maxWidth = "100%";
+      toast.style.cursor = "default";
+
+      const icon = document.createElement("span");
+      icon.textContent = type === "success" ? "✔" : type === "error" ? "✖" : "ℹ";
+      icon.style.marginRight = "10px";
+      icon.style.opacity = "0.9";
+      toast.prepend(icon);
+
+      wrap.appendChild(toast);
+      setTimeout(() => {
+        toast.style.transition = "opacity 200ms ease, transform 200ms ease";
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-6px)";
+        setTimeout(() => toast.remove(), 220);
+      }, 3200);
+    }
+
     async function detectSchool() {
       const email = document.getElementById("email");
       if (!email) return;
@@ -488,6 +523,7 @@
 
       output.className = "output";
       output.innerText = "";
+      output.style.display = "none";
       recordCard.style.display = "none";
       activationSection.style.display = "none";
       recordFound = false;
@@ -496,8 +532,7 @@
       const studentId = document.getElementById("studentId").value.trim();
 
       if (!schoolId || !studentId) {
-        output.classList.add("error");
-        output.innerText = "School ID and Student ID are required.";
+        toast("School ID and Student ID are required.", "error");
         return;
       }
 
@@ -528,16 +563,13 @@
           recordFound = true;
 
           if (data.activated) {
-            output.classList.add("info");
-            output.innerText = "This student account is already activated. You can login instead.";
+            toast("This student account is already activated. You can login instead.", "info");
           } else {
             activationSection.style.display = "block";
-            output.classList.add("success");
-            output.innerText = "You have been admitted. Complete your account activation below.";
+            toast("You have been admitted. Complete your account activation below.", "success");
           }
         } else {
-          output.classList.add("error");
-          output.innerText = data.message || "Student record not found.";
+          toast(data.message || "Student record not found.", "error");
         }
       } catch (error) {
         console.log(error);
@@ -559,26 +591,22 @@
       const confirmPassword = document.getElementById("confirmPassword").value.trim();
 
       if (!recordFound) {
-        output.classList.add("error");
-        output.innerText = "Please confirm your admission first.";
+        toast("Please confirm your admission first.", "error");
         return;
       }
 
       if (!email && !phone) {
-        output.classList.add("error");
-        output.innerText = "Provide either your email or phone number.";
+        toast("Provide either your email or phone number.", "error");
         return;
       }
 
       if (!password || !confirmPassword) {
-        output.classList.add("error");
-        output.innerText = "Please fill the password fields.";
+        toast("Please fill the password fields.", "error");
         return;
       }
 
       if (password !== confirmPassword) {
-        output.classList.add("error");
-        output.innerText = "Passwords do not match.";
+        toast("Passwords do not match.", "error");
         return;
       }
 
@@ -600,20 +628,17 @@
         const data = await response.json();
 
         if (response.ok) {
-          output.classList.add("success");
-          output.innerText = "Admission confirmed successfully. Redirecting to login...";
+          toast("Admission confirmed successfully. Redirecting to login...", "success");
 
           setTimeout(() => {
             window.location.href = "student-login.html";
           }, 1800);
         } else {
-          output.classList.add("error");
-          output.innerText = data.message || "Could not confirm admission.";
+          toast(data.message || "Could not confirm admission.", "error");
         }
       } catch (error) {
         console.log(error);
-        output.classList.add("error");
-        output.innerText = "Server error. Please try again.";
+        toast("Server error. Please try again.", "error");
       }
     }
 
