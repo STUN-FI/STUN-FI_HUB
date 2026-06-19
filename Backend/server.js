@@ -1459,6 +1459,10 @@ app.post("/student-confirm-admission", async (req, res) => {
       return res.status(404).json({ message: "Student record not found under this school" });
     }
 
+    if (student.isActivated) {
+      return res.status(409).json({ message: "Admission already confirmed. Please login or reset your password." });
+    }
+
     if (email) student.email = email;
     if (phone) student.phone = phone;
 
