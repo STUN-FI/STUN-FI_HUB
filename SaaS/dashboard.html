@@ -2393,7 +2393,6 @@ const school = JSON.parse(localStorage.getItem("school") || "null");
 const currentSchoolId = school?.schoolId || school?.id || "";
 let students = [];
 let selectedStudentGroup = "";
-let expandedStudentGroups = new Set();
 let currentViewSubjectStudentId = "";
 let currentSubjectStudentId = "";
 let teachers = [];
@@ -3035,31 +3034,6 @@ async function loadStudents() {
   }
 }
 
-function selectStudentGroup(key) {
-  selectedStudentGroup = key;
-  renderStudents();
-
-  const studentSection = document.getElementById("studentSectionContent");
-  const studentToggle = document.getElementById("studentSectionToggle");
-
-  if (studentSection) {
-    // Always open the toggle and display the section
-    if (studentToggle) {
-      studentToggle.classList.remove("collapsed");
-    }
-    studentSection.style.display = "block";
-
-    const groupKey = encodeURIComponent(key);
-    const selectedGroup = document.querySelector(`#studentList .class-group[data-group-key="${groupKey}"]`);
-
-    if (selectedGroup) {
-      selectedGroup.scrollIntoView({ behavior: "smooth", block: "start" });
-    } else {
-      studentSection.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
-}
-
 function clearSelectedStudentGroup() {
   selectedStudentGroup = "";
   document.getElementById("clearStudentGroupFilter").style.display = "none";
@@ -3155,97 +3129,19 @@ function renderStudents() {
 
   renderClassGroupSummary(grouped);
 
-  const displayKeys = selectedStudentGroup && grouped[selectedStudentGroup]
-    ? [selectedStudentGroup]
-    : Object.keys(grouped);
-
   studentList.innerHTML = "";
 
-  if (!displayKeys.length) {
+  if (!Object.keys(grouped).length) {
     studentList.innerHTML = `<div class="empty-state">No students found.</div>`;
     return;
   }
-
-  displayKeys.forEach((groupKey) => {
-    const group = grouped[groupKey];
-    const header = document.createElement("li");
-    header.className = "class-group";
-    header.dataset.groupKey = encodeURIComponent(groupKey);
-    const initialIcon = expandedStudentGroups.has(groupKey) ? 'chevron-down-outline' : 'chevron-forward-outline';
-    header.innerHTML = `
-      <div class="class-group-header" role="button" aria-expanded="${expandedStudentGroups.has(groupKey) ? 'true' : 'false'}">
-        <div>
-          <div class="item-title">${group.displayName}${group.arm ? ` ${group.arm}` : ""}</div>
-          <div class="class-group-summary">
-            <span class="class-pill">${group.students.length} students</span>
-          </div>
-        </div>
-        <div class="group-toggle"><ion-icon class="group-toggle-icon" name="${initialIcon}"></ion-icon></div>
-      </div>
-    `;
-
-    // container for children (students) — hidden by default
-    const children = document.createElement("ul");
-    children.className = "group-children";
-    children.style.display = expandedStudentGroups.has(groupKey) ? "block" : "none";
-
-    header.querySelector('.class-group-header').addEventListener('click', () => {
-      toggleStudentGroup(groupKey, header, children, group.students);
-    });
-
-    studentList.appendChild(header);
-    studentList.appendChild(children);
-  });
 }
 
 function toggleStudentGroup(groupKey, headerEl, childrenEl, studentsArray) {
-  const isExpanded = expandedStudentGroups.has(groupKey);
-  if (isExpanded) {
-    expandedStudentGroups.delete(groupKey);
-    childrenEl.style.display = 'none';
-    headerEl.querySelector('.class-group-header').setAttribute('aria-expanded', 'false');
-    const icon = headerEl.querySelector('.group-toggle ion-icon.group-toggle-icon');
-    if (icon) icon.setAttribute('name', 'chevron-forward-outline');
-    childrenEl.innerHTML = '';
-  } else {
-    expandedStudentGroups.add(groupKey);
-    headerEl.querySelector('.class-group-header').setAttribute('aria-expanded', 'true');
-    const icon = headerEl.querySelector('.group-toggle ion-icon.group-toggle-icon');
-    if (icon) icon.setAttribute('name', 'chevron-down-outline');
-    childrenEl.style.display = 'block';
-    // render students into childrenEl
-    childrenEl.innerHTML = '';
-    studentsArray.forEach((student) => {
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <div class="item-row">
-          <div class="avatar">${getInitials(student.name)}</div>
-          <div>
-            <div class="item-title">${student.name}</div>
-            <div class="item-meta">
-              Student ID: ${student.studentId || "-"}<br>
-              Reg Number: ${student.regNumber}<br>
-              Class: ${student.className || "-"} ${student.arm || ""}<br>
-              Email: ${student.email || "Not activated yet"}
-            </div>
-            ${getResultStatusBadge(student.studentId)}
-            ${getPaymentBadge(student.studentId)}
-            <div class="item-actions">
-              <button class="mini-btn btn-edit" onclick="openStudentEdit('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}', '${(student.className || "").replace(/'/g, "\\'")}', '${(student.arm || "").replace(/'/g, "\\'")}')">Edit</button>
-              <button class="mini-btn btn-view" onclick="openScoreModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Scores</button>
-              <button class="mini-btn btn-unlock" onclick="quickUnlockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Unlock</button>
-              <button class="mini-btn btn-lock" onclick="quickLockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Lock</button>
-              <button class="mini-btn btn-subjects" onclick="openSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Assign Subj</button>
-              <button class="mini-btn btn-view" onclick="openViewSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Subj</button>
-              <button class="mini-btn btn-unpaid" onclick="openStudentDelete('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}')">Delete</button>
-            </div>
-          </div>
-        </div>
-      `;
-      childrenEl.appendChild(li);
-    });
-  }
+  // Removed: expansion functionality is no longer needed
+  // All student details and actions now display in the modal via openClassStudentsModal()
 }
+
 
 
 function openStudentEdit(reg, name, className, arm) {
