@@ -1035,14 +1035,22 @@
     display: none;
   }
 
+  .audience-pill span {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
   .audience-pill input:checked + span {
     background: var(--accent);
     color: white;
-    border-radius: 14px;
-    padding: 12px 15px;
-    display: inline-block;
-    width: 100%;
-    box-shadow: 0 16px 40px rgba(56, 189, 248, 0.16);
+    border-radius: 18px;
+    padding: 14px 18px;
+    box-shadow: 0 20px 45px rgba(102, 204, 204, 0.22);
+    border: 1px solid rgba(255,255,255,0.24);
+    transform: translateY(-1px);
   }
 
   .media-upload-row {
