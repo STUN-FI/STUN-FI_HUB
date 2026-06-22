@@ -705,6 +705,43 @@
     gap: 10px;
   }
 
+  .student-card {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    background: var(--card);
+  }
+
+  .student-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: var(--card-2);
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 700;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .student-toggle:hover {
+    background: rgba(102, 204, 204, 0.08);
+    transform: translateY(-1px);
+  }
+
+  .student-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .student-actions.collapsed {
+    display: none;
+  }
+
   .mini-btn {
     padding: 10px 14px;
     font-size: 12px;
@@ -4084,7 +4121,7 @@ function openClassStudentsModal(className, arm, studentList) {
   const html = `
     <div style="display: grid; gap: 12px;">
       ${studentList.map((student) => `
-        <div style="border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--card);">
+        <div class="student-card">
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
             <div>
               <strong>${student.name || "-"}</strong>
@@ -4096,7 +4133,8 @@ function openClassStudentsModal(className, arm, studentList) {
               <div style="font-size: 0.85rem; color: var(--muted);">Phone: ${student.phone || "Not provided"}</div>
             </div>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <button class="student-toggle" type="button" onclick="const actions = this.closest('.student-card').querySelector('.student-actions'); const isHidden = actions.classList.toggle('collapsed'); this.textContent = isHidden ? 'Show actions' : 'Hide actions';">Show actions</button>
+          <div class="student-actions collapsed">
             <button class="mini-btn btn-edit" onclick="openStudentEdit('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}', '${(student.className || "").replace(/'/g, "\\'")}', '${(student.arm || "").replace(/'/g, "\\'")}')">Edit</button>
             <button class="mini-btn btn-view" onclick="openScoreModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Scores</button>
             <button class="mini-btn btn-unlock" onclick="quickUnlockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Unlock</button>
