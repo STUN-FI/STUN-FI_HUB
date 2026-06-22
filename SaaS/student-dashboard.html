@@ -244,6 +244,35 @@
       gap: 18px;
       align-items: flex-start;
       flex-wrap: wrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .topbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .topbar.shrink {
+      padding: 16px 22px;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    .topbar.shrink h2 {
+      font-size: clamp(1.25rem, 2vw, 1.75rem);
+    }
+
+    .topbar.shrink p {
+      font-size: 0.95rem;
+      margin-top: 6px;
+    }
+
+    .topbar.shrink .school-pill,
+    .topbar.shrink .secondary-btn,
+    .topbar.shrink .sidebar-toggle {
+      padding: 10px 14px;
     }
 
     body.dark .topbar {
@@ -702,6 +731,16 @@
 
       .scroll-card-body {
         max-height: 360px;
+      }
+    }
+
+    @media (min-width: 1051px) {
+      .topbar {
+        flex-wrap: nowrap;
+      }
+
+      .topbar-actions {
+        flex-wrap: nowrap;
       }
     }
 
@@ -1243,6 +1282,21 @@ function init() {
   loadStudentPosts();
   loadStudentResultCardStatus();
 }
+
+function updateTopbarShrink() {
+  const topbar = document.querySelector('.topbar');
+  if (!topbar) return;
+
+  if (window.scrollY > 60) {
+    topbar.classList.add('shrink');
+  } else {
+    topbar.classList.remove('shrink');
+  }
+}
+
+window.addEventListener('scroll', updateTopbarShrink, { passive: true });
+window.addEventListener('resize', updateTopbarShrink);
+window.addEventListener('load', updateTopbarShrink);
 
 init();
 </script>
