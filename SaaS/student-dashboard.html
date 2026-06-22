@@ -929,6 +929,41 @@
           </div>
 
           <div class="card">
+            <h3>Class Timetable</h3>
+            <div class="toolbar" style="gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+              <select id="studentTimetableSessionSelect" onchange="loadStudentTimetable()">
+                <option value="2025/2026">2025/2026</option>
+                <option value="2026/2027">2026/2027</option>
+                <option value="2027/2028">2027/2028</option>
+              </select>
+              <select id="studentTimetableTermSelect" onchange="loadStudentTimetable()">
+                <option value="1st Term">1st Term</option>
+                <option value="2nd Term">2nd Term</option>
+                <option value="3rd Term">3rd Term</option>
+              </select>
+            </div>
+            <div class="scroll-card-body">
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Day</th>
+                      <th>Subject</th>
+                      <th>Teacher ID</th>
+                      <th>Class</th>
+                      <th>Arm</th>
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody id="studentTimetableBody">
+                    <tr><td colspan="6" class="empty-state">Loading timetable...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
             <h3>Quick Info</h3>
             <div class="quick-grid">
               <div class="quick-card">
@@ -1126,6 +1161,73 @@ async function loadStudentPosts() {
   }
 }
 
+function escapeHtml(text) {
+  return String(text || "").replace(/[&<>'"]/g, function (char) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[char];
+  });
+}
+
+async function loadStudentTimetable() {
+  const session = document.getElementById("studentTimetableSessionSelect").value;
+  const term = document.getElementById("studentTimetableTermSelect").value;
+  const body = document.getElementById("studentTimetableBody");
+
+  if (body) {
+    body.innerHTML = `<tr><td colspan="6" class="empty-state">Loading timetable...</td></tr>`;
+  }
+
+  try {
+    const response = await fetch(
+      window.API_BASE + "/student-timetable/" + encodeURIComponent(student.studentId) +
+      "?schoolId=" + encodeURIComponent(student.schoolId) +
+      "&session=" + encodeURIComponent(session) +
+      "&term=" + encodeURIComponent(term)
+    );
+    const data = await response.json();
+
+    if (!response.ok) {
+      if (body) {
+        body.innerHTML = `<tr><td colspan="6" class="empty-state">${data.message || "Unable to load timetable."}</td></tr>`;
+      }
+      return;
+    }
+
+    renderStudentTimetable(Array.isArray(data) ? data : []);
+  } catch (error) {
+    console.log(error);
+    if (body) {
+      body.innerHTML = `<tr><td colspan="6" class="empty-state">Error loading timetable.</td></tr>`;
+    }
+  }
+}
+
+function renderStudentTimetable(entries) {
+  const body = document.getElementById("studentTimetableBody");
+  if (!body) return;
+
+  if (!entries || !entries.length) {
+    body.innerHTML = `<tr><td colspan="6" class="empty-state">No timetable entries available.</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = entries.map((entry) => `
+    <tr>
+      <td>${escapeHtml(entry.day || "")}</td>
+      <td>${escapeHtml(entry.subject || "")}</td>
+      <td>${escapeHtml(entry.teacherId || "")}</td>
+      <td>${escapeHtml(entry.className || "")}</td>
+      <td>${escapeHtml(entry.arm || "")}</td>
+      <td>${escapeHtml(entry.startTime || "")} - ${escapeHtml(entry.endTime || "")}</td>
+    </tr>
+  `).join("");
+}
+
 async function loadStudentResultCardStatus() {
   const wrap = document.getElementById("resultAccessCardArea");
   const session = "2025/2026";
@@ -1280,6 +1382,7 @@ function init() {
   fillStudentInfo();
   loadSchoolBranding();
   loadStudentPosts();
+  loadStudentTimetable();
   loadStudentResultCardStatus();
 }
 

@@ -961,6 +961,30 @@ const subscriptionSchema = new mongoose.Schema(
 
 subscriptionSchema.index({ status: 1, endDate: 1 });
 
+const timetableSchema = new mongoose.Schema(
+  {
+    schoolId: { type: String, required: true },
+    className: { type: String, required: true },
+    arm: { type: String, default: "" },
+    day: {
+      type: String,
+      enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      required: true
+    },
+    subject: { type: String, required: true },
+    teacherId: { type: String, required: true },
+    startTime: { type: String, required: true },
+    endTime: { type: String, required: true },
+    session: { type: String, default: "2025/2026" },
+    term: { type: String, default: "1st Term" }
+  },
+  { timestamps: true }
+);
+
+timetableSchema.index({ schoolId: 1, teacherId: 1, className: 1, session: 1, term: 1 });
+
+timetableSchema.index({ schoolId: 1, className: 1, arm: 1, session: 1, term: 1 });
+
 /* =========================
    MODELS
 ========================= */
@@ -980,6 +1004,7 @@ const PromotionSetting = mongoose.model("PromotionSetting", promotionSettingSche
 const PromotionHistory = mongoose.model("PromotionHistory", promotionHistorySchema);
 const Result = mongoose.model("Result", resultSchema);
 const Subscription = mongoose.model("Subscription", subscriptionSchema);
+const Timetable = mongoose.model("Timetable", timetableSchema);
 
 /* =========================
    REGISTER ADMIN ROUTES
@@ -2848,6 +2873,162 @@ app.delete("/delete-teacher", async (req, res) => {
     res.json({ message: "Teacher deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting teacher" });
+  }
+});
+
+app.post("/school/:schoolId/timetable", async (req, res) => {
+  try {
+    const schoolId = (req.params.schoolId || "").trim();
+    const className = (req.body.className || "").trim();
+    const arm = (req.body.arm || "").trim();
+    const day = (req.body.day || "").trim();
+    const subject = (req.body.subject || "").trim();
+    const teacherId = (req.body.teacherId || "").trim();
+    const startTime = (req.body.startTime || "").trim();
+    const endTime = (req.body.endTime || "").trim();
+    const session = (req.body.session || "2025/2026").trim();
+    const term = (req.body.term || "1st Term").trim();
+
+    if (!schoolId || !className || !day || !subject || !teacherId || !startTime || !endTime) {
+      return res.status(400).json({ message: "All timetable fields are required" });
+    }
+
+    const teacher = await Teacher.findOne({ teacherId, schoolId });
+    if (!teacher) {
+      return res.status(404).json({ message: "Teacher not found for this school" });
+    }
+
+    const existing = await Timetable.findOne({
+      schoolId,
+      className,
+      arm,
+      day,
+      subject,
+      teacherId,
+      startTime,
+      endTime,
+      session,
+      term
+    });
+
+    if (existing) {
+      return res.status(400).json({ message: "This timetable entry already exists" });
+    }
+
+    const entry = await Timetable.create({
+      schoolId,
+      className,
+      arm,
+      day,
+      subject,
+      teacherId,
+      startTime,
+      endTime,
+      session,
+      term
+    });
+
+    res.json({ message: "Timetable entry created successfully", entry });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error creating timetable entry" });
+  }
+});
+
+app.get("/school/:schoolId/timetable", async (req, res) => {
+  try {
+    const schoolId = (req.params.schoolId || "").trim();
+    const session = (req.query.session || "2025/2026").trim();
+    const term = (req.query.term || "1st Term").trim();
+    const className = (req.query.className || "").trim();
+    const arm = (req.query.arm || "").trim();
+    const teacherId = (req.query.teacherId || "").trim();
+    const day = (req.query.day || "").trim();
+    const subject = (req.query.subject || "").trim();
+
+    const query = {
+      schoolId,
+      session,
+      term
+    };
+
+    if (className) query.className = className;
+    if (arm) query.arm = arm;
+    if (teacherId) query.teacherId = teacherId;
+    if (day) query.day = day;
+    if (subject) query.subject = subject;
+
+    const timetable = await Timetable.find(query).sort({ day: 1, startTime: 1 });
+    res.json(timetable);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error loading timetable entries" });
+  }
+});
+
+app.delete("/school/:schoolId/timetable/:entryId", async (req, res) => {
+  try {
+    const schoolId = (req.params.schoolId || "").trim();
+    const entryId = (req.params.entryId || "").trim();
+
+    const deleted = await Timetable.findOneAndDelete({ _id: entryId, schoolId });
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Timetable entry not found" });
+    }
+
+    res.json({ message: "Timetable entry deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error deleting timetable entry" });
+  }
+});
+
+app.get("/teacher-timetable/:teacherId", async (req, res) => {
+  try {
+    const teacherId = (req.params.teacherId || "").trim();
+    const schoolId = (req.query.schoolId || "").trim();
+    const session = (req.query.session || "2025/2026").trim();
+    const term = (req.query.term || "1st Term").trim();
+
+    const teacher = await Teacher.findOne({ teacherId, schoolId });
+    if (!teacher) {
+      return res.status(404).json({ message: "Teacher not found" });
+    }
+
+    const timetable = await Timetable.find({ teacherId, schoolId, session, term }).sort({ day: 1, startTime: 1 });
+    res.json(timetable);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error loading teacher timetable" });
+  }
+});
+
+app.get("/student-timetable/:studentId", async (req, res) => {
+  try {
+    const studentId = (req.params.studentId || "").trim();
+    const schoolId = (req.query.schoolId || "").trim();
+    const session = (req.query.session || "2025/2026").trim();
+    const term = (req.query.term || "1st Term").trim();
+
+    const student = await Student.findOne({ studentId, schoolId });
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const query = {
+      schoolId,
+      className: student.className,
+      arm: student.arm || "",
+      session,
+      term
+    };
+
+    const timetable = await Timetable.find(query).sort({ day: 1, startTime: 1 });
+    res.json(timetable);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error loading student timetable" });
   }
 });
 

@@ -949,6 +949,40 @@
               </div>
             </div>
           </div>
+
+          <div class="card">
+            <h3>My Timetable</h3>
+            <div class="toolbar" style="gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+              <select id="teacherTimetableSessionSelect" onchange="loadTeacherTimetable()">
+                <option value="2025/2026">2025/2026</option>
+                <option value="2026/2027">2026/2027</option>
+                <option value="2027/2028">2027/2028</option>
+              </select>
+              <select id="teacherTimetableTermSelect" onchange="loadTeacherTimetable()">
+                <option value="1st Term">1st Term</option>
+                <option value="2nd Term">2nd Term</option>
+                <option value="3rd Term">3rd Term</option>
+              </select>
+            </div>
+            <div class="scroll-card-body">
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Day</th>
+                      <th>Class</th>
+                      <th>Arm</th>
+                      <th>Subject</th>
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody id="teacherTimetableBody">
+                    <tr><td colspan="5" class="empty-state">Loading timetable...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>
@@ -1593,6 +1627,72 @@ function setTeacherInfo() {
       }
     }
 
+    function escapeHtml(text) {
+      return String(text || "").replace(/[&<>'"]/g, function (char) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[char];
+      });
+    }
+
+    async function loadTeacherTimetable() {
+      const body = document.getElementById("teacherTimetableBody");
+      const session = document.getElementById("teacherTimetableSessionSelect")?.value || "2025/2026";
+      const term = document.getElementById("teacherTimetableTermSelect")?.value || "1st Term";
+
+      if (body) {
+        body.innerHTML = `<tr><td colspan="5" class="empty-state">Loading timetable...</td></tr>`;
+      }
+
+      try {
+        const response = await fetch(
+          window.API_BASE + "/teacher-timetable/" + encodeURIComponent(teacher.teacherId) +
+          "?schoolId=" + encodeURIComponent(teacher.schoolId) +
+          "&session=" + encodeURIComponent(session) +
+          "&term=" + encodeURIComponent(term)
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (body) {
+            body.innerHTML = `<tr><td colspan="5" class="empty-state">${escapeHtml(data.message || "Unable to load timetable.")}</td></tr>`;
+          }
+          return;
+        }
+
+        renderTeacherTimetable(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.log(error);
+        if (body) {
+          body.innerHTML = `<tr><td colspan="5" class="empty-state">Error loading timetable.</td></tr>`;
+        }
+      }
+    }
+
+    function renderTeacherTimetable(entries) {
+      const body = document.getElementById("teacherTimetableBody");
+      if (!body) return;
+
+      if (!entries || !entries.length) {
+        body.innerHTML = `<tr><td colspan="5" class="empty-state">No timetable entries available.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = entries.map((entry) => `
+        <tr>
+          <td>${escapeHtml(entry.day || "")}</td>
+          <td>${escapeHtml(entry.className || "")}</td>
+          <td>${escapeHtml(entry.arm || "")}</td>
+          <td>${escapeHtml(entry.subject || "")}</td>
+          <td>${escapeHtml(entry.startTime || "")} - ${escapeHtml(entry.endTime || "")}</td>
+        </tr>
+      `).join("");
+    }
+
       window.addEventListener("load", () => {
       const preloader = document.getElementById("preloader");
       if (!preloader) return;
@@ -1618,6 +1718,7 @@ function setTeacherInfo() {
       loadSchoolBranding();
       loadStudents();
       loadTeacherPosts();
+      loadTeacherTimetable();
     }
   </script>
   <script src="common.js"></script>
