@@ -275,6 +275,310 @@
       padding: 10px 14px;
     }
 
+    /* Enhanced card and content styles */
+    .card-wrapper {
+      display: grid;
+      gap: 22px;
+      margin-bottom: 28px;
+    }
+
+    .card-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .status-card {
+      background: linear-gradient(135deg, var(--card), var(--card-2));
+      border: 1.5px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .status-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 12px 32px rgba(102, 204, 204, 0.12);
+      transform: translateY(-4px);
+    }
+
+    .status-card h3 {
+      margin: 0 0 16px 0;
+      font-size: 1.25rem;
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .status-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .metric-item {
+      background: linear-gradient(135deg, var(--card-2), rgba(102, 204, 204, 0.05));
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px 12px;
+      text-align: center;
+      transition: all 0.25s ease;
+    }
+
+    .metric-item:hover {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(102, 204, 204, 0.08), rgba(102, 204, 204, 0.04));
+    }
+
+    .metric-value {
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .announcements-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: 540px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    .announcements-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .announcements-list::-webkit-scrollbar-thumb {
+      background: var(--line);
+      border-radius: 3px;
+    }
+
+    .announcements-list::-webkit-scrollbar-thumb:hover {
+      background: var(--muted);
+    }
+
+    .announcement-item {
+      background: linear-gradient(135deg, var(--card-2), rgba(102, 204, 204, 0.03));
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent);
+      border-radius: 14px;
+      padding: 16px;
+      transition: all 0.25s ease;
+    }
+
+    .announcement-item:hover {
+      border-left-color: var(--info);
+      box-shadow: 0 6px 20px rgba(102, 204, 204, 0.12);
+    }
+
+    .announcement-title {
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    .announcement-time {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .announcement-time:before {
+      content: '📅';
+    }
+
+    .announcement-body {
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 0.95rem;
+      background: rgba(255, 255, 255, 0.4);
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .timetable-filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    select {
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--card);
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-size: 0.95rem;
+    }
+
+    select:hover,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(102, 204, 204, 0.1);
+      outline: none;
+    }
+
+    .timetable-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .timetable-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .timetable-list::-webkit-scrollbar-thumb {
+      background: var(--line);
+      border-radius: 3px;
+    }
+
+    .timetable-item {
+      background: linear-gradient(135deg, var(--card-2), rgba(59, 130, 246, 0.04));
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      transition: all 0.25s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .timetable-item:hover {
+      border-color: var(--info);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.1);
+      transform: translateX(4px);
+    }
+
+    .timetable-subject {
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+      font-size: 0.95rem;
+    }
+
+    .timetable-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .timetable-time {
+      text-align: right;
+      font-weight: 800;
+      color: var(--accent);
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .timetable-teacher {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .teachers-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .teacher-card {
+      background: linear-gradient(135deg, var(--card-2), rgba(34, 197, 94, 0.04));
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      transition: all 0.25s ease;
+    }
+
+    .teacher-card:hover {
+      border-color: var(--success);
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.12);
+      transform: translateY(-3px);
+    }
+
+    .teacher-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #3b82f6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      flex-shrink: 0;
+      font-size: 0.9rem;
+    }
+
+    .teacher-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .teacher-name {
+      font-weight: 800;
+      color: var(--text);
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+
+    .teacher-subject {
+      font-size: 0.75rem;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .empty-state:before {
+      content: '📭';
+      display: block;
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+
     body.dark .topbar {
       background: rgba(17, 24, 39, 0.92);
       border-color: rgba(56, 189, 248, 0.12);
@@ -943,22 +1247,20 @@
               </select>
             </div>
             <div class="scroll-card-body">
-              <div class="table-wrap">
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Day</th>
-                      <th>Subject</th>
-                      <th>Teacher ID</th>
-                      <th>Class</th>
-                      <th>Arm</th>
-                      <th>Time</th>
-                    </tr>
-                  </thead>
-                  <tbody id="studentTimetableBody">
-                    <tr><td colspan="6" class="empty-state">Loading timetable...</td></tr>
-                  </tbody>
-                </table>
+              <div class="timetable-filters">
+                <select id="studentTimetableSessionSelect" onchange="loadStudentTimetable()">
+                  <option>2025/2026</option>
+                  <option>2026/2027</option>
+                  <option>2027/2028</option>
+                </select>
+                <select id="studentTimetableTermSelect" onchange="loadStudentTimetable()">
+                  <option>1st Term</option>
+                  <option>2nd Term</option>
+                  <option>3rd Term</option>
+                </select>
+              </div>
+              <div class="timetable-list" id="studentTimetableBody">
+                <div class="empty-state">Loading timetable...</div>
               </div>
             </div>
           </div>
@@ -1129,7 +1431,7 @@ async function loadStudentPosts() {
 
     posts.forEach((post) => {
       const div = document.createElement("div");
-      div.className = "announcement-card";
+      div.className = "announcement-item";
 
       const createdTime = new Date(post.createdAt).toLocaleString();
       let mediaHtml = "";
@@ -1145,10 +1447,8 @@ async function loadStudentPosts() {
       }
 
       div.innerHTML = `
-        <div class="announcement-top">
-          <div class="announcement-title">School Announcement</div>
-          <div class="announcement-time">${createdTime}</div>
-        </div>
+        <div class="announcement-title">📢 Announcement</div>
+        <div class="announcement-time">${createdTime}</div>
         <div class="announcement-body">${post.text || ""}</div>
         ${mediaHtml}
       `;
@@ -1179,7 +1479,7 @@ async function loadStudentTimetable() {
   const body = document.getElementById("studentTimetableBody");
 
   if (body) {
-    body.innerHTML = `<tr><td colspan="6" class="empty-state">Loading timetable...</td></tr>`;
+    body.innerHTML = `<div class="empty-state">Loading timetable...</div>`;
   }
 
   try {
@@ -1193,7 +1493,7 @@ async function loadStudentTimetable() {
 
     if (!response.ok) {
       if (body) {
-        body.innerHTML = `<tr><td colspan="6" class="empty-state">${data.message || "Unable to load timetable."}</td></tr>`;
+        body.innerHTML = `<div class="empty-state">${data.message || "Unable to load timetable."}</div>`;
       }
       return;
     }
@@ -1202,7 +1502,7 @@ async function loadStudentTimetable() {
   } catch (error) {
     console.log(error);
     if (body) {
-      body.innerHTML = `<tr><td colspan="6" class="empty-state">Error loading timetable.</td></tr>`;
+      body.innerHTML = `<div class="empty-state">Error loading timetable.</div>`;
     }
   }
 }
@@ -1212,19 +1512,25 @@ function renderStudentTimetable(entries) {
   if (!body) return;
 
   if (!entries || !entries.length) {
-    body.innerHTML = `<tr><td colspan="6" class="empty-state">No timetable entries available.</td></tr>`;
+    body.innerHTML = `<div class="empty-state">No timetable entries available.</div>`;
     return;
   }
 
   body.innerHTML = entries.map((entry) => `
-    <tr>
-      <td>${escapeHtml(entry.day || "")}</td>
-      <td>${escapeHtml(entry.subject || "")}</td>
-      <td>${escapeHtml(entry.teacherId || "")}</td>
-      <td>${escapeHtml(entry.className || "")}</td>
-      <td>${escapeHtml(entry.arm || "")}</td>
-      <td>${escapeHtml(entry.startTime || "")} - ${escapeHtml(entry.endTime || "")}</td>
-    </tr>
+    <div class="timetable-item">
+      <div>
+        <div class="timetable-subject">${escapeHtml(entry.subject || "")}</div>
+        <div class="timetable-meta">
+          <span>${escapeHtml(entry.day || "")}</span>
+          <span>•</span>
+          <span>${escapeHtml(entry.className || "")}${entry.arm ? ' - ' + escapeHtml(entry.arm) : ''}</span>
+        </div>
+      </div>
+      <div>
+        <div class="timetable-time">${escapeHtml(entry.startTime || "")} - ${escapeHtml(entry.endTime || "")}</div>
+        <div class="timetable-teacher">${escapeHtml(entry.teacherId || "")}</div>
+      </div>
+    </div>
   `).join("");
 }
 
