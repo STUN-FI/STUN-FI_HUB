@@ -414,31 +414,31 @@
       <div class="dashboard-widgets">
         <div class="widget-card">
           <div>
-            <h3>Result readiness</h3>
-            <p class="widget-value" id="readinessPercent">0%</p>
+            <h3>Current session</h3>
+            <p class="widget-value" id="sessionValue">2025/2026 • JSS1 A</p>
           </div>
-          <p class="widget-note" id="readinessNote">Result access is pending until the school publishes the latest term.</p>
+          <p class="widget-note">Your current academic session and class details.</p>
         </div>
         <div class="widget-card">
           <div>
-            <h3>Portal status</h3>
-            <p class="widget-value" id="portalStatus">Active</p>
+            <h3>Attendance</h3>
+            <p class="widget-value" id="attendancePercent">98%</p>
           </div>
-          <p class="widget-note" id="statusNote">Your student portal is active and ready for updates.</p>
+          <p class="widget-note">This is your attendance rate for the current term.</p>
         </div>
         <div class="widget-card">
           <div>
-            <h3>Latest announcement</h3>
-            <p class="widget-value" id="announcementText">No new announcements</p>
+            <h3>Fee status</h3>
+            <p class="widget-value" id="feeStatus">Paid</p>
           </div>
-          <p class="widget-note">Check back later for school notices and updates.</p>
+          <p class="widget-note">Shows whether your school fees are up to date.</p>
         </div>
         <div class="widget-card">
           <div>
-            <h3>Next action</h3>
-            <p class="widget-value" id="nextAction">View your academic history</p>
+            <h3>Next milestone</h3>
+            <p class="widget-value" id="nextMilestone">Check result</p>
           </div>
-          <p class="widget-note">Open your dashboard actions to stay on top of your progress.</p>
+          <p class="widget-note">Suggested next step to keep your progress moving.</p>
         </div>
       </div>
 
@@ -521,15 +521,10 @@
       document.getElementById('studentClass').textContent = classArm;
       document.getElementById('studentDetails').innerHTML = `Name: ${name} <br>School ID: ${schoolId} <br>Student ID: ${studentId} <br>Class: ${classArm} <br>Session: ${session}`;
 
-      const readiness = student.resultReady !== undefined ? `${student.resultReady}%` : '0%';
-      const portalStatus = student.portalStatus || (student.isActive ? 'Active' : 'Pending');
-      const announcement = student.latestAnnouncement || 'No new announcements';
-      const nextAction = student.nextAction || 'Check your academic history and result status.';
-
-      document.getElementById('readinessPercent').textContent = readiness;
-      document.getElementById('portalStatus').textContent = portalStatus;
-      document.getElementById('announcementText').textContent = announcement;
-      document.getElementById('nextAction').textContent = nextAction;
+      document.getElementById('sessionValue').textContent = `${session} • ${classArm}`;
+      document.getElementById('attendancePercent').textContent = student.attendanceRate ? `${student.attendanceRate}%` : '98%';
+      document.getElementById('feeStatus').textContent = student.feeStatus || 'Paid';
+      document.getElementById('nextMilestone').textContent = student.nextAction || 'Check your result';
     }
 
     window.addEventListener('DOMContentLoaded', () => {
