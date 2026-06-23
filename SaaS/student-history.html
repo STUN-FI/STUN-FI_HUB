@@ -9,29 +9,39 @@
   <script src="js/global-loader.js"></script>
 </head>
 <body>
-  <div class="card" style="max-width:1000px;margin:28px auto;padding:22px;">
-    <h3>Academic History</h3>
-    <p class="muted">View past sessions, terms and promotion decisions.</p>
-
-    <div style="display:flex;gap:12px;margin-top:18px;align-items:end;">
-      <div style="flex:1">
-        <label style="display:block;color:#6b7280;margin-bottom:6px">Session</label>
-        <select id="historySession" style="width:100%"></select>
-      </div>
-      <div style="width:180px">
-        <label style="display:block;color:#6b7280;margin-bottom:6px">Term</label>
-        <select id="historyTerm">
-          <option>1st Term</option>
-          <option>2nd Term</option>
-          <option selected>3rd Term</option>
-        </select>
-      </div>
+  <div style="max-width:1000px;margin:28px auto;padding:0 0 22px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px;">
       <div>
-        <button class="primary-btn" id="loadHistoryBtn">Load</button>
+        <h3 style="margin:0 0 8px;">Academic History</h3>
+        <p class="muted" style="margin:0;">View past sessions, terms and promotion decisions.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
+        <button class="secondary-btn" type="button" onclick="window.location.href='student-dashboard.html'">Back to Dashboard</button>
+        <button class="danger-btn" type="button" onclick="localStorage.removeItem('student');window.location.href='student-login.html'">Logout</button>
       </div>
     </div>
 
-    <div id="historyContent" style="margin-top:18px"></div>
+    <div class="card" style="padding:22px;">
+      <div style="display:flex;gap:12px;margin-top:18px;align-items:end;">
+        <div style="flex:1">
+          <label style="display:block;color:#6b7280;margin-bottom:6px">Session</label>
+          <select id="historySession" style="width:100%"></select>
+        </div>
+        <div style="width:180px">
+          <label style="display:block;color:#6b7280;margin-bottom:6px">Term</label>
+          <select id="historyTerm">
+            <option>1st Term</option>
+            <option>2nd Term</option>
+            <option selected>3rd Term</option>
+          </select>
+        </div>
+        <div>
+          <button class="primary-btn" id="loadHistoryBtn">Load</button>
+        </div>
+      </div>
+
+      <div id="historyContent" style="margin-top:18px"></div>
+    </div>
   </div>
 
   <script src="student-history.js"></script>
