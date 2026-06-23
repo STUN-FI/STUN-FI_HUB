@@ -705,43 +705,6 @@
     gap: 10px;
   }
 
-  .student-card {
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 16px;
-    background: var(--card);
-  }
-
-  .student-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 14px;
-    border-radius: 14px;
-    border: 1px solid var(--line);
-    background: var(--card-2);
-    color: var(--text);
-    cursor: pointer;
-    font-weight: 700;
-    transition: background 0.2s ease, transform 0.2s ease;
-  }
-
-  .student-toggle:hover {
-    background: rgba(102, 204, 204, 0.08);
-    transform: translateY(-1px);
-  }
-
-  .student-actions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 8px;
-    margin-top: 12px;
-  }
-
-  .student-actions.collapsed {
-    display: none;
-  }
-
   .mini-btn {
     padding: 10px 14px;
     font-size: 12px;
@@ -2114,7 +2077,6 @@
       <button class="tab-btn active" onclick="showTab('students', this)">Students</button>
       <button class="tab-btn" onclick="showTab('teachers', this)">Teachers</button>
       <button class="tab-btn" onclick="showTab('announcements', this)">Announcements</button>
-      <button class="tab-btn" onclick="showTab('timetable', this)">Timetable</button>
       <button class="tab-btn" onclick="showTab('settings', this)">Settings</button>
     </div>
 
@@ -2281,115 +2243,6 @@
           <div class="collapsible-content" id="postSectionContent">
             <div class="scroll-card-body">
               <div id="postList"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="timetableTab" class="tab-panel">
-      <div class="grid">
-        <div class="card">
-          <h3>School Timetable</h3>
-
-          <div class="toolbar">
-            <select id="ttSessionSelect" onchange="loadSchoolTimetable()">
-              <option value="2025/2026">2025/2026</option>
-              <option value="2026/2027">2026/2027</option>
-              <option value="2027/2028">2027/2028</option>
-            </select>
-
-            <select id="ttTermSelect" onchange="loadSchoolTimetable()">
-              <option value="1st Term">1st Term</option>
-              <option value="2nd Term">2nd Term</option>
-              <option value="3rd Term">3rd Term</option>
-            </select>
-
-            <button class="secondary-btn" onclick="showTimetableForm()">Add Timetable Entry</button>
-          </div>
-
-          <div class="toolbar" style="margin-top:12px; gap:10px; flex-wrap:wrap; align-items:center;">
-            <input id="ttSearchFilter" type="text" placeholder="Search subject / class / teacher" oninput="loadSchoolTimetable()" style="flex:1; min-width:220px;" />
-            <input id="ttFilterClass" type="text" placeholder="Class" oninput="loadSchoolTimetable()" style="width:140px;" />
-            <input id="ttFilterArm" type="text" placeholder="Arm" oninput="loadSchoolTimetable()" style="width:100px;" />
-            <select id="ttFilterDay" onchange="loadSchoolTimetable()" style="width:150px;">
-              <option value="">All Days</option>
-              <option value="Monday">Monday</option>
-              <option value="Tuesday">Tuesday</option>
-              <option value="Wednesday">Wednesday</option>
-              <option value="Thursday">Thursday</option>
-              <option value="Friday">Friday</option>
-              <option value="Saturday">Saturday</option>
-              <option value="Sunday">Sunday</option>
-            </select>
-            <input id="ttFilterTeacherId" type="text" placeholder="Teacher ID" oninput="loadSchoolTimetable()" style="width:160px;" />
-            <button class="secondary-btn" onclick="clearTimetableFilters()">Clear Filters</button>
-          </div>
-
-          <div id="timetableForm" class="collapsible-content" style="display:none; margin-bottom:18px;">
-            <div class="form-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;">
-              <div class="form-group">
-                <label for="ttClassName">Class</label>
-                <input id="ttClassName" placeholder="JSS1">
-              </div>
-              <div class="form-group">
-                <label for="ttArm">Arm</label>
-                <input id="ttArm" placeholder="A">
-              </div>
-              <div class="form-group">
-                <label for="ttDay">Day</label>
-                <select id="ttDay">
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Wednesday">Wednesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
-                  <option value="Sunday">Sunday</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="ttSubject">Subject</label>
-                <input id="ttSubject" placeholder="Mathematics">
-              </div>
-              <div class="form-group">
-                <label for="ttTeacherId">Teacher ID</label>
-                <input id="ttTeacherId" placeholder="TCH0001">
-              </div>
-              <div class="form-group">
-                <label for="ttStartTime">Start Time</label>
-                <input id="ttStartTime" type="time">
-              </div>
-              <div class="form-group">
-                <label for="ttEndTime">End Time</label>
-                <input id="ttEndTime" type="time">
-              </div>
-            </div>
-            <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;">
-              <button class="primary-btn" onclick="createTimetableEntry()">Save Entry</button>
-              <button class="secondary-btn" onclick="hideTimetableForm()">Cancel</button>
-            </div>
-            <div id="ttFormStatus" style="margin-top:12px; color: var(--danger);"></div>
-          </div>
-
-          <div class="scroll-card-body">
-            <div class="table-wrap">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Day</th>
-                    <th>Class</th>
-                    <th>Arm</th>
-                    <th>Subject</th>
-                    <th>Teacher ID</th>
-                    <th>Time</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="schoolTimetableBody">
-                  <tr><td colspan="7" class="empty-state">No timetable entries yet.</td></tr>
-                </tbody>
-              </table>
             </div>
           </div>
         </div>
@@ -4231,7 +4084,7 @@ function openClassStudentsModal(className, arm, studentList) {
   const html = `
     <div style="display: grid; gap: 12px;">
       ${studentList.map((student) => `
-        <div class="student-card">
+        <div style="border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--card);">
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
             <div>
               <strong>${student.name || "-"}</strong>
@@ -4243,8 +4096,7 @@ function openClassStudentsModal(className, arm, studentList) {
               <div style="font-size: 0.85rem; color: var(--muted);">Phone: ${student.phone || "Not provided"}</div>
             </div>
           </div>
-          <button class="student-toggle" type="button" onclick="const actions = this.closest('.student-card').querySelector('.student-actions'); const isHidden = actions.classList.toggle('collapsed'); this.textContent = isHidden ? 'Show actions' : 'Hide actions';">Show actions</button>
-          <div class="student-actions collapsed">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
             <button class="mini-btn btn-edit" onclick="openStudentEdit('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}', '${(student.className || "").replace(/'/g, "\\'")}', '${(student.arm || "").replace(/'/g, "\\'")}')">Edit</button>
             <button class="mini-btn btn-view" onclick="openScoreModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Scores</button>
             <button class="mini-btn btn-unlock" onclick="quickUnlockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Unlock</button>
@@ -5266,8 +5118,7 @@ async function init() {
     loadSessionHistory(),
     loadStudents(),
     loadTeachers(),
-    loadNotifications(),
-    loadSchoolTimetable()
+    loadNotifications()
   ]);
   renderActivities();
   setTimeout(() => loadPosts("students"), 500);
@@ -5522,203 +5373,6 @@ Delete
 `
 }).join("");
 
-}
-
-function showTimetableForm() {
-  const form = document.getElementById("timetableForm");
-  if (form) {
-    form.style.display = "block";
-    document.getElementById("ttFormStatus").innerText = "";
-  }
-}
-
-function hideTimetableForm() {
-  const form = document.getElementById("timetableForm");
-  if (form) {
-    form.style.display = "none";
-  }
-  resetTimetableForm();
-}
-
-function resetTimetableForm() {
-  document.getElementById("ttClassName").value = "";
-  document.getElementById("ttArm").value = "";
-  document.getElementById("ttDay").value = "Monday";
-  document.getElementById("ttSubject").value = "";
-  document.getElementById("ttTeacherId").value = "";
-  document.getElementById("ttStartTime").value = "";
-  document.getElementById("ttEndTime").value = "";
-  document.getElementById("ttFormStatus").innerText = "";
-}
-
-async function loadSchoolTimetable() {
-  const session = document.getElementById("ttSessionSelect").value;
-  const term = document.getElementById("ttTermSelect").value;
-  const filterText = document.getElementById("ttSearchFilter").value.trim();
-  const className = document.getElementById("ttFilterClass").value.trim();
-  const arm = document.getElementById("ttFilterArm").value.trim();
-  const day = document.getElementById("ttFilterDay").value;
-  const teacherId = document.getElementById("ttFilterTeacherId").value.trim();
-  const body = document.getElementById("schoolTimetableBody");
-
-  if (body) {
-    body.innerHTML = `<tr><td colspan="7" class="empty-state">Loading timetable...</td></tr>`;
-  }
-
-  try {
-    let url = window.API_BASE + "/school/" + encodeURIComponent(currentSchoolId) + "/timetable?session=" + encodeURIComponent(session) + "&term=" + encodeURIComponent(term);
-    if (className) url += "&className=" + encodeURIComponent(className);
-    if (arm) url += "&arm=" + encodeURIComponent(arm);
-    if (day) url += "&day=" + encodeURIComponent(day);
-    if (teacherId) url += "&teacherId=" + encodeURIComponent(teacherId);
-
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (!response.ok) {
-      if (body) {
-        body.innerHTML = `<tr><td colspan="7" class="empty-state">${escapeHtml(data.message || "Unable to load timetable.")}</td></tr>`;
-      }
-      return;
-    }
-
-    let entries = Array.isArray(data) ? data : [];
-
-    if (filterText) {
-      const search = filterText.toLowerCase();
-      entries = entries.filter((entry) => {
-        return (
-          (entry.subject || "").toLowerCase().includes(search) ||
-          (entry.className || "").toLowerCase().includes(search) ||
-          (entry.arm || "").toLowerCase().includes(search) ||
-          (entry.teacherId || "").toLowerCase().includes(search) ||
-          (entry.day || "").toLowerCase().includes(search)
-        );
-      });
-    }
-
-    renderSchoolTimetable(entries);
-  } catch (error) {
-    console.log(error);
-    if (body) {
-      body.innerHTML = `<tr><td colspan="7" class="empty-state">Error loading timetable.</td></tr>`;
-    }
-  }
-}
-
-function clearTimetableFilters() {
-  document.getElementById("ttSearchFilter").value = "";
-  document.getElementById("ttFilterClass").value = "";
-  document.getElementById("ttFilterArm").value = "";
-  document.getElementById("ttFilterDay").value = "";
-  document.getElementById("ttFilterTeacherId").value = "";
-  loadSchoolTimetable();
-}
-
-function renderSchoolTimetable(entries) {
-  const body = document.getElementById("schoolTimetableBody");
-  if (!body) return;
-
-  if (!entries || !entries.length) {
-    body.innerHTML = `<tr><td colspan="7" class="empty-state">No timetable entries yet.</td></tr>`;
-    return;
-  }
-
-  body.innerHTML = entries.map(entry => {
-    return `
-      <tr>
-        <td>${escapeHtml(entry.day || "")}</td>
-        <td>${escapeHtml(entry.className || "")}</td>
-        <td>${escapeHtml(entry.arm || "-")}</td>
-        <td>${escapeHtml(entry.subject || "")}</td>
-        <td>${escapeHtml(entry.teacherId || "")}</td>
-        <td>${escapeHtml(entry.startTime || "")} - ${escapeHtml(entry.endTime || "")}</td>
-        <td>
-          <button class="mini-btn danger-btn" onclick="deleteTimetableEntry('${entry._id}')">Delete</button>
-        </td>
-      </tr>
-    `;
-  }).join("");
-}
-
-async function createTimetableEntry() {
-  const className = document.getElementById("ttClassName").value.trim();
-  const arm = document.getElementById("ttArm").value.trim();
-  const day = document.getElementById("ttDay").value;
-  const subject = document.getElementById("ttSubject").value.trim();
-  const teacherId = document.getElementById("ttTeacherId").value.trim();
-  const startTime = document.getElementById("ttStartTime").value;
-  const endTime = document.getElementById("ttEndTime").value;
-  const session = document.getElementById("ttSessionSelect").value;
-  const term = document.getElementById("ttTermSelect").value;
-  const status = document.getElementById("ttFormStatus");
-
-  if (!className || !day || !subject || !teacherId || !startTime || !endTime) {
-    if (status) status.innerText = "Please fill all required timetable fields.";
-    return;
-  }
-
-  if (status) status.innerText = "Saving...";
-
-  try {
-    const response = await fetch(
-      window.API_BASE + "/school/" + encodeURIComponent(currentSchoolId) + "/timetable",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          className,
-          arm,
-          day,
-          subject,
-          teacherId,
-          startTime,
-          endTime,
-          session,
-          term
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      if (status) status.innerText = data.message || "Could not save timetable entry.";
-      return;
-    }
-
-    hideTimetableForm();
-    await loadSchoolTimetable();
-    toast("Timetable entry saved", "success");
-  } catch (error) {
-    console.log(error);
-    if (status) status.innerText = "Error saving timetable entry.";
-  }
-}
-
-async function deleteTimetableEntry(entryId) {
-  if (!entryId || !confirm("Delete this timetable entry?")) return;
-
-  try {
-    const response = await fetch(
-      window.API_BASE + "/school/" + encodeURIComponent(currentSchoolId) + "/timetable/" + encodeURIComponent(entryId),
-      {
-        method: "DELETE"
-      }
-    );
-
-    const data = await response.json();
-    if (!response.ok) {
-      toast(data.message || "Could not delete timetable entry", "error");
-      return;
-    }
-
-    await loadSchoolTimetable();
-    toast("Timetable entry deleted", "success");
-  } catch (error) {
-    console.log(error);
-    toast("Error deleting timetable entry", "error");
-  }
 }
 
 init();
