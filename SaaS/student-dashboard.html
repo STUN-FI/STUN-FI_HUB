@@ -196,12 +196,29 @@
       position: sticky;
       top: 0;
       z-index: 20;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(18px);
       border: 1px solid rgba(102, 204, 204, 0.18);
       border-radius: 28px;
       box-shadow: 0 30px 75px rgba(15, 23, 42, 0.08);
       padding: 24px 30px;
+    }
+
+    .topbar > * {
+      min-width: 320px;
+      flex: 0 0 auto;
+    }
+
+    .topbar::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .topbar::-webkit-scrollbar-thumb {
+      background: rgba(102,204,204,0.3);
+      border-radius: 999px;
     }
 
     body.dark .topbar {
@@ -220,32 +237,47 @@
       color: var(--muted);
     }
 
-    .stats-grid {
+    .dashboard-widgets {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
       margin-bottom: 24px;
     }
 
-    .stat-card {
+    .widget-card {
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 16px;
+      border-radius: 20px;
       padding: 22px;
       box-shadow: var(--shadow);
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
     }
 
-    .stat-card h3 {
-      margin: 0 0 10px;
+    .widget-card h3 {
+      margin: 0;
       font-size: 1rem;
       color: var(--muted);
     }
 
-    .stat-card p {
+    .widget-card p {
       margin: 0;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .widget-value {
       font-size: 2rem;
       font-weight: 800;
       color: var(--text);
+    }
+
+    .widget-note {
+      color: var(--muted);
+      font-size: 0.95rem;
     }
 
     .card {
@@ -379,22 +411,34 @@
         </div>
       </section>
 
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h3>School ID</h3>
-          <p id="statSchoolId">--</p>
+      <div class="dashboard-widgets">
+        <div class="widget-card">
+          <div>
+            <h3>Result readiness</h3>
+            <p class="widget-value" id="readinessPercent">0%</p>
+          </div>
+          <p class="widget-note" id="readinessNote">Result access is pending until the school publishes the latest term.</p>
         </div>
-        <div class="stat-card">
-          <h3>Student ID</h3>
-          <p id="statStudentId">--</p>
+        <div class="widget-card">
+          <div>
+            <h3>Portal status</h3>
+            <p class="widget-value" id="portalStatus">Active</p>
+          </div>
+          <p class="widget-note" id="statusNote">Your student portal is active and ready for updates.</p>
         </div>
-        <div class="stat-card">
-          <h3>Class & Arm</h3>
-          <p id="statClassArm">--</p>
+        <div class="widget-card">
+          <div>
+            <h3>Latest announcement</h3>
+            <p class="widget-value" id="announcementText">No new announcements</p>
+          </div>
+          <p class="widget-note">Check back later for school notices and updates.</p>
         </div>
-        <div class="stat-card">
-          <h3>Session</h3>
-          <p id="statSession">2025/2026</p>
+        <div class="widget-card">
+          <div>
+            <h3>Next action</h3>
+            <p class="widget-value" id="nextAction">View your academic history</p>
+          </div>
+          <p class="widget-note">Open your dashboard actions to stay on top of your progress.</p>
         </div>
       </div>
 
@@ -475,11 +519,17 @@
       document.getElementById('studentName').textContent = name;
       document.getElementById('topName').textContent = name.split(' ')[0] || name;
       document.getElementById('studentClass').textContent = classArm;
-      document.getElementById('statSchoolId').textContent = schoolId;
-      document.getElementById('statStudentId').textContent = studentId;
-      document.getElementById('statClassArm').textContent = classArm;
-      document.getElementById('statSession').textContent = session;
       document.getElementById('studentDetails').innerHTML = `Name: ${name} <br>School ID: ${schoolId} <br>Student ID: ${studentId} <br>Class: ${classArm} <br>Session: ${session}`;
+
+      const readiness = student.resultReady !== undefined ? `${student.resultReady}%` : '0%';
+      const portalStatus = student.portalStatus || (student.isActive ? 'Active' : 'Pending');
+      const announcement = student.latestAnnouncement || 'No new announcements';
+      const nextAction = student.nextAction || 'Check your academic history and result status.';
+
+      document.getElementById('readinessPercent').textContent = readiness;
+      document.getElementById('portalStatus').textContent = portalStatus;
+      document.getElementById('announcementText').textContent = announcement;
+      document.getElementById('nextAction').textContent = nextAction;
     }
 
     window.addEventListener('DOMContentLoaded', () => {
