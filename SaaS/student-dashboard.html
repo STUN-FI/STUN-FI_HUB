@@ -395,6 +395,12 @@
     @media (max-width: 720px) {
       .topbar {
         padding: 16px 20px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .topbar-left {
+        width: 100%;
       }
 
       .topbar-left h1 {
@@ -403,31 +409,36 @@
 
       .topbar-left p {
         white-space: normal;
-        max-width: 100%;
+        max-width: none;
         margin-top: 6px;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
       }
 
       .topbar-actions {
-        gap: 8px;
+        gap: 10px;
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
       }
 
       .topbar-actions button {
         padding: 12px 14px;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
+        flex: 1 1 100%;
+        min-width: 0;
+        text-align: center;
       }
 
       .main {
         padding: 16px 16px;
       }
 
-      .stats-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .metric-grid {
+      .stats-grid,
+      .metric-grid,
+      .panel-grid {
         grid-template-columns: 1fr;
       }
+    }
     }
   </style>
 </head>
