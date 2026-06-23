@@ -172,9 +172,24 @@
 
     .topbar-actions {
       display: flex;
-      gap: 10px;
-      flex-wrap: nowrap;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
       flex-shrink: 0;
+      justify-content: flex-end;
+    }
+
+    .topbar-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(102,204,204,0.18);
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 700;
+      white-space: nowrap;
     }
 
     .topbar-actions button {
@@ -536,10 +551,11 @@
           <ion-icon name="menu-outline"></ion-icon>
         </button>
         <div class="topbar-left">
-          <h1>Welcome back, <span id="topName">Student</span></h1>
+          <h1>Welcome, <span id="topName">Student</span></h1>
         </div>
 
         <div class="topbar-actions">
+          <span class="topbar-pill" id="schoolIdPill">School ID: --</span>
           <button type="button" onclick="window.location.href='student-result.html'">
             <ion-icon name="document-text-outline"></ion-icon> Result Access
           </button>
@@ -692,8 +708,7 @@
       document.getElementById('classValue').textContent = classArm;
       document.getElementById('portalValue').textContent = portalStatus;
       document.getElementById('accessValue').textContent = resultAccess;
-      document.getElementById('attendanceValue').textContent = attendance;
-      document.getElementById('overviewSubtext').textContent = `Welcome back, ${name}. Here is your latest student performance overview.`;
+      document.getElementById('schoolIdPill').textContent = `School ID: ${student.schoolId || '--'}`;
       document.getElementById('studentStatus').textContent = portalStatus === 'Active' ? 'Active student' : 'Pending student';
       document.getElementById('weeklyPerformance').textContent = 'Keep up the momentum — check results and history for the latest updates.';
       document.getElementById('lessonsCompleted').textContent = student.completedLessons || '18';
