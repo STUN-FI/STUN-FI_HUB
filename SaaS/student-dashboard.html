@@ -133,9 +133,9 @@
 
     header.topbar {
       display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 18px;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
       padding: 28px 32px;
       backdrop-filter: blur(18px);
       background: rgba(6,11,25,0.95);
@@ -144,29 +144,24 @@
       position: sticky;
       top: 0;
       z-index: 10;
+      flex-wrap: wrap;
       overflow: hidden;
     }
 
     .topbar-left {
       min-width: 0;
       overflow: hidden;
-    }
-
-    .topbar-header {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
       flex: 1;
     }
 
-    .topbar-header h1 {
+    .topbar-left h1 {
       margin: 0;
       font-size: 2.4rem;
       line-height: 1.05;
     }
 
     .topbar-subtitle {
-      margin: 0;
+      margin: 10px 0 0;
       color: var(--muted);
       max-width: 760px;
       line-height: 1.6;
@@ -176,7 +171,8 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      width: 100%;
+      min-width: 260px;
+      width: min(100%, 420px);
     }
 
     .topbar-row {
@@ -199,6 +195,7 @@
       justify-content: center;
       cursor: pointer;
       font-size: 1.2rem;
+      min-width: 58px;
     }
 
     .topbar-pill {
@@ -232,6 +229,10 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
+    }
+
+    .result-button ion-icon {
+      font-size: 1.2rem;
     }
 
     .result-button ion-icon {
@@ -592,23 +593,23 @@
 
     <main class="main">
       <header class="topbar">
-        <div class="topbar-header">
+        <div class="topbar-left">
           <h1>Welcome, <span id="topName">Student</span></h1>
           <p class="topbar-subtitle">Check your announcements, account details, and result-access status here.</p>
-          <span id="studentStatus" class="visually-hidden">Active Student</span>
         </div>
 
-        <div class="topbar-row">
-          <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" aria-label="Open menu">
-            <ion-icon name="menu-outline"></ion-icon>
+        <div class="topbar-actions">
+          <div class="topbar-row">
+            <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" aria-label="Open menu">
+              <ion-icon name="menu-outline"></ion-icon>
+            </button>
+            <span class="topbar-pill" id="schoolIdPill">School ID: --</span>
+          </div>
+          <button class="result-button" type="button" onclick="window.location.href='student-result.html'">
+            <ion-icon name="document-text-outline"></ion-icon>
+            Result Access
           </button>
-          <span class="topbar-pill" id="schoolIdPill">School ID: --</span>
         </div>
-
-        <button class="result-button" type="button" onclick="window.location.href='student-result.html'">
-          <ion-icon name="document-text-outline"></ion-icon>
-          Result Access
-        </button>
       </header>
 
       <div class="stats-grid">
