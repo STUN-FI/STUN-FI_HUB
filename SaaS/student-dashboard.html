@@ -193,19 +193,12 @@
       background: rgba(0, 0, 0, 0.45);
       z-index: 1000;
       padding: 16px;
+      pointer-events: none;
     }
 
     .modal-backdrop.active {
-      display: flex;
-    }
-
-    .modal-dialog {
-      width: min(420px, 100%);
-      background: var(--card);
-      border-radius: 24px;
-      padding: 28px;
-      box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
-      border: 1px solid rgba(102, 204, 204, 0.18);
+      display: flex !important;
+      pointer-events: auto;
     }
 
     .modal-dialog h3 {
@@ -750,7 +743,7 @@
         <ion-icon name="sunny-outline"></ion-icon>
         Light mode
       </button>
-      <button type="button" class="logout-btn" onclick="showLogoutModal()">Logout</button>
+      <button type="button" class="logout-btn" id="logoutButton">Logout</button>
       </div>
     </aside>
 
@@ -975,7 +968,10 @@
       document.getElementById('portalValue').textContent = portalStatus;
       document.getElementById('accessValue').textContent = resultAccess;
       document.getElementById('schoolIdPill').textContent = `School ID: ${student.schoolId || '--'}`;
-      document.getElementById('studentStatus').textContent = portalStatus === 'Active' ? 'Active student' : 'Pending student';
+      const studentStatusEl = document.getElementById('studentStatus');
+      if (studentStatusEl) {
+        studentStatusEl.textContent = portalStatus === 'Active' ? 'Active student' : 'Pending student';
+      }
       document.getElementById('topName').textContent = name.split(' ')[0] || name;
       document.getElementById('weeklyPerformance').textContent = 'Keep up the momentum — check results and history for the latest updates.';
       document.getElementById('lessonsCompleted').textContent = student.completedLessons || '18';
@@ -993,6 +989,7 @@
       applyTheme(savedTheme);
       fillDashboard();
 
+      document.getElementById('logoutButton').addEventListener('click', showLogoutModal);
       document.getElementById('confirmLogoutBtn').addEventListener('click', confirmLogout);
       document.getElementById('cancelLogoutBtn').addEventListener('click', hideLogoutModal);
       document.getElementById('logoutModal').addEventListener('click', (event) => {
