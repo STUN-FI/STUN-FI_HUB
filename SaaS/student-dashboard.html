@@ -14,28 +14,36 @@
     :root {
       --accent: #66cccc;
       --accent-hover: #54b8b8;
-      --bg: #081026;
-      --sidebar: rgba(15,23,42,0.95);
-      --card: rgba(255,255,255,0.05);
-      --card-2: rgba(255,255,255,0.08);
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --line: rgba(255,255,255,0.12);
+      --bg: #f4f7fb;
+      --sidebar: #0f172a;
+      --card: #ffffff;
+      --card-2: #f8fafc;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
       --success: #22c55e;
       --danger: #ef4444;
       --warning: #f59e0b;
-      --shadow: 0 30px 80px rgba(0,0,0,0.35);
+      --shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
+      --topbar-bg: rgba(255,255,255,0.92);
+      --topbar-border: 1px solid rgba(102,204,204,0.18);
+      --topbar-shadow: 0 32px 80px rgba(15, 23, 42, 0.08);
+      --topbar-radius: 24px;
     }
 
     body.dark {
-      --bg: #f4f7fb;
-      --sidebar: #ffffff;
-      --card: rgba(255,255,255,0.95);
-      --card-2: #f8fafc;
-      --text: #0f172a;
-      --muted: #64748b;
-      --line: #e2e8f0;
-      --shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+      --bg: #0b1120;
+      --sidebar: #020617;
+      --card: #111827;
+      --card-2: #0f172a;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --line: rgba(255,255,255,0.08);
+      --shadow: 0 14px 35px rgba(0,0,0,0.28);
+      --topbar-bg: rgba(6,11,25,0.95);
+      --topbar-border: 1px solid rgba(255,255,255,0.08);
+      --topbar-shadow: 0 30px 80px rgba(0,0,0,0.35);
+      --topbar-radius: 24px;
     }
 
     * {
@@ -73,7 +81,7 @@
       top: 0;
       height: 100vh;
       overflow-y: auto;
-      border-right: 1px solid rgba(255,255,255,0.08);
+      border-right: 1px solid var(--line);
       transform: translateX(0);
       transition: transform 0.3s ease;
     }
@@ -175,9 +183,10 @@
       gap: 24px;
       padding: 28px 32px;
       backdrop-filter: blur(18px);
-      background: rgba(6,11,25,0.95);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 24px;
+      background: var(--topbar-bg);
+      border: var(--topbar-border);
+      border-radius: var(--topbar-radius);
+      box-shadow: var(--topbar-shadow);
       position: sticky;
       top: 0;
       z-index: 10;
