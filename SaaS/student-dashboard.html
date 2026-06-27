@@ -27,6 +27,17 @@
       --shadow: 0 30px 80px rgba(0,0,0,0.35);
     }
 
+    body.dark {
+      --bg: #f4f7fb;
+      --sidebar: #ffffff;
+      --card: rgba(255,255,255,0.95);
+      --card-2: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+    }
+
     * {
       box-sizing: border-box;
       font-family: Arial, sans-serif;
@@ -35,9 +46,9 @@
     html, body {
       margin: 0;
       min-height: 100%;
-      background: radial-gradient(circle at top, rgba(102,204,204,0.18), transparent 35%),
-                  linear-gradient(180deg, #081026 0%, #0f172a 100%);
+      background: var(--bg);
       color: var(--text);
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
     .layout {
@@ -765,15 +776,25 @@
 
     function applyTheme(theme) {
       const themeButton = document.getElementById('themeButton');
-      if (theme === 'dark') {
-        document.body.classList.add('dark');
-        themeButton.innerHTML = '<ion-icon name="moon-outline"></ion-icon>Dark mode';
-        themeButton.setAttribute('aria-label', 'Current theme: dark');
-      } else {
-        document.body.classList.remove('dark');
-        themeButton.innerHTML = '<ion-icon name="sunny-outline"></ion-icon>Light mode';
-        themeButton.setAttribute('aria-label', 'Current theme: light');
+      const isDark = theme === 'dark';
+
+      document.body.classList.toggle('dark', isDark);
+      document.documentElement.style.setProperty('--bg', isDark ? '#f4f7fb' : '#081026');
+      document.documentElement.style.setProperty('--sidebar', isDark ? '#ffffff' : 'rgba(15,23,42,0.95)');
+      document.documentElement.style.setProperty('--card', isDark ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.05)');
+      document.documentElement.style.setProperty('--card-2', isDark ? '#f8fafc' : 'rgba(255,255,255,0.08)');
+      document.documentElement.style.setProperty('--text', isDark ? '#0f172a' : '#e5e7eb');
+      document.documentElement.style.setProperty('--muted', isDark ? '#64748b' : '#94a3b8');
+      document.documentElement.style.setProperty('--line', isDark ? '#e2e8f0' : 'rgba(255,255,255,0.12)');
+      document.documentElement.style.setProperty('--shadow', isDark ? '0 20px 50px rgba(15, 23, 42, 0.12)' : '0 30px 80px rgba(0,0,0,0.35)');
+
+      if (themeButton) {
+        themeButton.innerHTML = isDark
+          ? '<ion-icon name="sunny-outline"></ion-icon>Light mode'
+          : '<ion-icon name="moon-outline"></ion-icon>Dark mode';
+        themeButton.setAttribute('aria-label', isDark ? 'Current theme: dark' : 'Current theme: light');
       }
+
       localStorage.setItem('studentDashboardTheme', theme);
     }
 
