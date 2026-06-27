@@ -190,16 +190,16 @@
       align-items: flex-start;
       gap: 24px;
       padding: 28px 32px;
-      backdrop-filter: blur(18px);
-      background: var(--topbar-bg);
-      border: var(--topbar-border);
-      border-radius: var(--topbar-radius);
-      box-shadow: var(--topbar-shadow);
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
       position: sticky;
       top: 0;
       z-index: 10;
       flex-wrap: wrap;
       overflow: hidden;
+      margin-bottom: 24px;
     }
 
     .topbar-left {
@@ -820,7 +820,6 @@
         document.documentElement.style.setProperty('--muted', '#6b7280');
         document.documentElement.style.setProperty('--line', '#e5e7eb');
         document.documentElement.style.setProperty('--shadow', '0 14px 35px rgba(15, 23, 42, 0.08)');
-        if (logo) logo.src = 'img/BLACK%20PNG%20STUNFI.png';
       } else {
         // Dark theme values
         document.documentElement.style.setProperty('--bg', '#0b1120');
@@ -831,7 +830,6 @@
         document.documentElement.style.setProperty('--muted', '#94a3b8');
         document.documentElement.style.setProperty('--line', 'rgba(255,255,255,0.08)');
         document.documentElement.style.setProperty('--shadow', '0 14px 35px rgba(0,0,0,0.28)');
-        if (logo) logo.src = 'img/stunfi-logo-white.png';
       }
 
       if (themeButton) {
