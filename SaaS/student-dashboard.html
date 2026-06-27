@@ -850,6 +850,8 @@
     }
 
     function logout() {
+      const confirmed = window.confirm('Are you sure you want to log out?');
+      if (!confirmed) return;
       localStorage.removeItem('student');
       window.location.href = 'student-login.html';
     }
