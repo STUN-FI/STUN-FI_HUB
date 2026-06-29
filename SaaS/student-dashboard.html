@@ -262,15 +262,26 @@
       position: sticky;
       top: 0;
       z-index: 10;
-      flex-wrap: wrap;
-      overflow: hidden;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
       margin-bottom: 24px;
     }
 
+    header.topbar::-webkit-scrollbar {
+      display: none;
+    }
+
     .topbar-left {
-      min-width: 0;
+      min-width: 320px;
       overflow: hidden;
-      flex: 1;
+      flex: 0 0 auto;
+    }
+
+    .topbar-actions {
+      min-width: 320px;
+      flex: 0 0 auto;
     }
 
     .topbar-left h1 {
@@ -907,6 +918,7 @@
       }
 
       localStorage.setItem('studentDashboardTheme', theme);
+      localStorage.setItem('studentResultTheme', theme);
     }
 
     function toggleTheme() {

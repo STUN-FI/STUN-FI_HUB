@@ -1041,7 +1041,9 @@
 
     function toggleTheme() {
       document.body.classList.toggle("dark");
-      localStorage.setItem("studentResultTheme", document.body.classList.contains("dark") ? "dark" : "light");
+      const selectedTheme = document.body.classList.contains("dark") ? "dark" : "light";
+      localStorage.setItem("studentResultTheme", selectedTheme);
+      localStorage.setItem("studentDashboardTheme", selectedTheme);
       updateThemeButton();
     }
 
