@@ -239,7 +239,7 @@
     }
 
     .modal-actions button.primary {
-      background: rgba(102, 108, 255, 0.95);
+      background: var(--danger);
       color: #fff;
     }
 
@@ -983,7 +983,7 @@
       if (studentStatusEl) {
         studentStatusEl.textContent = portalStatus === 'Active' ? 'Active student' : 'Pending student';
       }
-      document.getElementById('topName').textContent = name.split(' ')[0] || name;
+      document.getElementById('attendanceValue').textContent = attendance;
       document.getElementById('weeklyPerformance').textContent = 'Keep up the momentum — check results and history for the latest updates.';
       document.getElementById('lessonsCompleted').textContent = student.completedLessons || '18';
       document.getElementById('activeTerms').textContent = student.activeTerms || '1';
@@ -995,10 +995,32 @@
       document.getElementById('studentDetails').innerHTML = `Name: ${name} <br>School ID: ${student.schoolId || '--'} <br>Student ID: ${student.studentId || '--'} <br>Class: ${classArm} <br>Session: ${student.session || '2025/2026'}`;
     }
 
+    async function loadAnnouncements(schoolId) {
+      const announcementEl = document.getElementById('announcementPanel');
+      if (!announcementEl) return;
+
+      try {
+        const response = await fetch(window.api(`/posts/${encodeURIComponent(schoolId)}?audience=students`));
+        if (response.ok) {
+          const posts = await response.json();
+          if (Array.isArray(posts) && posts.length > 0) {
+            const latest = posts[0];
+            announcementEl.textContent = latest.text || latest.message || latest.title || 'No new announcements at the moment.';
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Announcements load failed:', error);
+      }
+
+      announcementEl.textContent = student.latestAnnouncement || 'No new announcements at the moment.';
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('studentDashboardTheme') || 'light';
       applyTheme(savedTheme);
       fillDashboard();
+      loadAnnouncements(student.schoolId || '');
 
       document.getElementById('logoutButton').addEventListener('click', showLogoutModal);
       document.getElementById('confirmLogoutBtn').addEventListener('click', confirmLogout);

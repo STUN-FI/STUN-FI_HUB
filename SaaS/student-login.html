@@ -396,7 +396,20 @@
 
         if (response.ok) {
           localStorage.setItem("token", data.token);
-          localStorage.setItem("student", JSON.stringify(data.student));
+          const studentData = {
+            ...data.student,
+            attendanceRate: data.student?.attendanceRate || '',
+            latestAnnouncement: data.student?.latestAnnouncement || '',
+            latestResult: data.student?.latestResult || '',
+            completedLessons: data.student?.completedLessons || '',
+            activeTerms: data.student?.activeTerms || '',
+            pendingFees: data.student?.pendingFees || '',
+            assignmentStatus: data.student?.assignmentStatus || '',
+            examReadiness: data.student?.examReadiness || '',
+            portalStatus: data.student?.portalStatus || '',
+            resultReady: data.student?.resultReady ?? false
+          };
+          localStorage.setItem("student", JSON.stringify(studentData));
 
           output.classList.add("success");
           output.innerText = "Login successful. Redirecting...";

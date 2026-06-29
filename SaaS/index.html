@@ -718,11 +718,37 @@
       background: rgba(255,255,255,0.04);
       border-radius: 20px;
       padding: 18px;
+      cursor: pointer;
+      transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+    }
+
+    .login-option:hover {
+      transform: translateY(-1px);
+      border-color: rgba(102,204,204,0.35);
+    }
+
+    .login-option.active {
+      border-color: rgba(102,204,204,0.7);
+      background: rgba(102,204,204,0.08);
     }
 
     .login-option h4 {
       margin: 0 0 8px;
       font-size: 1.15rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .login-option h4::after {
+      content: '\25BC';
+      font-size: 0.9rem;
+      transition: transform 180ms ease;
+    }
+
+    .login-option.active h4::after {
+      transform: rotate(180deg);
     }
 
     .login-option p {
@@ -733,7 +759,13 @@
     }
 
     .login-option .role-links {
+      display: none;
       gap: 8px;
+      margin-top: 8px;
+    }
+
+    .login-option.active .role-links {
+      display: grid;
     }
 
     #preloader {
@@ -1274,6 +1306,21 @@
         closeLoginModal();
       }
     });
+
+    function setupLoginRoleAccordion() {
+      const options = document.querySelectorAll('.login-option');
+      options.forEach((option) => {
+        option.addEventListener('click', (event) => {
+          if (event.target.closest('.role-link')) return;
+          options.forEach((other) => {
+            if (other !== option) other.classList.remove('active');
+          });
+          option.classList.toggle('active');
+        });
+      });
+    }
+
+    window.addEventListener('load', setupLoginRoleAccordion);
 
     function startTypedHeadline() {
       const element = document.getElementById('typedHeadline');
