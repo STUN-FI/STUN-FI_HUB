@@ -199,6 +199,16 @@
     .modal-backdrop.active {
       display: flex !important;
       pointer-events: auto;
+      opacity: 1;
+    }
+
+    .modal-dialog {
+      width: min(420px, 100%);
+      background: var(--card);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+      border: 1px solid rgba(102, 204, 204, 0.18);
     }
 
     .modal-dialog h3 {
