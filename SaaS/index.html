@@ -328,8 +328,8 @@
 
     .hero-graphic .floating-icon {
       position: absolute;
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -343,39 +343,35 @@
     }
 
     .hero-graphic .floating-icon.icon-1 {
-      top: 6%;
-      left: 52%;
-      transform: translate(-50%, 0);
-      animation-delay: 0s;
+      top: -18px;
+      left: 50%;
+      margin-left: -21px;
     }
 
     .hero-graphic .floating-icon.icon-2 {
-      top: 34%;
-      left: 8%;
-      transform: translate(0, -50%);
-      animation-delay: 0.8s;
+      top: 50%;
+      left: -18px;
+      margin-top: -21px;
     }
 
     .hero-graphic .floating-icon.icon-3 {
-      top: 34%;
-      right: 8%;
-      transform: translate(0, -50%);
-      animation-delay: 1.6s;
+      top: 50%;
+      right: -18px;
+      margin-top: -21px;
     }
 
     .hero-graphic .floating-icon.icon-4 {
-      bottom: 10%;
-      left: 52%;
-      transform: translate(-50%, 0);
-      animation-delay: 2.4s;
+      bottom: -18px;
+      left: 50%;
+      margin-left: -21px;
     }
 
     @keyframes floaty {
       0%, 100% {
-        transform: translate(var(--tx, 0), var(--ty, 0));
+        transform: translateY(0);
       }
       50% {
-        transform: translate(var(--tx, 0), -12px);
+        transform: translateY(-12px);
       }
     }
 
