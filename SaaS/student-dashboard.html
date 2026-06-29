@@ -259,9 +259,8 @@
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 24px;
       box-shadow: var(--shadow);
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      position: relative;
+      z-index: auto;
       flex-wrap: nowrap;
       overflow-x: auto;
       overflow-y: hidden;
@@ -879,16 +878,19 @@
       window.location.href = 'student-login.html';
     }
 
-    function applyTheme(theme) {
+    function getStoredTheme() {
+      return localStorage.getItem('studentDashboardTheme')
+        || localStorage.getItem('studentResultTheme')
+        || 'light';
+    }
+
+    function applyTheme(theme, save = true) {
       const themeButton = document.getElementById('themeButton');
-      const logo = document.getElementById('brandLogo');
       const isLight = theme === 'light';
 
-      // Apply body class for compatibility with any CSS that targets body.dark
       document.body.classList.toggle('dark', !isLight);
 
       if (isLight) {
-        // Light theme values (matches dashboard.html defaults)
         document.documentElement.style.setProperty('--bg', '#f4f7fb');
         document.documentElement.style.setProperty('--sidebar', '#0f172a');
         document.documentElement.style.setProperty('--card', '#ffffff');
@@ -898,7 +900,6 @@
         document.documentElement.style.setProperty('--line', '#e5e7eb');
         document.documentElement.style.setProperty('--shadow', '0 14px 35px rgba(15, 23, 42, 0.08)');
       } else {
-        // Dark theme values
         document.documentElement.style.setProperty('--bg', '#0b1120');
         document.documentElement.style.setProperty('--sidebar', '#020617');
         document.documentElement.style.setProperty('--card', '#111827');
@@ -910,19 +911,20 @@
       }
 
       if (themeButton) {
-        // show the action the user will take: when light -> show Dark mode, when dark -> show Light mode
         themeButton.innerHTML = isLight
           ? '<ion-icon name="moon-outline"></ion-icon>Dark mode'
           : '<ion-icon name="sunny-outline"></ion-icon>Light mode';
         themeButton.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
       }
 
-      localStorage.setItem('studentDashboardTheme', theme);
-      localStorage.setItem('studentResultTheme', theme);
+      if (save) {
+        localStorage.setItem('studentDashboardTheme', theme);
+        localStorage.setItem('studentResultTheme', theme);
+      }
     }
 
     function toggleTheme() {
-      const currentTheme = localStorage.getItem('studentDashboardTheme') || 'light';
+      const currentTheme = getStoredTheme();
       const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
       applyTheme(nextTheme);
     }
@@ -1029,8 +1031,8 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      const savedTheme = localStorage.getItem('studentDashboardTheme') || 'light';
-      applyTheme(savedTheme);
+      const savedTheme = getStoredTheme();
+      applyTheme(savedTheme, false);
       fillDashboard();
       loadAnnouncements(student.schoolId || '');
 
@@ -1042,6 +1044,12 @@
           hideLogoutModal();
         }
       });
+    });
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'studentDashboardTheme' || event.key === 'studentResultTheme') {
+        applyTheme(event.newValue || 'light', false);
+      }
     });
   </script>
 

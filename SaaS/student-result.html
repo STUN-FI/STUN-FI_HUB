@@ -1039,12 +1039,26 @@
       return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
     }
 
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
-      const selectedTheme = document.body.classList.contains("dark") ? "dark" : "light";
-      localStorage.setItem("studentResultTheme", selectedTheme);
-      localStorage.setItem("studentDashboardTheme", selectedTheme);
+    function getStoredTheme() {
+      return localStorage.getItem('studentResultTheme')
+        || localStorage.getItem('studentDashboardTheme')
+        || 'light';
+    }
+
+    function applyTheme(theme, save = false) {
+      const isDark = theme === 'dark';
+      document.body.classList.toggle('dark', isDark);
+      if (save) {
+        localStorage.setItem('studentResultTheme', theme);
+        localStorage.setItem('studentDashboardTheme', theme);
+      }
       updateThemeButton();
+    }
+
+    function toggleTheme() {
+      const currentTheme = getStoredTheme();
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(nextTheme, true);
     }
 
     function updateThemeButton() {
@@ -1425,10 +1439,8 @@
       });
 
     function init() {
-      const savedTheme = localStorage.getItem("studentResultTheme");
-      if (savedTheme === "dark") {
-        document.body.classList.add("dark");
-      }
+      const savedTheme = getStoredTheme();
+      applyTheme(savedTheme, false);
       updateThemeButton();
 
       closeSidebar();
@@ -1437,6 +1449,12 @@
       loadSchoolBranding();
       loadResultAccess();
     }
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'studentDashboardTheme' || event.key === 'studentResultTheme') {
+        applyTheme(event.newValue || 'light', false);
+      }
+    });
 
     init();
   </script>
