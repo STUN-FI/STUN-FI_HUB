@@ -67,13 +67,29 @@
     .layout {
       height: 100vh;
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: 300px 1fr;
       overflow: hidden;
       transition: grid-template-columns 0.3s ease;
     }
 
     .layout.collapsed {
       grid-template-columns: 0 1fr;
+    }
+
+    .sidebar-close {
+      display: none;
+      width: 44px;
+      height: 44px;
+      margin-left: auto;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.08);
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
     }
 
     .sidebar {
@@ -533,20 +549,18 @@
     }
 
     .sidebar-toggle {
-      background: rgba(102,108,255,0.95);
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      font-size: 1.5rem;
-      padding: 0;
       width: 58px;
       height: 58px;
-      z-index: 100;
       border-radius: 18px;
+      border: none;
+      background: rgba(102,108,255,0.95);
+      color: #fff;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.2s ease, background 0.2s ease;
+      cursor: pointer;
+      font-size: 1.2rem;
+      min-width: 58px;
     }
 
     .sidebar-toggle:hover {
@@ -595,6 +609,10 @@
 
       .sidebar.active {
         transform: translateX(0);
+      }
+
+      .sidebar-close {
+        display: inline-flex;
       }
 
       .sidebar-toggle {
@@ -725,9 +743,10 @@
   </style>
 </head>
 <body>
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
   <div class="layout">
     <aside class="sidebar" id="sidebar">
+      <button class="sidebar-close" onclick="closeSidebar()"><ion-icon name="close-outline"></ion-icon></button>
       <div class="sidebar-brand">
         <img id="brandLogo" src="img/stunfi-logo-white.png" alt="STUN-FI Logo">
         <h3>STUN-FI HUB</h3>
@@ -978,7 +997,18 @@
       sidebar.classList.remove('active');
       overlay.classList.remove('active');
       layout.classList.remove('collapsed');
+
+      if (window.innerWidth > 1040) {
+        localStorage.setItem('sidebarClosed', 'false');
+      }
     }
+
+    window.addEventListener('load', () => {
+      const isClosed = localStorage.getItem('sidebarClosed') === 'true';
+      if (isClosed && window.innerWidth > 1040) {
+        document.querySelector('.layout').classList.add('collapsed');
+      }
+    });
 
     function fillDashboard() {
       const name = student.name || 'Student';
