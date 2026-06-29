@@ -8,6 +8,7 @@
     <link rel="icon" href="img/Favicon.png?v=2" type="image/png" sizes="any">
     <link rel="shortcut icon" href="img/Favicon.png?v=2" type="image/x-icon">
 <link rel='stylesheet' href='styles.css'>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
@@ -741,14 +742,18 @@
       gap: 12px;
     }
 
-    .login-option h4::after {
-      content: '\25BC';
-      font-size: 0.9rem;
-      transition: transform 180ms ease;
+    .login-option h4 .accordion-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      color: var(--muted);
+      transition: transform 180ms ease, color 180ms ease;
     }
 
-    .login-option.active h4::after {
+    .login-option.active h4 .accordion-icon {
       transform: rotate(180deg);
+      color: var(--accent);
     }
 
     .login-option p {
@@ -1233,7 +1238,7 @@
 
       <div class="login-grid">
         <div class="login-option">
-          <h4>School</h4>
+          <h4>School <i class="bx bx-chevron-down accordion-icon"></i></h4>
           <p>School owners and admins can register or login to manage their school portal.</p>
           <div class="role-links">
             <a class="role-link" href="login.html">School Login <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
@@ -1242,7 +1247,7 @@
         </div>
 
         <div class="login-option">
-          <h4>Teacher</h4>
+          <h4>Teacher <i class="bx bx-chevron-down accordion-icon"></i></h4>
           <p>Teachers should confirm account first before logging in for score entry and updates.</p>
           <div class="role-links">
             <a class="role-link" href="teacher-confirm-account.html">Confirm Account <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
@@ -1251,7 +1256,7 @@
         </div>
 
         <div class="login-option">
-          <h4>Student</h4>
+          <h4>Student <i class="bx bx-chevron-down accordion-icon"></i></h4>
           <p>Students should confirm admission first before logging in to the student portal.</p>
           <div class="role-links">
             <a class="role-link" href="student-confirm-admission.html">Confirm Admission <span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
