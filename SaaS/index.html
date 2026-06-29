@@ -763,6 +763,43 @@
       min-height: 68px;
     }
 
+    details {
+      background: var(--card);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      padding: 12px;
+    }
+
+    details summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      color: white;
+      outline: none;
+    }
+
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: var(--muted);
+      transition: transform 180ms ease, color 180ms ease;
+    }
+
+    details[open] summary .faq-icon {
+      transform: rotate(180deg);
+      color: var(--accent);
+    }
+
     .login-option .role-links {
       display: none;
       gap: 8px;
@@ -1192,12 +1229,12 @@
         </div>
       </div>
       <div style="max-width:900px;margin:0 auto;">
-        <details style="background:var(--card);padding:12px;border-radius:10px;margin-bottom:10px;">
-          <summary style="font-weight:700;">How do I register my school?</summary>
+        <details>
+          <summary>How do I register my school? <i class="bx bx-chevron-down faq-icon"></i></summary>
           <div style="color:var(--muted);margin-top:8px;">Use the Register School button at the top and follow the onboarding steps.</div>
         </details>
-        <details style="background:var(--card);padding:12px;border-radius:10px;margin-bottom:10px;">
-          <summary style="font-weight:700;">Can teachers enter results?</summary>
+        <details>
+          <summary>Can teachers enter results? <i class="bx bx-chevron-down faq-icon"></i></summary>
           <div style="color:var(--muted);margin-top:8px;">Yes — teachers can confirm their account and submit subject scores from their dashboard.</div>
         </details>
       </div>
