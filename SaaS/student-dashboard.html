@@ -548,37 +548,6 @@
       color: var(--accent);
     }
 
-    .tabs {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-    }
-
-    .tab-btn {
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid var(--line);
-      padding: 12px 16px;
-      border-radius: 14px;
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-    }
-
-    .tab-btn.active {
-      background: var(--accent);
-      color: white;
-      border-color: transparent;
-    }
-
-    .tab-panel {
-      display: none;
-    }
-
-    .tab-panel.active {
-      display: block;
-    }
-
     .sidebar-toggle {
       width: 58px;
       height: 58px;
@@ -783,187 +752,141 @@
         <h3>STUN-FI HUB</h3>
       </div>
 
-      <div class="school-mini-card">
-      <img id="sidebarSchoolLogo" class="school-mini-logo" src="img/stunfi-logo-white.png" alt="STUN-FI Logo">
-      <div class="school-mini-name" id="sidebarSchoolName">Student Portal</div>
-      <div class="school-mini-id" id="sidebarSchoolId">ID: --</div>
-      <div class="school-mini-motto">Quick access to your results, announcements, and profile settings.</div>
-    </div>
+      <nav class="nav-section">
+        <button class="nav-item active" onclick="scrollToSection('overview')">
+          <ion-icon name="grid-outline"></ion-icon>
+          Overview
+        </button>
+        <button class="nav-item" onclick="scrollToSection('progress')">
+          <ion-icon name="bar-chart-outline"></ion-icon>
+          Progress
+        </button>
+        <button class="nav-item" onclick="scrollToSection('announcements')">
+          <ion-icon name="megaphone-outline"></ion-icon>
+          Announcements
+        </button>
+        <button class="nav-item" onclick="scrollToSection('actions')">
+          <ion-icon name="document-text-outline"></ion-icon>
+          Quick Actions
+        </button>
+        <button class="nav-item" onclick="scrollToSection('profile')">
+          <ion-icon name="person-circle-outline"></ion-icon>
+          Profile
+        </button>
+        <button class="nav-item" onclick="window.location.href='student-history.html'">
+          <ion-icon name="time-outline"></ion-icon>
+          Academic History
+        </button>
+      </nav>
 
-    <div class="nav-box">
-      <h3>Overview</h3>
-      <p>See your portal status, attendance, and quick actions in one place.</p>
-    </div>
-
-    <div class="nav-box">
-      <h3>Result access</h3>
-      <p>Open your results page and track your latest academic updates.</p>
-    </div>
-
-    <div class="sidebar-actions">
-      <button class="secondary-btn" onclick="showTab('overview', document.getElementById('overviewTabBtn'))"><ion-icon name="grid-outline"></ion-icon> Overview</button>
-      <button class="secondary-btn" onclick="showTab('results', document.getElementById('resultsTabBtn'))"><ion-icon name="document-text-outline"></ion-icon> Results</button>
-      <button class="secondary-btn" onclick="showTab('announcements', document.getElementById('announcementsTabBtn'))"><ion-icon name="megaphone-outline"></ion-icon> Announcements</button>
-      <button class="secondary-btn" onclick="showTab('settings', document.getElementById('settingsTabBtn'))"><ion-icon name="settings-outline"></ion-icon> Settings</button>
-      <button class="theme-btn" id="themeButton" onclick="toggleTheme()"><ion-icon name="sunny-outline"></ion-icon> Toggle theme</button>
-      <button class="logout-btn" id="logoutButton" onclick="showLogoutModal()"><ion-icon name="log-out-outline"></ion-icon> Logout</button>
-    </div>
+      <div class="sidebar-footer">
+        <button type="button" id="themeButton" onclick="toggleTheme()">
+        <ion-icon name="sunny-outline"></ion-icon>
+        Light mode
+      </button>
+      <button type="button" class="logout-btn" id="logoutButton">Logout</button>
+      </div>
     </aside>
 
     <main class="main">
-      <div class="topbar">
+      <header class="topbar">
         <div class="topbar-left">
           <h1>Welcome, <span id="topName">Student</span></h1>
-          <p class="topbar-subtitle">This is your student portal. Use the tabs to move between your overview, results, announcements, and settings.</p>
+          <p class="topbar-subtitle">Check your announcements, account details, and result-access status here.</p>
         </div>
 
         <div class="topbar-actions">
-          <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" aria-label="Open menu">
-            <ion-icon name="menu-outline"></ion-icon>
-          </button>
-          <div class="topbar-pill" id="schoolIdPill">School ID: --</div>
+          <div class="topbar-row">
+            <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" aria-label="Open menu">
+              <ion-icon name="menu-outline"></ion-icon>
+            </button>
+            <span class="topbar-pill" id="schoolIdPill">School ID: --</span>
+          </div>
           <button class="result-button" type="button" onclick="window.location.href='student-result.html'">
             <ion-icon name="document-text-outline"></ion-icon>
             Result Access
           </button>
         </div>
-      </div>
+      </header>
 
-      <div class="tabs">
-        <button id="overviewTabBtn" class="tab-btn active" onclick="showTab('overview', this)">Overview</button>
-        <button id="resultsTabBtn" class="tab-btn" onclick="showTab('results', this)">Results</button>
-        <button id="announcementsTabBtn" class="tab-btn" onclick="showTab('announcements', this)">Announcements</button>
-        <button id="settingsTabBtn" class="tab-btn" onclick="showTab('settings', this)">Settings</button>
-      </div>
-
-      <section id="overviewTab" class="tab-panel active">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <h3>Student ID</h3>
-            <p class="stat-value" id="studentIdValue">--</p>
-          </div>
-          <div class="stat-card">
-            <h3>Class</h3>
-            <p class="stat-value" id="classValue">--</p>
-          </div>
-          <div class="stat-card">
-            <h3>Portal Status</h3>
-            <p class="stat-value" id="portalValue">--</p>
-          </div>
-          <div class="stat-card">
-            <h3>Result Access</h3>
-            <p class="stat-value" id="accessValue">--</p>
-          </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Student ID</h3>
+          <p class="stat-value" id="studentIdValue">--</p>
         </div>
-
-        <div class="metric-grid">
-          <div class="metric-card">
-            <h3>Weekly performance</h3>
-            <p id="weeklyPerformance">Visit the results page to check your latest grades and class performance.</p>
-          </div>
-          <div class="metric-card">
-            <h3>Attendance rate</h3>
-            <p id="attendanceValue">--</p>
-          </div>
+        <div class="stat-card">
+          <h3>Class</h3>
+          <p class="stat-value" id="classValue">--</p>
         </div>
-
-        <div class="panel-grid">
-          <div class="panel-card">
-            <h3>Retention metrics</h3>
-            <ul>
-              <li><span>Completed lessons</span><strong id="lessonsCompleted">--</strong></li>
-              <li><span>Active terms</span><strong id="activeTerms">--</strong></li>
-              <li><span>Pending fees</span><strong id="pendingFees">--</strong></li>
-            </ul>
-          </div>
-          <div class="panel-card">
-            <h3>Performance summary</h3>
-            <ul>
-              <li><span>Assignment status</span><strong id="assignmentStatus">--</strong></li>
-              <li><span>Exam readiness</span><strong id="examReadiness">--</strong></li>
-              <li><span>Latest result</span><strong id="latestResult">--</strong></li>
-            </ul>
-          </div>
+        <div class="stat-card">
+          <h3>Portal Status</h3>
+          <p class="stat-value" id="portalValue">--</p>
         </div>
-
-        <section class="panel-card">
-          <h3>Quick actions</h3>
-          <div class="quick-links">
-            <a class="quick-link" href="student-result.html">
-              <ion-icon name="document-text-outline"></ion-icon>
-              <strong>Check Result</strong>
-              <span>Open your most recent result information.</span>
-            </a>
-            <a class="quick-link" href="student-history.html">
-              <ion-icon name="time-outline"></ion-icon>
-              <strong>View History</strong>
-              <span>Review academic history and promotion decisions.</span>
-            </a>
-            <a class="quick-link" href="student-login.html">
-              <ion-icon name="person-outline"></ion-icon>
-              <strong>Profile</strong>
-              <span>Return to the login flow or sign out.</span>
-            </a>
-          </div>
-        </section>
-
-        <section class="panel-card">
-          <h3>Student profile</h3>
-          <p id="studentDetails">Loading student profile details...</p>
-        </section>
-      </section>
-
-      <section id="resultsTab" class="tab-panel">
-        <div class="panel-card">
+        <div class="stat-card">
           <h3>Result Access</h3>
-          <p>Use the button below to open your latest academic result. Your access state and latest result summary are displayed here.</p>
-          <p><strong>Status:</strong> <span id="accessValueAlt">--</span></p>
-          <p><strong>Latest result:</strong> <span id="latestResultAlt">--</span></p>
-          <button class="primary-btn" onclick="window.location.href='student-result.html'"><ion-icon name="document-text-outline"></ion-icon> Open Result Page</button>
+          <p class="stat-value" id="accessValue">--</p>
         </div>
+      </div>
 
+      <div class="metric-grid">
+        <div class="metric-card">
+          <h3>Weekly performance</h3>
+          <p id="weeklyPerformance">Visit the results page to check your latest grades and class performance.</p>
+        </div>
+        <div class="metric-card">
+          <h3>Attendance rate</h3>
+          <p id="attendanceValue">--</p>
+        </div>
+      </div>
+
+      <section id="progress" class="panel-grid">
         <div class="panel-card">
-          <h3>Result summary</h3>
+          <h3>Retention metrics</h3>
           <ul>
-            <li><span>Student ID</span><strong id="studentIdValueAlt">--</strong></li>
-            <li><span>Class</span><strong id="classValueAlt">--</strong></li>
-            <li><span>Attendance</span><strong id="attendanceValueAlt">--</strong></li>
+            <li><span>Completed lessons</span><strong id="lessonsCompleted">--</strong></li>
+            <li><span>Active terms</span><strong id="activeTerms">--</strong></li>
+            <li><span>Pending fees</span><strong id="pendingFees">--</strong></li>
+          </ul>
+        </div>
+        <div class="panel-card">
+          <h3>Performance summary</h3>
+          <ul>
+            <li><span>Assignment status</span><strong id="assignmentStatus">--</strong></li>
+            <li><span>Exam readiness</span><strong id="examReadiness">--</strong></li>
+            <li><span>Latest result</span><strong id="latestResult">--</strong></li>
           </ul>
         </div>
       </section>
 
-      <section id="announcementsTab" class="tab-panel">
-        <section class="panel-card">
-          <h3>Latest announcements</h3>
-          <p id="announcementPanel">No new announcements. Check back later for updates from your school.</p>
-        </section>
-        <section class="panel-card">
-          <h3>Action items</h3>
-          <ul>
-            <li>Check results from the Results tab.</li>
-            <li>Review your attendance and profile information.</li>
-            <li>Contact your school if any details are incorrect.</li>
-          </ul>
-        </section>
+      <section id="announcements" class="panel-card">
+        <h3>Latest announcements</h3>
+        <p id="announcementPanel">No new announcements. Check back later for updates from your school.</p>
       </section>
 
-      <section id="settingsTab" class="tab-panel">
-        <section class="panel-card">
-          <h3>Account settings</h3>
-          <p>Student name: <strong id="settingsStudentName">--</strong></p>
-          <p>School ID: <strong id="settingsSchoolId">--</strong></p>
-          <p>Student ID: <strong id="settingsStudentId">--</strong></p>
-          <p>Class: <strong id="settingsClassValue">--</strong></p>
-        </section>
-        <section class="panel-card">
-          <h3>Theme</h3>
-          <p>Toggle between light and dark mode for your dashboard.</p>
-          <button class="secondary-btn" onclick="toggleTheme()" id="settingsThemeButton"><ion-icon name="sunny-outline"></ion-icon> Change theme</button>
-        </section>
-        <section class="panel-card">
-          <h3>Logout</h3>
-          <button class="logout-btn" onclick="showLogoutModal()">Logout</button>
-        </section>
+      <section id="actions" class="panel-card">
+        <h3>Quick actions</h3>
+        <div class="quick-links">
+          <a class="quick-link" href="student-result.html">
+            <ion-icon name="document-text-outline"></ion-icon>
+            <strong>Check Result</strong>
+            <span>Open your most recent result information.</span>
+          </a>
+          <a class="quick-link" href="student-history.html">
+            <ion-icon name="time-outline"></ion-icon>
+            <strong>View History</strong>
+            <span>Review academic history and promotion decisions.</span>
+          </a>
+          <a class="quick-link" href="student-login.html">
+            <ion-icon name="person-outline"></ion-icon>
+            <strong>Profile</strong>
+            <span>Return to the login flow or sign out.</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="profile" class="panel-card">
+        <h3>Student profile</h3>
+        <p id="studentDetails">Loading student profile details...</p>
       </section>
     </main>
   </div>
@@ -981,8 +904,41 @@
         || 'light';
     }
 
+    function getStoredAccent() {
+      try {
+        const school = JSON.parse(localStorage.getItem('school') || 'null');
+        if (school && school.accentColor) {
+          return school.accentColor;
+        }
+      } catch (error) {
+        console.warn('Could not parse stored school accent:', error);
+      }
+      return localStorage.getItem('dashboardAccent');
+    }
+
+    function adjustColor(hex, amount) {
+      let col = (hex || '#66cccc').replace('#', '');
+      let num = parseInt(col, 16);
+
+      let r = (num >> 16) + amount;
+      let g = ((num >> 8) & 0x00FF) + amount;
+      let b = (num & 0x0000FF) + amount;
+
+      r = Math.max(0, Math.min(255, r));
+      g = Math.max(0, Math.min(255, g));
+      b = Math.max(0, Math.min(255, b));
+
+      return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+    }
+
+    function applyAccent(accent) {
+      if (!accent) return;
+      document.documentElement.style.setProperty('--accent', accent);
+      document.documentElement.style.setProperty('--accent-hover', adjustColor(accent, -18));
+    }
+
     function applyTheme(theme, save = true) {
-      const themeButtons = document.querySelectorAll('.theme-btn, #settingsThemeButton');
+      const themeButton = document.getElementById('themeButton');
       const isLight = theme === 'light';
 
       document.body.classList.toggle('dark', !isLight);
@@ -1007,12 +963,14 @@
         document.documentElement.style.setProperty('--shadow', '0 14px 35px rgba(0,0,0,0.28)');
       }
 
-      themeButtons.forEach(button => {
-        button.innerHTML = isLight
-          ? '<ion-icon name="moon-outline"></ion-icon> Dark mode'
-          : '<ion-icon name="sunny-outline"></ion-icon> Light mode';
-        button.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
-      });
+      applyAccent(getStoredAccent());
+
+      if (themeButton) {
+        themeButton.innerHTML = isLight
+          ? '<ion-icon name="moon-outline"></ion-icon>Dark mode'
+          : '<ion-icon name="sunny-outline"></ion-icon>Light mode';
+        themeButton.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+      }
 
       if (save) {
         localStorage.setItem('studentDashboardTheme', theme);
@@ -1046,13 +1004,11 @@
       logout();
     }
 
-    function showTab(tabName, btn) {
-      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(button => button.classList.remove('active'));
-      document.getElementById(tabName + 'Tab').classList.add('active');
-      btn.classList.add('active');
-      if (window.innerWidth <= 1040) {
+    function scrollToSection(id) {
+      const section = document.getElementById(id);
+      if (section) {
         closeSidebar();
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
 
@@ -1102,15 +1058,6 @@
       document.getElementById('classValue').textContent = classArm;
       document.getElementById('portalValue').textContent = portalStatus;
       document.getElementById('accessValue').textContent = resultAccess;
-      document.getElementById('accessValueAlt').textContent = resultAccess;
-      document.getElementById('latestResultAlt').textContent = result;
-      document.getElementById('studentIdValueAlt').textContent = student.studentId || '--';
-      document.getElementById('classValueAlt').textContent = classArm;
-      document.getElementById('attendanceValueAlt').textContent = attendance;
-      document.getElementById('settingsStudentName').textContent = name;
-      document.getElementById('settingsSchoolId').textContent = student.schoolId || '--';
-      document.getElementById('settingsStudentId').textContent = student.studentId || '--';
-      document.getElementById('settingsClassValue').textContent = classArm;
       document.getElementById('schoolIdPill').textContent = `School ID: ${student.schoolId || '--'}`;
       const studentStatusEl = document.getElementById('studentStatus');
       if (studentStatusEl) {
@@ -1168,6 +1115,21 @@
     window.addEventListener('storage', (event) => {
       if (event.key === 'studentDashboardTheme' || event.key === 'studentResultTheme') {
         applyTheme(event.newValue || 'light', false);
+      }
+
+      if (event.key === 'dashboardAccent') {
+        applyAccent(event.newValue || getStoredAccent());
+      }
+
+      if (event.key === 'school') {
+        try {
+          const school = JSON.parse(event.newValue || 'null');
+          if (school && school.accentColor) {
+            applyAccent(school.accentColor);
+          }
+        } catch (error) {
+          console.warn('Failed to parse updated school accent from storage event:', error);
+        }
       }
     });
   </script>

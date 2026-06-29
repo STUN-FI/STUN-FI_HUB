@@ -2723,6 +2723,16 @@ function applyAccentColor() {
   const color = document.getElementById("accentColorInput").value || "#66cccc";
   document.documentElement.style.setProperty("--accent", color);
   document.documentElement.style.setProperty("--accent-hover", adjustColor(color, -18));
+  localStorage.setItem("dashboardAccent", color);
+
+  try {
+    const school = JSON.parse(localStorage.getItem("school") || "null") || {};
+    school.accentColor = color;
+    localStorage.setItem("school", JSON.stringify(school));
+  } catch (error) {
+    console.warn("Could not persist accent color to school storage:", error);
+  }
+
   toast("Accent color applied", "success");
 }
 
