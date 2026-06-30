@@ -938,7 +938,10 @@
           ? '<ion-icon name="moon-outline"></ion-icon><span>Dark Mode</span>'
           : '<ion-icon name="sunny-outline"></ion-icon><span>Light Mode</span>';
       }
-      document.getElementById('themeLabel').textContent = isLight ? 'Light' : 'Dark';
+      const themeLabel = document.getElementById('themeLabel');
+      if (themeLabel) {
+        themeLabel.textContent = isLight ? 'Light' : 'Dark';
+      }
       if (save) {
         localStorage.setItem('studentDashboardTheme', theme);
         localStorage.setItem('dashboardTheme', theme);
