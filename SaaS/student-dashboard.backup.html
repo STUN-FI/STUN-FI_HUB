@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STUN-FI HUB | Student Dashboard</title>
+  <link rel="icon" href="img/Favicon.png?v=2" type="image/png" sizes="any">
+  <link rel="shortcut icon" href="img/Favicon.png?v=2" type="image/x-icon">
+  <link rel='stylesheet' href='styles.css'>
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+  <script src="js/config.js"></script>
+  <style>
+    :root {
+      --accent: #66cccc;
+      --accent-hover: #54b8b8;
+      --bg: #f4f7fb;
+      --sidebar: #020617;
+      --sidebar-text: #e5e7eb;
+      --sidebar-border: 1px solid rgba(255,255,255,0.08);
+      --sidebar-brand-border: rgba(255,255,255,0.08);
+      --sidebar-item-bg: rgba(255,255,255,0.04);
+      --sidebar-item-hover-bg: rgba(102,204,204,0.12);
+      --card: #ffffff;
+      --card-2: #f8fafc;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
+      --topbar-bg: rgba(255,255,255,0.92);
+      --topbar-border: 1px solid rgba(102,204,204,0.18);
+      --topbar-shadow: 0 32px 80px rgba(15, 23, 42, 0.08);
+      --topbar-radius: 24px;
+    }
+
+    body.dark {
+      --bg: #0b1120;
+      --sidebar: #020617;
+      --card: #111827;
+      --card-2: #0f172a;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --line: rgba(255,255,255,0.08);
+      --shadow: 0 14px 35px rgba(0,0,0,0.28);
+      --topbar-bg: rgba(6,11,25,0.95);
+      --topbar-border: 1px solid rgba(255,255,255,0.08);
+      --topbar-shadow: 0 30px 80px rgba(0,0,0,0.35);
+      --topbar-radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .layout {
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      overflow: hidden;
+      transition: grid-template-columns 0.3s ease;
+    }
+
+    .layout.collapsed {
+      grid-template-columns: 0 1fr;
+    }
+
+    .sidebar-close {
+      display: none;
+      width: 44px;
+      height: 44px;
+      margin-left: auto;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.08);
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar {
+      background: #020617;
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: visible;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      transform: translateX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .layout.collapsed .sidebar {
+      transform: translateX(-100%);
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .sidebar-brand img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+
+    .sidebar-brand h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--sidebar-text);
+    }
+
+    .nav-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      color: var(--sidebar-text);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .nav-item.active,
+    .nav-item:hover {
+      border-color: rgba(102,204,204,0.25);
+      background: rgba(102,204,204,0.12);
+    }
+
+    .nav-item ion-icon {
+      font-size: 1.2rem;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      display: grid;
+      gap: 10px;
+    }
+
+    .sidebar-footer button {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      background: rgba(255,255,255,0.06);
+      color: var(--sidebar-text);
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .sidebar-footer .logout-btn {
+      background: var(--danger) !important;
+      color: #fff !important;
+      border: none;
+    }
+
+    .sidebar-footer .logout-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(0.95);
+    }
+
+    .sidebar-footer button:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.1);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 1000;
+      padding: 16px;
+      pointer-events: none;
+    }
+
+    .modal-backdrop.active {
+      display: flex !important;
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    .modal-dialog {
+      width: min(420px, 100%);
+      background: var(--card);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+      border: 1px solid rgba(102, 204, 204, 0.18);
+    }
+
+    .modal-dialog h3 {
+      margin: 0 0 12px;
+      font-size: 1.2rem;
+    }
+
+    .modal-dialog p {
+      margin: 0 0 24px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .modal-actions button {
+      min-width: 110px;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .modal-actions button.primary {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .modal-actions button.secondary {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    header.topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      padding: 28px 32px;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+      z-index: auto;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 24px;
+    }
+
+    header.topbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .topbar-left {
+      min-width: 0;
+      overflow: hidden;
+      flex: 1 1 0;
+    }
+
+    .topbar-actions {
+      min-width: 0;
+      flex: 0 1 auto;
+      justify-content: flex-end;
+    }
+
+    .topbar-left h1 {
+      margin: 0;
+      font-size: 2.4rem;
+      line-height: 1.05;
+    }
+
+    .topbar-subtitle {
+      margin: 10px 0 0;
+      color: var(--muted);
+      max-width: 760px;
+      line-height: 1.6;
+    }
+
+    .topbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: flex-end;
+      min-width: 260px;
+      width: min(100%, 420px);
+    }
+
+    .topbar-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .sidebar-toggle {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      border: none;
+      background: rgba(102,108,255,0.95);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      min-width: 58px;
+    }
+
+    .topbar-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      min-width: 220px;
+      padding: 16px 20px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(102,204,204,0.18);
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .result-button {
+      width: 100%;
+      border: none;
+      background: rgba(102, 108, 255, 0.95);
+      color: #fff;
+      box-shadow: 0 18px 40px rgba(84, 86, 255, 0.2);
+      border-radius: 20px;
+      padding: 18px 22px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .result-button ion-icon {
+      font-size: 1.2rem;
+    }
+
+    .result-button ion-icon {
+      font-size: 1.2rem;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .main {
+      padding: 28px 32px;
+      overflow-y: auto;
+      min-height: 100%;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .page-header h2 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card,
+    .metric-card,
+    .panel-card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card {
+      padding: 16px;
+    }
+
+    .stat-card h3,
+    .metric-card h3,
+    .panel-card h3 {
+      margin: 0 0 12px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0;
+      color: var(--text);
+    }
+
+    .metric-card p,
+    .panel-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .metric-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(102,204,204,0.16);
+      color: var(--accent);
+      font-weight: 700;
+      margin-top: 14px;
+    }
+
+    .panel-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .panel-card ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel-card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .panel-card li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .panel-card li strong {
+      color: var(--text);
+    }
+
+    .quick-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .quick-link {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text);
+      text-decoration: none;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .quick-link:hover {
+      transform: translateY(-2px);
+      background: rgba(102,204,204,0.12);
+    }
+
+    .quick-link ion-icon {
+      font-size: 1.4rem;
+      color: var(--accent);
+    }
+
+    .sidebar-toggle {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      border: none;
+      background: rgba(102,108,255,0.95);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      min-width: 58px;
+    }
+
+    .sidebar-toggle:hover {
+      background: rgba(84,86,255,1);
+      transform: translateY(-1px);
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 99;
+      transition: opacity 0.2s ease;
+      opacity: 0;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .sidebar-toggle {
+      display: inline-flex;
+    }
+
+    @media (max-width: 1040px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .layout.collapsed {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        z-index: 100;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+      }
+
+      .sidebar.active {
+        transform: translateX(0);
+      }
+
+      .sidebar-close {
+        display: inline-flex;
+      }
+
+      .sidebar-toggle {
+        display: block;
+      }
+
+      .topbar-actions {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+      }
+
+      .topbar-row {
+        width: 100%;
+      }
+
+      .page-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .panel-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        overflow-x: hidden;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        width: min(280px, 90vw);
+      }
+
+      .sidebar-toggle {
+        position: fixed;
+        top: 16px;
+        left: 16px;
+      }
+
+      .topbar {
+        padding: 16px 20px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+      }
+
+      .topbar-left {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .topbar-left h1 {
+        font-size: 1.4rem;
+      }
+
+      .topbar-left p {
+        white-space: normal;
+        max-width: none;
+        margin-top: 8px;
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .topbar-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+      }
+
+      .topbar-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
+        flex-wrap: nowrap;
+      }
+
+      .topbar-row .topbar-pill {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .topbar-actions button,
+      .topbar-actions .topbar-pill {
+        width: auto;
+      }
+
+      .sidebar-toggle {
+        position: static;
+        top: unset;
+        left: unset;
+      }
+
+      .main {
+        padding: 16px;
+      }
+
+      .page-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .stats-grid,
+      .metric-grid,
+      .panel-grid,
+      .quick-links {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-card,
+      .stat-card,
+      .metric-card {
+        padding: 20px;
+      }
+
+      .quick-link {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <button class="sidebar-close" onclick="closeSidebar()"><ion-icon name="close-outline"></ion-icon></button>
+      <div class="sidebar-brand">
+        <img id="brandLogo" src="img/stunfi-logo-white.png" alt="STUN-FI Logo">
+        <h3>STUN-FI HUB</h3>
+      </div>
+
+      <nav class="nav-section">
+        <button class="nav-item active" onclick="scrollToSection('overview')">
+          <ion-icon name="grid-outline"></ion-icon>
+          Overview
+        </button>
+        <button class="nav-item" onclick="scrollToSection('progress')">
+          <ion-icon name="bar-chart-outline"></ion-icon>
+          Progress
+        </button>
+        <button class="nav-item" onclick="scrollToSection('announcements')">
+          <ion-icon name="megaphone-outline"></ion-icon>
+          Announcements
+        </button>
+        <button class="nav-item" onclick="scrollToSection('actions')">
+          <ion-icon name="document-text-outline"></ion-icon>
+          Quick Actions
+        </button>
+        <button class="nav-item" onclick="scrollToSection('profile')">
+          <ion-icon name="person-circle-outline"></ion-icon>
+          Profile
+        </button>
+        <button class="nav-item" onclick="window.location.href='student-history.html'">
+          <ion-icon name="time-outline"></ion-icon>
+          Academic History
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" id="themeButton" onclick="toggleTheme()">
+        <ion-icon name="sunny-outline"></ion-icon>
+        Light mode
+      </button>
+      <button type="button" class="logout-btn" id="logoutButton">Logout</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1>Welcome, <span id="topName">Student</span></h1>
+          <p class="topbar-subtitle">Check your announcements, account details, and result-access status here.</p>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="topbar-row">
+            <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" aria-label="Open menu">
+              <ion-icon name="menu-outline"></ion-icon>
+            </button>
+            <span class="topbar-pill" id="schoolIdPill">School ID: --</span>
+          </div>
+          <button class="result-button" type="button" onclick="window.location.href='student-result.html'">
+            <ion-icon name="document-text-outline"></ion-icon>
+            Result Access
+          </button>
+        </div>
+      </header>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Student ID</h3>
+          <p class="stat-value" id="studentIdValue">--</p>
+        </div>
+        <div class="stat-card">
+          <h3>Class</h3>
+          <p class="stat-value" id="classValue">--</p>
+        </div>
+        <div class="stat-card">
+          <h3>Portal Status</h3>
+          <p class="stat-value" id="portalValue">--</p>
+        </div>
+        <div class="stat-card">
+          <h3>Result Access</h3>
+          <p class="stat-value" id="accessValue">--</p>
+        </div>
+      </div>
+
+      <div class="metric-grid">
+        <div class="metric-card">
+          <h3>Weekly performance</h3>
+          <p id="weeklyPerformance">Visit the results page to check your latest grades and class performance.</p>
+        </div>
+        <div class="metric-card">
+          <h3>Attendance rate</h3>
+          <p id="attendanceValue">--</p>
+        </div>
+      </div>
+
+      <section id="progress" class="panel-grid">
+        <div class="panel-card">
+          <h3>Retention metrics</h3>
+          <ul>
+            <li><span>Completed lessons</span><strong id="lessonsCompleted">--</strong></li>
+            <li><span>Active terms</span><strong id="activeTerms">--</strong></li>
+            <li><span>Pending fees</span><strong id="pendingFees">--</strong></li>
+          </ul>
+        </div>
+        <div class="panel-card">
+          <h3>Performance summary</h3>
+          <ul>
+            <li><span>Assignment status</span><strong id="assignmentStatus">--</strong></li>
+            <li><span>Exam readiness</span><strong id="examReadiness">--</strong></li>
+            <li><span>Latest result</span><strong id="latestResult">--</strong></li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="announcements" class="panel-card">
+        <h3>Latest announcements</h3>
+        <p id="announcementPanel">No new announcements. Check back later for updates from your school.</p>
+      </section>
+
+      <section id="actions" class="panel-card">
+        <h3>Quick actions</h3>
+        <div class="quick-links">
+          <a class="quick-link" href="student-result.html">
+            <ion-icon name="document-text-outline"></ion-icon>
+            <strong>Check Result</strong>
+            <span>Open your most recent result information.</span>
+          </a>
+          <a class="quick-link" href="student-history.html">
+            <ion-icon name="time-outline"></ion-icon>
+            <strong>View History</strong>
+            <span>Review academic history and promotion decisions.</span>
+          </a>
+          <a class="quick-link" href="student-login.html">
+            <ion-icon name="person-outline"></ion-icon>
+            <strong>Profile</strong>
+            <span>Return to the login flow or sign out.</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="profile" class="panel-card">
+        <h3>Student profile</h3>
+        <p id="studentDetails">Loading student profile details...</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const student = JSON.parse(localStorage.getItem('student') || 'null');
+
+    if (!student || !student.studentId || !student.schoolId) {
+      window.location.href = 'student-login.html';
+    }
+
+    function getStoredTheme() {
+      return localStorage.getItem('studentDashboardTheme')
+        || localStorage.getItem('studentResultTheme')
+        || 'light';
+    }
+
+    function getStoredAccent() {
+      try {
+        const school = JSON.parse(localStorage.getItem('school') || 'null');
+        if (school && school.accentColor) {
+          return school.accentColor;
+        }
+      } catch (error) {
+        console.warn('Could not parse stored school accent:', error);
+      }
+      return localStorage.getItem('dashboardAccent');
+    }
+
+    function adjustColor(hex, amount) {
+      let col = (hex || '#66cccc').replace('#', '');
+      let num = parseInt(col, 16);
+
+      let r = (num >> 16) + amount;
+      let g = ((num >> 8) & 0x00FF) + amount;
+      let b = (num & 0x0000FF) + amount;
+
+      r = Math.max(0, Math.min(255, r));
+      g = Math.max(0, Math.min(255, g));
+      b = Math.max(0, Math.min(255, b));
+
+      return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+    }
+
+    function applyAccent(accent) {
+      if (!accent) return;
+      document.documentElement.style.setProperty('--accent', accent);
+      document.documentElement.style.setProperty('--accent-hover', adjustColor(accent, -18));
+    }
+
+    function applyTheme(theme, save = true) {
+      const themeButton = document.getElementById('themeButton');
+      const isLight = theme === 'light';
+
+      document.body.classList.toggle('dark', !isLight);
+
+      if (isLight) {
+        document.documentElement.style.setProperty('--bg', '#f4f7fb');
+        document.documentElement.style.setProperty('--sidebar', '#0f172a');
+        document.documentElement.style.setProperty('--card', '#ffffff');
+        document.documentElement.style.setProperty('--card-2', '#f8fafc');
+        document.documentElement.style.setProperty('--text', '#1f2937');
+        document.documentElement.style.setProperty('--muted', '#6b7280');
+        document.documentElement.style.setProperty('--line', '#e5e7eb');
+        document.documentElement.style.setProperty('--shadow', '0 14px 35px rgba(15, 23, 42, 0.08)');
+      } else {
+        document.documentElement.style.setProperty('--bg', '#0b1120');
+        document.documentElement.style.setProperty('--sidebar', '#020617');
+        document.documentElement.style.setProperty('--card', '#111827');
+        document.documentElement.style.setProperty('--card-2', '#0f172a');
+        document.documentElement.style.setProperty('--text', '#e5e7eb');
+        document.documentElement.style.setProperty('--muted', '#94a3b8');
+        document.documentElement.style.setProperty('--line', 'rgba(255,255,255,0.08)');
+        document.documentElement.style.setProperty('--shadow', '0 14px 35px rgba(0,0,0,0.28)');
+      }
+
+      applyAccent(getStoredAccent());
+
+      if (themeButton) {
+        themeButton.innerHTML = isLight
+          ? '<ion-icon name="moon-outline"></ion-icon>Dark mode'
+          : '<ion-icon name="sunny-outline"></ion-icon>Light mode';
+        themeButton.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+      }
+
+      if (save) {
+        localStorage.setItem('studentDashboardTheme', theme);
+        localStorage.setItem('studentResultTheme', theme);
+      }
+    }
+
+    function toggleTheme() {
+      const currentTheme = getStoredTheme();
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(nextTheme);
+    }
+
+    function logout() {
+      localStorage.removeItem('student');
+      window.location.href = 'student-login.html';
+    }
+
+    function showLogoutModal() {
+      const modal = document.getElementById('logoutModal');
+      modal.classList.add('active');
+    }
+
+    function hideLogoutModal() {
+      const modal = document.getElementById('logoutModal');
+      modal.classList.remove('active');
+    }
+
+    function confirmLogout() {
+      hideLogoutModal();
+      logout();
+    }
+
+    function scrollToSection(id) {
+      const section = document.getElementById(id);
+      if (section) {
+        closeSidebar();
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const layout = document.querySelector('.layout');
+
+      if (window.innerWidth <= 1040) {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+      } else {
+        layout.classList.toggle('collapsed');
+      }
+    }
+
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const layout = document.querySelector('.layout');
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      layout.classList.remove('collapsed');
+
+      if (window.innerWidth > 1040) {
+        localStorage.setItem('sidebarClosed', 'false');
+      }
+    }
+
+    window.addEventListener('load', () => {
+      const isClosed = localStorage.getItem('sidebarClosed') === 'true';
+      if (isClosed && window.innerWidth > 1040) {
+        document.querySelector('.layout').classList.add('collapsed');
+      }
+    });
+
+    function fillDashboard() {
+      const name = student.name || 'Student';
+      const classArm = [student.className, student.arm].filter(Boolean).join(' ').trim() || 'Unknown';
+      const portalStatus = student.portalStatus || (student.isActive ? 'Active' : 'Pending');
+      const resultAccess = student.resultReady ? 'Ready' : 'Not Ready';
+      const attendance = student.attendanceRate ? `${student.attendanceRate}%` : '88%';
+      const result = student.latestResult || 'No result yet';
+
+      document.getElementById('topName').textContent = name.split(' ')[0] || name;
+      document.getElementById('studentIdValue').textContent = student.studentId || '--';
+      document.getElementById('classValue').textContent = classArm;
+      document.getElementById('portalValue').textContent = portalStatus;
+      document.getElementById('accessValue').textContent = resultAccess;
+      document.getElementById('schoolIdPill').textContent = `School ID: ${student.schoolId || '--'}`;
+      const studentStatusEl = document.getElementById('studentStatus');
+      if (studentStatusEl) {
+        studentStatusEl.textContent = portalStatus === 'Active' ? 'Active student' : 'Pending student';
+      }
+      document.getElementById('attendanceValue').textContent = attendance;
+      document.getElementById('weeklyPerformance').textContent = 'Keep up the momentum — check results and history for the latest updates.';
+      document.getElementById('lessonsCompleted').textContent = student.completedLessons || '18';
+      document.getElementById('activeTerms').textContent = student.activeTerms || '1';
+      document.getElementById('pendingFees').textContent = student.pendingFees || 'None';
+      document.getElementById('assignmentStatus').textContent = student.assignmentStatus || 'On track';
+      document.getElementById('examReadiness').textContent = student.examReadiness || 'Preparing';
+      document.getElementById('latestResult').textContent = result;
+      document.getElementById('announcementPanel').textContent = student.latestAnnouncement || 'No new announcements at the moment.';
+      document.getElementById('studentDetails').innerHTML = `Name: ${name} <br>School ID: ${student.schoolId || '--'} <br>Student ID: ${student.studentId || '--'} <br>Class: ${classArm} <br>Session: ${student.session || '2025/2026'}`;
+    }
+
+    async function loadAnnouncements(schoolId) {
+      const announcementEl = document.getElementById('announcementPanel');
+      if (!announcementEl) return;
+
+      try {
+        const response = await fetch(window.api(`/posts/${encodeURIComponent(schoolId)}?audience=students`));
+        if (response.ok) {
+          const posts = await response.json();
+          if (Array.isArray(posts) && posts.length > 0) {
+            const latest = posts[0];
+            announcementEl.textContent = latest.text || latest.message || latest.title || 'No new announcements at the moment.';
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Announcements load failed:', error);
+      }
+
+      announcementEl.textContent = student.latestAnnouncement || 'No new announcements at the moment.';
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = getStoredTheme();
+      applyTheme(savedTheme, false);
+      fillDashboard();
+      loadAnnouncements(student.schoolId || '');
+
+      document.getElementById('logoutButton').addEventListener('click', showLogoutModal);
+      document.getElementById('confirmLogoutBtn').addEventListener('click', confirmLogout);
+      document.getElementById('cancelLogoutBtn').addEventListener('click', hideLogoutModal);
+      document.getElementById('logoutModal').addEventListener('click', (event) => {
+        if (event.target === event.currentTarget) {
+          hideLogoutModal();
+        }
+      });
+    });
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'studentDashboardTheme' || event.key === 'studentResultTheme') {
+        applyTheme(event.newValue || 'light', false);
+      }
+
+      if (event.key === 'dashboardAccent') {
+        applyAccent(event.newValue || getStoredAccent());
+      }
+
+      if (event.key === 'school') {
+        try {
+          const school = JSON.parse(event.newValue || 'null');
+          if (school && school.accentColor) {
+            applyAccent(school.accentColor);
+          }
+        } catch (error) {
+          console.warn('Failed to parse updated school accent from storage event:', error);
+        }
+      }
+    });
+  </script>
+
+  <div class="modal-backdrop" id="logoutModal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <h3>Confirm logout</h3>
+      <p>Are you sure you want to log out? Your progress will be saved in your account.</p>
+      <div class="modal-actions">
+        <button type="button" class="secondary" id="cancelLogoutBtn">Cancel</button>
+        <button type="button" class="primary" id="confirmLogoutBtn">Logout</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
