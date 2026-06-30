@@ -668,9 +668,6 @@
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
   <div class="layout" id="layout">
     <aside class="sidebar" id="sidebar">
-      <button class="sidebar-close" type="button" onclick="closeSidebar()" aria-label="Close menu">
-        <ion-icon name="close-outline"></ion-icon>
-      </button>
       <div class="brand-card school-brand-card">
         <div>
           <h3 id="sidebarSchoolTitle">STUN-FI HUB</h3>
@@ -1021,8 +1018,9 @@
       const sidebarAvatar = document.getElementById('sidebarAvatar');
       const sidebarProfileImage = document.getElementById('sidebarProfileImage');
       const sidebarProfileInitials = document.getElementById('sidebarProfileInitials');
-      const schoolLogo = (JSON.parse(localStorage.getItem('school') || 'null') || {}).logo || '';
-      const schoolName = (JSON.parse(localStorage.getItem('school') || 'null') || {}).name || 'School';
+      const storedSchool = JSON.parse(localStorage.getItem('school') || 'null') || {};
+      const schoolLogo = storedSchool.logo || '';
+      const schoolName = student?.schoolName || storedSchool.name || student?.schoolId || 'School';
       const studentPhoto = student?.photo || student?.avatar || student?.image || '';
       document.getElementById('sidebarName').textContent = name;
       document.getElementById('sidebarSchoolTitle').textContent = schoolName;
@@ -1037,6 +1035,11 @@
         }
       } else {
         document.getElementById('sidebarInitials').textContent = initials || 'ST';
+      }
+      if (studentPhoto) {
+        sidebarProfileImage.innerHTML = `<img src="${studentPhoto}" alt="${name} profile">`;
+      } else {
+        sidebarProfileInitials.textContent = initials || 'ST';
       }
       if (studentPhoto) {
         sidebarProfileImage.innerHTML = `<img src="${studentPhoto}" alt="${name} profile">`;
