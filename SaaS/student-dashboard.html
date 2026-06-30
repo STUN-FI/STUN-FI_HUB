@@ -132,7 +132,63 @@
 
     .nav-section {
       display: grid;
+      gap: 14px;
+    }
+
+    .profile-card {
+      display: grid;
+      gap: 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px;
+      padding: 18px;
+    }
+
+    .profile-card .avatar {
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: white;
+    }
+
+    .profile-card h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: white;
+    }
+
+    .profile-card .meta {
+      display: grid;
       gap: 8px;
+    }
+
+    .profile-card .meta span {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--sidebar-muted);
+      font-size: 0.92rem;
+    }
+
+    .sidebar-note {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 16px;
+      color: var(--sidebar-text);
+      line-height: 1.5;
+    }
+
+    .sidebar-note h4 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      color: white;
     }
 
     .nav-item {
@@ -437,22 +493,18 @@
       </div>
 
       <nav class="nav-section">
-        <button class="nav-item active" type="button" data-tab="overview">
-          <ion-icon name="grid-outline"></ion-icon>
-          <span>Overview</span>
-        </button>
-        <button class="nav-item" type="button" data-tab="results">
-          <ion-icon name="document-text-outline"></ion-icon>
-          <span>Results</span>
-        </button>
-        <button class="nav-item" type="button" data-tab="announcements">
-          <ion-icon name="megaphone-outline"></ion-icon>
-          <span>Announcements</span>
-        </button>
-        <button class="nav-item" type="button" data-tab="settings">
-          <ion-icon name="settings-outline"></ion-icon>
-          <span>Settings</span>
-        </button>
+        <div class="profile-card">
+          <div class="avatar"><span id="sidebarInitials">ST</span></div>
+          <h3 id="sidebarName">Student Name</h3>
+          <div class="meta">
+            <span><strong>Student ID</strong><span id="sidebarStudentId">STD0000</span></span>
+            <span><strong>Class</strong><span id="sidebarClass">JSS1</span></span>
+          </div>
+        </div>
+        <div class="sidebar-note">
+          <h4>Profile Overview</h4>
+          <p>Use this section for a quick profile summary and to access your academic history.</p>
+        </div>
         <button class="nav-item" type="button" onclick="window.location.href='student-history.html'">
           <ion-icon name="time-outline"></ion-icon>
           <span>Academic History</span>
@@ -687,6 +739,11 @@
       document.getElementById('profileSnapshot').textContent = `${student?.schoolName || 'School'} • ${student?.className || student?.class || 'N/A'} • ${student?.studentId || 'N/A'}`;
       document.getElementById('studentIdValue').textContent = student?.studentId || '--';
       document.getElementById('classValue').textContent = student?.className || student?.class || '--';
+      const initials = name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
+      document.getElementById('sidebarInitials').textContent = initials || 'ST';
+      document.getElementById('sidebarName').textContent = name;
+      document.getElementById('sidebarStudentId').textContent = student?.studentId || '--';
+      document.getElementById('sidebarClass').textContent = student?.className || student?.class || '--';
       document.getElementById('portalValue').textContent = student?.portalStatus || 'Active';
       document.getElementById('accessValue').textContent = student?.resultAccess || 'Enabled';
       document.getElementById('attendanceValue').textContent = student?.attendance || '96%';
