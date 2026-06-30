@@ -466,34 +466,14 @@
       background: var(--accent-soft);
     }
 
-    .overview-card.fees {
-      background: rgba(34, 197, 94, 0.1);
-      border-color: rgba(34, 197, 94, 0.16);
+    .overview-card {
+      border-color: var(--accent-soft);
     }
 
-    .overview-card.fees .card-top ion-icon {
-      color: #16a34a;
-      background: rgba(22, 163, 74, 0.12);
-    }
-
-    .overview-card.results {
-      background: rgba(14, 165, 233, 0.1);
-      border-color: rgba(14, 165, 233, 0.16);
-    }
-
-    .overview-card.results .card-top ion-icon {
-      color: #0ea5e9;
-      background: rgba(14, 165, 233, 0.12);
-    }
-
+    .overview-card.fees,
+    .overview-card.results,
     .overview-card.courses {
-      background: rgba(59, 130, 246, 0.1);
-      border-color: rgba(59, 130, 246, 0.16);
-    }
-
-    .overview-card.courses .card-top ion-icon {
-      color: #2563eb;
-      background: rgba(37, 99, 235, 0.12);
+      background: var(--card);
     }
 
     .stat-card h3 { margin: 0 0 8px; font-size: .95rem; color: var(--muted); }
@@ -671,6 +651,8 @@
       .hero-card { grid-template-columns: 1fr; }
       .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .panel-grid { grid-template-columns: 1fr; }
+      .tab-row { flex-direction: column; }
+      .tab-btn { width: 100%; }
     }
 
     @media (max-width: 620px) {
@@ -750,6 +732,36 @@
         </div>
       </header>
 
+      <section class="overview-cards">
+        <div class="overview-card courses">
+          <div class="card-top">
+            <ion-icon name="book-outline"></ion-icon>
+            <div>
+              <h4>Courses Registered</h4>
+            </div>
+          </div>
+          <strong id="coursesCount">-- courses</strong>
+        </div>
+        <div class="overview-card results">
+          <div class="card-top">
+            <ion-icon name="bar-chart-outline"></ion-icon>
+            <div>
+              <h4>Results Published</h4>
+            </div>
+          </div>
+          <strong id="resultsCount">-- results</strong>
+        </div>
+        <div class="overview-card fees">
+          <div class="card-top">
+            <ion-icon name="wallet-outline"></ion-icon>
+            <div>
+              <h4>Fees paid</h4>
+            </div>
+          </div>
+          <strong id="feesPaid">-- NGN</strong>
+        </div>
+      </section>
+
       <div class="tab-row" role="tablist" aria-label="Student sections">
         <button class="tab-btn active" type="button" data-tab="overview"><ion-icon name="grid-outline"></ion-icon>Overview</button>
         <button class="tab-btn" type="button" data-tab="results"><ion-icon name="document-text-outline"></ion-icon>Results</button>
@@ -767,36 +779,6 @@
           <div class="sub-card">
             <h3>Profile Snapshot</h3>
             <p class="muted" id="profileSnapshot">Loading student profile…</p>
-          </div>
-        </section>
-
-        <section class="overview-cards">
-          <div class="overview-card courses">
-            <div class="card-top">
-              <ion-icon name="book-outline"></ion-icon>
-              <div>
-                <h4>Courses Registered</h4>
-              </div>
-            </div>
-            <strong id="coursesCount">-- courses</strong>
-          </div>
-          <div class="overview-card results">
-            <div class="card-top">
-              <ion-icon name="bar-chart-outline"></ion-icon>
-              <div>
-                <h4>Results Published</h4>
-              </div>
-            </div>
-            <strong id="resultsCount">-- results</strong>
-          </div>
-          <div class="overview-card fees">
-            <div class="card-top">
-              <ion-icon name="wallet-outline"></ion-icon>
-              <div>
-                <h4>Fees paid</h4>
-              </div>
-            </div>
-            <strong id="feesPaid">-- NGN</strong>
           </div>
         </section>
 
