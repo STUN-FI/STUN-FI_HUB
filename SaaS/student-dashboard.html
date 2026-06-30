@@ -264,6 +264,15 @@
       border-radius: 999px;
       font-weight: 700;
       box-shadow: var(--shadow);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn ion-icon {
+      font-size: 1.1rem;
+      display: inline-flex;
+      vertical-align: middle;
     }
 
     .tab-btn.active {
@@ -478,10 +487,10 @@
       </header>
 
       <div class="tab-row" role="tablist" aria-label="Student sections">
-        <button class="tab-btn active" type="button" data-tab="overview">Overview</button>
-        <button class="tab-btn" type="button" data-tab="results">Results</button>
-        <button class="tab-btn" type="button" data-tab="announcements">Announcements</button>
-        <button class="tab-btn" type="button" data-tab="settings">Settings</button>
+        <button class="tab-btn active" type="button" data-tab="overview"><ion-icon name="grid-outline"></ion-icon>Overview</button>
+        <button class="tab-btn" type="button" data-tab="results"><ion-icon name="document-text-outline"></ion-icon>Results</button>
+        <button class="tab-btn" type="button" data-tab="announcements"><ion-icon name="megaphone-outline"></ion-icon>Announcements</button>
+        <button class="tab-btn" type="button" data-tab="settings"><ion-icon name="settings-outline"></ion-icon>Settings</button>
       </div>
 
       <div class="content-grid">
