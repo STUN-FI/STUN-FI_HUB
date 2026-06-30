@@ -615,6 +615,10 @@ const studentSchema = new mongoose.Schema(
 
     email: { type: String, default: "" },
     phone: { type: String, default: "" },
+    gender: { type: String, default: "" },
+    dob: { type: String, default: "" },
+    homeTown: { type: String, default: "" },
+    contactAddress: { type: String, default: "" },
     password: { type: String, default: "" },
 
     resetToken: String,
@@ -1454,11 +1458,61 @@ app.post("/student-login", async (req, res) => {
         arm: student.arm,
         regNumber: student.regNumber,
         email: student.email,
-        phone: student.phone
+        phone: student.phone,
+        gender: student.gender || "",
+        dob: student.dob || "",
+        homeTown: student.homeTown || "",
+        contactAddress: student.contactAddress || ""
       }
     });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.put("/student-profile", verifyToken, async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== "student") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const studentId = req.user.studentId;
+    const schoolId = req.user.schoolId;
+    const student = await Student.findOne({ studentId, schoolId });
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    student.email = normalizeEmail(req.body.email || "");
+    student.phone = (req.body.phone || "").trim();
+    student.gender = (req.body.gender || "").trim();
+    student.dob = (req.body.dob || "").trim();
+    student.homeTown = (req.body.homeTown || "").trim();
+    student.contactAddress = (req.body.contactAddress || "").trim();
+
+    await student.save();
+
+    res.json({
+      message: "Profile updated successfully",
+      student: {
+        studentId: student.studentId,
+        name: student.name,
+        schoolId: student.schoolId,
+        className: student.className,
+        arm: student.arm,
+        regNumber: student.regNumber,
+        email: student.email,
+        phone: student.phone,
+        gender: student.gender || "",
+        dob: student.dob || "",
+        homeTown: student.homeTown || "",
+        contactAddress: student.contactAddress || ""
+      }
+    });
+  } catch (error) {
+    console.error("Error updating student profile:", error);
+    res.status(500).json({ message: "Error saving profile" });
   }
 });
 

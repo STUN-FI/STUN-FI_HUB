@@ -75,6 +75,9 @@
       border-right: 1px solid rgba(255,255,255,0.08);
       position: relative;
       min-height: 100vh;
+      max-height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
       transition: transform 0.3s ease, opacity 0.3s ease;
       z-index: 60;
     }
@@ -83,20 +86,6 @@
       transform: translateX(-100%);
       opacity: 0;
       pointer-events: none;
-    }
-
-    .sidebar-close {
-      display: none;
-      width: 42px;
-      height: 42px;
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 14px;
-      background: rgba(255,255,255,0.08);
-      color: white;
-      font-size: 22px;
-      align-items: center;
-      justify-content: center;
-      margin-left: auto;
     }
 
     .brand-card {
@@ -109,19 +98,19 @@
       border: 1px solid rgba(255,255,255,0.08);
     }
 
-    .brand-card img {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.08);
-      padding: 4px;
-    }
-
     .brand-card h3 {
       margin: 0;
       font-size: 1rem;
       color: white;
+    }
+
+    .school-brand-card {
+      border-color: rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .school-brand-card h3 {
+      color: var(--accent);
     }
 
     .brand-card p {
@@ -144,10 +133,67 @@
       padding: 18px;
     }
 
+    .profile-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
     .profile-card .avatar {
       width: 78px;
       height: 78px;
+      min-width: 78px;
       border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: white;
+      overflow: hidden;
+    }
+
+    .profile-card .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .profile-card h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: white;
+    }
+
+    .profile-card .sidebar-school {
+      margin: 6px 0 0;
+      color: var(--sidebar-muted);
+      font-size: 0.9rem;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--sidebar-muted);
+      font-size: 0.92rem;
+    }
+
+    .profile-image-card {
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px;
+      padding: 20px;
+      gap: 14px;
+    }
+
+    .profile-image-card img,
+    .profile-image-card .avatar {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      object-fit: cover;
       background: rgba(255,255,255,0.12);
       display: inline-flex;
       align-items: center;
@@ -157,38 +203,12 @@
       color: white;
     }
 
-    .profile-card h3 {
+    .profile-image-card p {
       margin: 0;
-      font-size: 1rem;
-      color: white;
-    }
-
-    .profile-card .meta {
-      display: grid;
-      gap: 8px;
-    }
-
-    .profile-card .meta span {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      color: var(--sidebar-muted);
-      font-size: 0.92rem;
-    }
-
-    .sidebar-note {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      padding: 16px;
       color: var(--sidebar-text);
+      text-align: center;
       line-height: 1.5;
-    }
-
-    .sidebar-note h4 {
-      margin: 0 0 8px;
       font-size: 0.95rem;
-      color: white;
     }
 
     .nav-item {
@@ -249,6 +269,32 @@
     .main-panel {
       padding: 20px 22px 28px;
       min-width: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .main-watermark {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.08;
+    }
+
+    .main-watermark img {
+      max-width: min(320px, 45%);
+      max-height: min(320px, 45%);
+      width: auto;
+      height: auto;
+      filter: grayscale(100%);
+      object-fit: contain;
+    }
+
+    .main-panel > * {
+      position: relative;
+      z-index: 1;
     }
 
     .topbar {
@@ -372,10 +418,82 @@
       margin-bottom: 10px;
     }
 
-    .stats-grid {
+    .overview-cards {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 16px;
+      margin-top: 10px;
+    }
+
+    .overview-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+      min-height: 170px;
+      box-shadow: var(--shadow);
+    }
+
+    .overview-card h4 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    .overview-card strong {
+      display: block;
+      margin-top: 12px;
+      font-size: 1.6rem;
+      color: var(--text);
+    }
+
+    .overview-card .card-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .overview-card .card-top ion-icon {
+      font-size: 1.5rem;
+      color: var(--accent);
+      min-width: 42px;
+      min-height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: var(--accent-soft);
+    }
+
+    .overview-card.fees {
+      background: rgba(34, 197, 94, 0.1);
+      border-color: rgba(34, 197, 94, 0.16);
+    }
+
+    .overview-card.fees .card-top ion-icon {
+      color: #16a34a;
+      background: rgba(22, 163, 74, 0.12);
+    }
+
+    .overview-card.results {
+      background: rgba(14, 165, 233, 0.1);
+      border-color: rgba(14, 165, 233, 0.16);
+    }
+
+    .overview-card.results .card-top ion-icon {
+      color: #0ea5e9;
+      background: rgba(14, 165, 233, 0.12);
+    }
+
+    .overview-card.courses {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.16);
+    }
+
+    .overview-card.courses .card-top ion-icon {
+      color: #2563eb;
+      background: rgba(37, 99, 235, 0.12);
     }
 
     .stat-card h3 { margin: 0 0 8px; font-size: .95rem; color: var(--muted); }
@@ -425,6 +543,94 @@
       background: var(--card-2);
     }
 
+    .profile-form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .profile-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .profile-field label {
+      font-weight: 700;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .profile-field input,
+    .profile-field select,
+    .profile-field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .profile-field input:read-only,
+    .profile-field textarea:read-only,
+    .profile-field select:disabled {
+      background: rgba(148,163,184,0.12);
+      color: var(--muted);
+      border-color: rgba(148,163,184,0.32);
+    }
+
+    .form-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .form-message {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: var(--text);
+      opacity: 0.9;
+      transition: color 0.2s ease, opacity 0.2s ease;
+    }
+
+    .form-message.success {
+      color: var(--accent);
+    }
+
+    .form-message.error {
+      color: #f77;
+    }
+
+    .form-btn {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .form-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .form-btn.primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .form-btn.secondary {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
     .muted { color: var(--muted); }
 
     .sidebar-overlay {
@@ -460,7 +666,6 @@
         opacity: 1;
         pointer-events: auto;
       }
-      .sidebar-close { display: inline-flex; }
       .topbar { flex-direction: column; }
       .topbar-actions { justify-content: flex-start; }
       .hero-card { grid-template-columns: 1fr; }
@@ -484,26 +689,32 @@
       <button class="sidebar-close" type="button" onclick="closeSidebar()" aria-label="Close menu">
         <ion-icon name="close-outline"></ion-icon>
       </button>
-      <div class="brand-card">
-        <img src="img/stunfi-logo-white.png" alt="STUN-FI Logo" />
+      <div class="brand-card school-brand-card">
         <div>
-          <h3>STUN-FI HUB</h3>
+          <h3 id="sidebarSchoolTitle">STUN-FI HUB</h3>
           <p>Student portal</p>
         </div>
       </div>
 
       <nav class="nav-section">
         <div class="profile-card">
-          <div class="avatar"><span id="sidebarInitials">ST</span></div>
-          <h3 id="sidebarName">Student Name</h3>
+          <div class="profile-card-header">
+            <div class="avatar" id="sidebarAvatar">
+              <span id="sidebarInitials">ST</span>
+            </div>
+            <div>
+              <h3 id="sidebarName">Student Name</h3>
+              <p class="sidebar-school" id="sidebarSchoolName">School Name</p>
+            </div>
+          </div>
           <div class="meta">
             <span><strong>Student ID</strong><span id="sidebarStudentId">STD0000</span></span>
             <span><strong>Class</strong><span id="sidebarClass">JSS1</span></span>
           </div>
         </div>
-        <div class="sidebar-note">
-          <h4>Profile Overview</h4>
-          <p>Use this section for a quick profile summary and to access your academic history.</p>
+        <div class="profile-image-card" id="sidebarProfileImageCard">
+          <div id="sidebarProfileImage" class="avatar"><span id="sidebarProfileInitials">ST</span></div>
+          <p id="sidebarProfileLabel">Profile image</p>
         </div>
         <button class="nav-item" type="button" onclick="window.location.href='student-history.html'">
           <ion-icon name="time-outline"></ion-icon>
@@ -521,6 +732,7 @@
     </aside>
 
     <main class="main-panel">
+      <div class="main-watermark" id="mainWatermark"></div>
       <header class="topbar">
         <div class="topbar-left">
           <h1>Welcome, <span id="topName">Student</span></h1>
@@ -541,8 +753,8 @@
       <div class="tab-row" role="tablist" aria-label="Student sections">
         <button class="tab-btn active" type="button" data-tab="overview"><ion-icon name="grid-outline"></ion-icon>Overview</button>
         <button class="tab-btn" type="button" data-tab="results"><ion-icon name="document-text-outline"></ion-icon>Results</button>
-        <button class="tab-btn" type="button" data-tab="announcements"><ion-icon name="megaphone-outline"></ion-icon>Announcements</button>
-        <button class="tab-btn" type="button" data-tab="settings"><ion-icon name="settings-outline"></ion-icon>Settings</button>
+        <button class="tab-btn" type="button" data-tab="announcements"><ion-icon name="megaphone-outline"></ion-icon>Announcements<span class="tab-badge" id="announcementTabBadge" aria-hidden="true"></span></button>
+        <button class="tab-btn" type="button" data-tab="settings"><ion-icon name="create-outline"></ion-icon>Update Profile</button>
       </div>
 
       <div class="content-grid">
@@ -558,22 +770,33 @@
           </div>
         </section>
 
-        <section class="stats-grid">
-          <div class="stat-card">
-            <h3>Student ID</h3>
-            <strong id="studentIdValue">--</strong>
+        <section class="overview-cards">
+          <div class="overview-card courses">
+            <div class="card-top">
+              <ion-icon name="book-outline"></ion-icon>
+              <div>
+                <h4>Courses Registered</h4>
+              </div>
+            </div>
+            <strong id="coursesCount">-- courses</strong>
           </div>
-          <div class="stat-card">
-            <h3>Class</h3>
-            <strong id="classValue">--</strong>
+          <div class="overview-card results">
+            <div class="card-top">
+              <ion-icon name="bar-chart-outline"></ion-icon>
+              <div>
+                <h4>Results Published</h4>
+              </div>
+            </div>
+            <strong id="resultsCount">-- results</strong>
           </div>
-          <div class="stat-card">
-            <h3>Portal Status</h3>
-            <strong id="portalValue">--</strong>
-          </div>
-          <div class="stat-card">
-            <h3>Result Access</h3>
-            <strong id="accessValue">--</strong>
+          <div class="overview-card fees">
+            <div class="card-top">
+              <ion-icon name="wallet-outline"></ion-icon>
+              <div>
+                <h4>Fees paid</h4>
+              </div>
+            </div>
+            <strong id="feesPaid">-- NGN</strong>
           </div>
         </section>
 
@@ -616,25 +839,69 @@
 
         <section class="panel-grid" id="panel-settings" style="display:none">
           <div class="panel-card">
-            <h3>Personal preferences</h3>
-            <div class="settings-list">
-              <div class="settings-item">
-                <span>Theme</span>
-                <strong id="themeLabel">Light</strong>
+            <h3>Update Profile</h3>
+            <form id="profileForm" class="profile-form">
+              <div class="profile-grid">
+                <div class="profile-field">
+                  <label for="profileName">Full name</label>
+                  <input id="profileName" name="name" type="text" readonly />
+                </div>
+                <div class="profile-field">
+                  <label for="profileStudentId">Student ID</label>
+                  <input id="profileStudentId" name="studentId" type="text" readonly />
+                </div>
+                <div class="profile-field">
+                  <label for="profileSchoolId">School ID</label>
+                  <input id="profileSchoolId" name="schoolId" type="text" readonly />
+                </div>
+                <div class="profile-field">
+                  <label for="profileClass">Class</label>
+                  <input id="profileClass" name="className" type="text" readonly />
+                </div>
+                <div class="profile-field">
+                  <label for="profileRegNumber">Reg Number</label>
+                  <input id="profileRegNumber" name="regNumber" type="text" readonly />
+                </div>
+                <div class="profile-field">
+                  <label for="profileGender">Gender</label>
+                  <select id="profileGender" name="gender">
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="profile-field">
+                  <label for="profileEmail">Email Address</label>
+                  <input id="profileEmail" name="email" type="email" placeholder="Enter email" />
+                </div>
+                <div class="profile-field">
+                  <label for="profilePhone">Phone Number</label>
+                  <input id="profilePhone" name="phone" type="tel" placeholder="Enter phone" />
+                </div>
+                <div class="profile-field">
+                  <label for="profileDob">Date of Birth</label>
+                  <input id="profileDob" name="dob" type="date" />
+                </div>
+                <div class="profile-field">
+                  <label for="profileHomeTown">Home Town</label>
+                  <input id="profileHomeTown" name="homeTown" type="text" placeholder="Enter home town" />
+                </div>
               </div>
-              <div class="settings-item">
-                <span>Accent</span>
-                <strong id="accentLabel">Default</strong>
+              <div class="profile-field">
+                <label for="profileAddress">Contact Address</label>
+                <textarea id="profileAddress" name="address" rows="4" placeholder="Enter contact address"></textarea>
               </div>
-              <div class="settings-item">
-                <span>Sidebar</span>
-                <strong id="sidebarLabel">Expandable</strong>
+              <div class="form-footer">
+                <button type="button" class="form-btn secondary" id="resetProfileBtn">Reset</button>
+                <button type="submit" class="form-btn primary">Save profile</button>
               </div>
-            </div>
+              <div id="profileFormMessage" class="form-message"></div>
+            </form>
           </div>
           <div class="panel-card">
-            <h3>Need help?</h3>
-            <p class="muted">Use the menu to switch sections, view results, or open your academic history at any time.</p>
+            <h3>Note</h3>
+            <p class="muted">Fields entered by your school are read-only. You can update only the data that is allowed for your profile.</p>
           </div>
         </section>
       </div>
@@ -642,7 +909,7 @@
   </div>
 
   <script>
-    const student = JSON.parse(localStorage.getItem('student') || 'null');
+    let student = JSON.parse(localStorage.getItem('student') || 'null');
     if (!student || !student.studentId || !student.schoolId) {
       window.location.href = 'student-login.html';
     }
@@ -711,6 +978,13 @@
         const panel = document.getElementById(`panel-${name}`);
         if (panel) panel.style.display = name === tab ? '' : 'none';
       });
+      if (tab === 'announcements') {
+        const badge = document.getElementById('announcementTabBadge');
+        if (badge) {
+          badge.classList.remove('has-notification');
+          badge.textContent = '';
+        }
+      }
     }
 
     function toggleSidebar() {
@@ -722,6 +996,22 @@
       } else {
         layout.classList.toggle('collapsed');
         document.getElementById('sidebarOverlay').classList.remove('show');
+      }
+    }
+
+    function updateAnnouncementBadge() {
+      const badge = document.getElementById('announcementTabBadge');
+      if (!badge) return;
+
+      const announcementText = student?.latestAnnouncement || student?.announcementNote || '';
+      const count = Number(student?.announcementCount) || (announcementText ? 1 : 0);
+
+      if (count > 0) {
+        badge.textContent = count > 1 ? String(count) : '';
+        badge.classList.add('has-notification');
+      } else {
+        badge.textContent = '';
+        badge.classList.remove('has-notification');
       }
     }
 
@@ -739,11 +1029,35 @@
       document.getElementById('profileSnapshot').textContent = `${student?.schoolName || 'School'} • ${student?.className || student?.class || 'N/A'} • ${student?.studentId || 'N/A'}`;
       document.getElementById('studentIdValue').textContent = student?.studentId || '--';
       document.getElementById('classValue').textContent = student?.className || student?.class || '--';
+      document.getElementById('coursesCount').textContent = `${student?.coursesRegistered || 9} courses`;
+      document.getElementById('resultsCount').textContent = `${student?.resultsPublished || 0} results`;
+      document.getElementById('feesPaid').textContent = `${student?.feesPaid || '226,040'} NGN`;
       const initials = name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
-      document.getElementById('sidebarInitials').textContent = initials || 'ST';
+      const sidebarAvatar = document.getElementById('sidebarAvatar');
+      const sidebarProfileImage = document.getElementById('sidebarProfileImage');
+      const sidebarProfileInitials = document.getElementById('sidebarProfileInitials');
+      const schoolLogo = (JSON.parse(localStorage.getItem('school') || 'null') || {}).logo || '';
+      const schoolName = (JSON.parse(localStorage.getItem('school') || 'null') || {}).name || 'School';
+      const studentPhoto = student?.photo || student?.avatar || student?.image || '';
       document.getElementById('sidebarName').textContent = name;
+      document.getElementById('sidebarSchoolTitle').textContent = schoolName;
+      document.getElementById('sidebarSchoolName').textContent = schoolName;
       document.getElementById('sidebarStudentId').textContent = student?.studentId || '--';
       document.getElementById('sidebarClass').textContent = student?.className || student?.class || '--';
+      if (schoolLogo) {
+        sidebarAvatar.innerHTML = `<img src="${schoolLogo}" alt="${schoolName} logo">`;
+        const watermark = document.getElementById('mainWatermark');
+        if (watermark) {
+          watermark.innerHTML = `<img src="${schoolLogo}" alt="${schoolName} watermark">`;
+        }
+      } else {
+        document.getElementById('sidebarInitials').textContent = initials || 'ST';
+      }
+      if (studentPhoto) {
+        sidebarProfileImage.innerHTML = `<img src="${studentPhoto}" alt="${name} profile">`;
+      } else {
+        sidebarProfileInitials.textContent = initials || 'ST';
+      }
       document.getElementById('portalValue').textContent = student?.portalStatus || 'Active';
       document.getElementById('accessValue').textContent = student?.resultAccess || 'Enabled';
       document.getElementById('attendanceValue').textContent = student?.attendance || '96%';
@@ -752,10 +1066,107 @@
       document.getElementById('announcementSummary').textContent = student?.announcementNote || 'Your latest school notices will appear here.';
       document.getElementById('accentLabel').textContent = getStoredAccent().toUpperCase();
       document.getElementById('sidebarLabel').textContent = window.innerWidth <= 980 ? 'Mobile overlay' : 'Expandable';
+      updateAnnouncementBadge();
+      setupProfileForm();
       document.getElementById('logoutButton').addEventListener('click', () => {
         localStorage.removeItem('student');
         window.location.href = 'student-login.html';
       });
+    }
+
+    function setupProfileForm() {
+      const form = document.getElementById('profileForm');
+      if (!form) return;
+
+      const readonlyFields = ['name', 'studentId', 'schoolId', 'className', 'regNumber'];
+      readonlyFields.forEach((key) => {
+        const field = form.querySelector(`[name="${key}"]`);
+        if (field) {
+          field.readOnly = true;
+          if (field.tagName === 'SELECT') field.disabled = true;
+        }
+      });
+
+      const mapValue = (id, value) => {
+        const field = document.getElementById(id);
+        if (field) field.value = value || '';
+      };
+
+      mapValue('profileName', student?.name || student?.studentName || '');
+      mapValue('profileStudentId', student?.studentId || '');
+      mapValue('profileSchoolId', student?.schoolId || '');
+      mapValue('profileClass', student?.className || student?.class || '');
+      mapValue('profileRegNumber', student?.regNumber || '');
+      mapValue('profileGender', student?.gender || '');
+      mapValue('profileEmail', student?.email || '');
+      mapValue('profilePhone', student?.phone || '');
+      mapValue('profileDob', student?.dob || '');
+      mapValue('profileHomeTown', student?.homeTown || '');
+      mapValue('profileAddress', student?.contactAddress || student?.address || '');
+
+      const messageBox = document.getElementById('profileFormMessage');
+      const setFormMessage = (message, type) => {
+        if (!messageBox) return;
+        messageBox.textContent = message || '';
+        messageBox.className = type ? `form-message ${type}` : 'form-message';
+      };
+
+      form.onsubmit = async (event) => {
+        event.preventDefault();
+        setFormMessage('Saving profile...', '');
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+          setFormMessage('Please log in again before saving your profile.', 'error');
+          return;
+        }
+
+        const formData = new FormData(form);
+        const updatedPayload = {
+          email: formData.get('email')?.toString().trim() || '',
+          phone: formData.get('phone')?.toString().trim() || '',
+          dob: formData.get('dob')?.toString().trim() || '',
+          gender: formData.get('gender')?.toString().trim() || '',
+          homeTown: formData.get('homeTown')?.toString().trim() || '',
+          contactAddress: formData.get('address')?.toString().trim() || ''
+        };
+
+        try {
+          const response = await fetch(window.api('/student-profile'), {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify(updatedPayload)
+          });
+
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.message || 'Unable to save profile');
+          }
+
+          student = {
+            ...student,
+            ...result.student
+          };
+
+          localStorage.setItem('student', JSON.stringify(student));
+          setFormMessage('Profile saved successfully.', 'success');
+          setupProfileForm();
+        } catch (error) {
+          console.error(error);
+          setFormMessage('Failed to save profile. ' + (error.message || 'Please try again.'), 'error');
+        }
+      };
+
+      const resetButton = document.getElementById('resetProfileBtn');
+      if (resetButton) {
+        resetButton.addEventListener('click', () => {
+          form.reset();
+          setupProfileForm();
+        });
+      }
     }
 
     document.querySelectorAll('.tab-btn, .nav-item[data-tab]').forEach((btn) => {
