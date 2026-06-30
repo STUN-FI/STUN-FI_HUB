@@ -82,6 +82,10 @@
       z-index: 60;
     }
 
+    .sidebar-close {
+      display: none !important;
+    }
+
     .layout.collapsed .sidebar {
       transform: translateX(-100%);
       opacity: 0;
@@ -1022,11 +1026,16 @@
       const schoolLogo = storedSchool.logo || '';
       const schoolName = student?.schoolName || storedSchool.name || student?.schoolId || 'School';
       const studentPhoto = student?.photo || student?.avatar || student?.image || '';
-      document.getElementById('sidebarName').textContent = name;
-      document.getElementById('sidebarSchoolTitle').textContent = schoolName;
-      document.getElementById('sidebarSchoolName').textContent = schoolName;
-      document.getElementById('sidebarStudentId').textContent = student?.studentId || '--';
-      document.getElementById('sidebarClass').textContent = student?.className || student?.class || '--';
+      const sidebarNameEl = document.getElementById('sidebarName');
+      const sidebarSchoolTitleEl = document.getElementById('sidebarSchoolTitle');
+      const sidebarSchoolNameEl = document.getElementById('sidebarSchoolName');
+      const sidebarStudentIdEl = document.getElementById('sidebarStudentId');
+      const sidebarClassEl = document.getElementById('sidebarClass');
+      if (sidebarNameEl) sidebarNameEl.textContent = name;
+      if (sidebarSchoolTitleEl) sidebarSchoolTitleEl.textContent = schoolName;
+      if (sidebarSchoolNameEl) sidebarSchoolNameEl.textContent = schoolName;
+      if (sidebarStudentIdEl) sidebarStudentIdEl.textContent = student?.studentId || '--';
+      if (sidebarClassEl) sidebarClassEl.textContent = student?.className || student?.class || '--';
       if (schoolLogo) {
         sidebarAvatar.innerHTML = `<img src="${schoolLogo}" alt="${schoolName} logo">`;
         const watermark = document.getElementById('mainWatermark');
@@ -1052,14 +1061,19 @@
       document.getElementById('latestResult').textContent = student?.latestResult || 'Awaiting update';
       document.getElementById('examReadiness').textContent = student?.examReadiness || 'Ready';
       document.getElementById('announcementSummary').textContent = student?.announcementNote || 'Your latest school notices will appear here.';
-      document.getElementById('accentLabel').textContent = getStoredAccent().toUpperCase();
-      document.getElementById('sidebarLabel').textContent = window.innerWidth <= 980 ? 'Mobile overlay' : 'Expandable';
+      const accentLabelEl = document.getElementById('accentLabel');
+      if (accentLabelEl) {
+        accentLabelEl.textContent = getStoredAccent().toUpperCase();
+      }
       updateAnnouncementBadge();
       setupProfileForm();
-      document.getElementById('logoutButton').addEventListener('click', () => {
-        localStorage.removeItem('student');
-        window.location.href = 'student-login.html';
-      });
+      const logoutButton = document.getElementById('logoutButton');
+      if (logoutButton) {
+        logoutButton.addEventListener('click', () => {
+          localStorage.removeItem('student');
+          window.location.href = 'student-login.html';
+        });
+      }
     }
 
     function setupProfileForm() {
@@ -1166,7 +1180,6 @@
     });
 
     window.addEventListener('resize', () => {
-      document.getElementById('sidebarLabel').textContent = window.innerWidth <= 980 ? 'Mobile overlay' : 'Expandable';
       if (window.innerWidth > 980) {
         document.getElementById('layout').classList.remove('sidebar-open');
         document.getElementById('sidebarOverlay').classList.remove('show');
