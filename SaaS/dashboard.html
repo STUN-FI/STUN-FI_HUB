@@ -69,7 +69,7 @@
   }
 
   .sidebar {
-    background: var(--sidebar);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 14%, var(--sidebar)), var(--sidebar));
     color: white;
     height: 100vh;
     overflow-y: auto;
@@ -79,6 +79,7 @@
     gap: 18px;
     transition: margin-left 0.25s ease;
     z-index: 50;
+    border-right: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
   }
 
   .layout.closed .sidebar {
@@ -138,8 +139,8 @@
 
   .school-mini-card,
   .nav-box {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: color-mix(in srgb, var(--accent) 10%, rgba(255,255,255,0.06));
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
     border-radius: 20px;
     padding: 18px;
   }
@@ -210,6 +211,13 @@
   .theme-btn,
   .logout-btn {
     padding: 12px 14px;
+  }
+
+  .sidebar-actions button,
+  .secondary-btn,
+  .theme-btn,
+  .logout-btn {
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   }
 
   .primary-btn,
