@@ -401,7 +401,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 28px;
+      margin-bottom: 40px;
     }
 
     .tab-btn {
@@ -1071,11 +1071,11 @@
       const sidebarSchoolNameEl = document.getElementById('sidebarSchoolName');
       const sidebarStudentIdEl = document.getElementById('sidebarStudentId');
       const sidebarClassEl = document.getElementById('sidebarClass');
-      if (sidebarNameEl) sidebarNameEl.textContent = name;
-      if (sidebarSchoolTitleEl) sidebarSchoolTitleEl.textContent = schoolName;
-      if (sidebarSchoolNameEl) sidebarSchoolNameEl.textContent = schoolName;
-      if (sidebarStudentIdEl) sidebarStudentIdEl.textContent = student?.studentId || '--';
-      if (sidebarClassEl) sidebarClassEl.textContent = student?.className || student?.class || '--';
+      if (sidebarNameEl) sidebarNameEl.textContent = name || 'Student';
+      if (sidebarSchoolTitleEl) sidebarSchoolTitleEl.textContent = schoolName || 'School';
+      if (sidebarSchoolNameEl) sidebarSchoolNameEl.textContent = schoolName || 'School';
+      if (sidebarStudentIdEl) sidebarStudentIdEl.textContent = (student?.studentId || '--').toUpperCase();
+      if (sidebarClassEl) sidebarClassEl.textContent = (student?.className || student?.class || '--').toUpperCase();
       if (schoolLogo) {
         sidebarAvatar.innerHTML = `<img src="${schoolLogo}" alt="${schoolName} logo">`;
         const watermark = document.getElementById('mainWatermark');
@@ -1103,9 +1103,11 @@
       if (logoutButton) {
         logoutButton.addEventListener('click', () => {
           localStorage.removeItem('student');
+          localStorage.removeItem('school');
           window.location.href = 'student-login.html';
         });
       }
+      console.log('[Dashboard] Data populated:', { name, schoolName, studentId: student?.studentId, className: student?.className });
     }
 
     function setupProfileForm() {
