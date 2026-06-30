@@ -933,6 +933,11 @@
       window.location.href = 'student-login.html';
     }
 
+    window.api = window.api || function(path) {
+      if (!path.startsWith('/')) path = '/' + path;
+      return window.location.origin.replace(/\/$/, '') + path;
+    };
+
     function getStoredTheme() {
       return localStorage.getItem('studentDashboardTheme') || localStorage.getItem('dashboardTheme') || 'light';
     }
@@ -1219,5 +1224,6 @@
       setActiveTab('overview');
     });
   </script>
+  <script src="common.js"></script>
 </body>
 </html>
