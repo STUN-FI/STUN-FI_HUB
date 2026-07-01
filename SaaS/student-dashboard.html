@@ -697,6 +697,7 @@
       .hero-card { grid-template-columns: 1fr; }
       .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .panel-grid { grid-template-columns: 1fr; }
+      .overview-cards { grid-template-columns: 1fr; }
       .tab-row { flex-direction: column; }
       .tab-btn { width: 100%; }
     }
@@ -705,6 +706,8 @@
       .main-panel { padding: 14px 14px 24px; }
       .topbar { padding: 18px; border-radius: 20px; }
       .stats-grid { grid-template-columns: 1fr; }
+      .overview-cards { grid-template-columns: 1fr; }
+      .overview-card { min-height: auto; padding: 18px; }
       .tab-row { gap: 8px; }
       .tab-btn { width: 100%; }
     }
@@ -1176,12 +1179,12 @@
       document.getElementById('classValue').textContent = student?.className || student?.class || '--';
       document.getElementById('coursesCount').textContent = `${student?.coursesRegistered || 0} courses`;
       document.getElementById('resultsCount').textContent = `${student?.resultsPublished || 0} results`;
-      document.getElementById('feesPaid').textContent = `${student?.feesPaid || '0'} NGN`;
+      document.getElementById('feesPaid').textContent = `${student?.feesPaid || '226,040'} NGN`;
       const initials = name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
       const sidebarAvatar = document.getElementById('sidebarAvatar');
       const sidebarInitialsEl = document.getElementById('sidebarInitials');
       const storedSchool = JSON.parse(localStorage.getItem('school') || 'null') || {};
-      const schoolLogo = storedSchool.logo || student?.schoolLogo || '';
+      const schoolLogo = storedSchool.logo || '';
       const schoolName = student?.schoolName || storedSchool.name || student?.schoolId || 'School';
       const studentPhoto = student?.photo || student?.avatar || student?.image || '';
       const sidebarNameEl = document.getElementById('sidebarName');
