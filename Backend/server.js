@@ -1291,6 +1291,36 @@ app.post("/assign-subjects-to-student", async (req, res) => {
   }
 });
 
+function findTeacherForEnrollment(enrollment, teachers) {
+  const subject = (enrollment.subject || "").trim().toLowerCase();
+  const className = (enrollment.className || "").trim().toLowerCase();
+  const arm = (enrollment.arm || "").trim().toLowerCase();
+
+  for (const teacher of teachers) {
+    const teacherName = teacher.name || "";
+    const email = teacher.email || "";
+    const phone = teacher.phone || "";
+
+    if (Array.isArray(teacher.assignments) && teacher.assignments.length) {
+      const match = teacher.assignments.find((assignment) => {
+        const matchSubject = (assignment.subject || "").trim().toLowerCase() === subject;
+        const matchClass = (assignment.className || "").trim().toLowerCase() === className;
+        const matchArm = !assignment.arm || (assignment.arm || "").trim().toLowerCase() === arm;
+        return matchSubject && matchClass && matchArm;
+      });
+      if (match) {
+        return { name: teacherName, email, phone };
+      }
+    }
+
+    if ((teacher.subject || "").trim().toLowerCase() === subject && (teacher.className || "").trim().toLowerCase() === className) {
+      return { name: teacherName, email, phone };
+    }
+  }
+
+  return null;
+}
+
 app.get("/student-subjects/:studentId", async (req, res) => {
   try {
     const studentId = (req.params.studentId || "").trim();
@@ -1305,8 +1335,23 @@ app.get("/student-subjects/:studentId", async (req, res) => {
       term
     }).sort({ subject: 1 });
 
-    res.json(subjects);
+    const teachers = await Teacher.find({ schoolId }).lean();
+
+    const enrichedSubjects = subjects.map((subject) => ({
+      _id: subject._id,
+      studentId: subject.studentId,
+      schoolId: subject.schoolId,
+      subject: subject.subject,
+      className: subject.className,
+      arm: subject.arm,
+      session: subject.session,
+      term: subject.term,
+      teacher: findTeacherForEnrollment(subject, teachers)
+    }));
+
+    res.json(enrichedSubjects);
   } catch (error) {
+    console.error("Error loading student subjects:", error);
     res.status(500).json({ message: "Error loading student subjects" });
   }
 });

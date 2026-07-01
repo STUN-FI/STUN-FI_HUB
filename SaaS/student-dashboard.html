@@ -401,7 +401,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 40px;
+      margin-bottom: 56px;
     }
 
     .tab-btn {
@@ -432,6 +432,7 @@
     .content-grid {
       display: grid;
       gap: 28px;
+      margin-top: 18px;
     }
 
     .hero-card, .panel-card, .stat-card, .sub-card {
@@ -777,10 +778,10 @@
           <div class="card-top">
             <ion-icon name="book-outline"></ion-icon>
             <div>
-              <h4>Courses Registered</h4>
+              <h4>Subject offering</h4>
             </div>
           </div>
-          <strong id="coursesCount">-- courses</strong>
+          <strong id="coursesCount">-- subjects</strong>
         </div>
         <div class="overview-card results">
           <div class="card-top">
@@ -819,6 +820,13 @@
           <div class="sub-card">
             <h3>Profile Snapshot</h3>
             <p class="muted" id="profileSnapshot">Loading student profile…</p>
+          </div>
+        </section>
+
+        <section class="panel-card" id="subjectAssignmentsPanel">
+          <h3>Assigned subjects</h3>
+          <div class="announcement-list" id="subjectList">
+            <div class="announcement-item">Loading subject assignments…</div>
           </div>
         </section>
 
@@ -1045,6 +1053,31 @@
       }
     }
 
+    function renderSubjectAssignments(subjects) {
+      const subjectList = document.getElementById('subjectList');
+      if (!subjectList) return;
+      if (!Array.isArray(subjects) || subjects.length === 0) {
+        subjectList.innerHTML = '<div class="announcement-item">No subjects assigned yet.</div>';
+        return;
+      }
+
+      subjectList.innerHTML = subjects.map((subject) => {
+        const teacherName = subject?.teacher?.name || 'TBA';
+        const teacherEmail = subject?.teacher?.email ? `Email: ${subject.teacher.email}` : '';
+        const teacherPhone = subject?.teacher?.phone ? `Phone: ${subject.teacher.phone}` : '';
+        const teacherContact = [teacherEmail, teacherPhone].filter(Boolean).join(' • ');
+
+        return `
+          <div class="announcement-item">
+            <strong>${subject.subject || 'Unknown subject'}</strong>
+            <div class="muted">Class: ${subject.className || '--'}${subject.arm ? ' • ' + subject.arm : ''}</div>
+            <div class="muted">Teacher: ${teacherName}</div>
+            ${teacherContact ? `<div class="muted">${teacherContact}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
     async function loadLiveDashboardData() {
       const schoolId = student?.schoolId || '';
       const studentId = student?.studentId || '';
@@ -1155,11 +1188,20 @@
           const subjects = await subjectsResponse.json();
           const coursesCount = document.getElementById('coursesCount');
           if (coursesCount) {
-            coursesCount.textContent = `${Array.isArray(subjects) ? subjects.length : 0} courses`;
+            const subjectCount = Array.isArray(subjects) ? subjects.length : 0;
+            student = {
+              ...student,
+              subjectCount,
+              subjects: Array.isArray(subjects) ? subjects : []
+            };
+            localStorage.setItem('student', JSON.stringify(student));
+            coursesCount.textContent = `${subjectCount} subject${subjectCount === 1 ? '' : 's'}`;
           }
+          renderSubjectAssignments(subjects);
         }
       } catch (error) {
         console.warn('Unable to load student subjects', error);
+        renderSubjectAssignments([]);
       }
     }
 
@@ -1177,7 +1219,8 @@
       document.getElementById('profileSnapshot').textContent = `${student?.schoolName || 'School'} • ${student?.className || student?.class || 'N/A'} • ${student?.studentId || 'N/A'}`;
       document.getElementById('studentIdValue').textContent = student?.studentId || '--';
       document.getElementById('classValue').textContent = student?.className || student?.class || '--';
-      document.getElementById('coursesCount').textContent = `${student?.coursesRegistered || 0} courses`;
+      const subjectCountValue = Number(student?.subjectCount ?? student?.coursesRegistered ?? 0);
+      document.getElementById('coursesCount').textContent = `${subjectCountValue} subject${subjectCountValue === 1 ? '' : 's'}`;
       document.getElementById('resultsCount').textContent = `${student?.resultsPublished || 0} results`;
       document.getElementById('feesPaid').textContent = `${student?.feesPaid || '226,040'} NGN`;
       const initials = name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
