@@ -1042,6 +1042,124 @@
       }
     }
 
+    async function loadLiveDashboardData() {
+      const schoolId = student?.schoolId || '';
+      const studentId = student?.studentId || '';
+
+      if (!schoolId || !studentId) return;
+
+      try {
+        const schoolResponse = await fetch(window.api(`/school-lookup?schoolId=${encodeURIComponent(schoolId)}`));
+        if (schoolResponse.ok) {
+          const schoolData = await schoolResponse.json();
+          const resolvedSchoolName = schoolData.name || student?.schoolName || schoolId || 'School';
+          student = {
+            ...student,
+            schoolName: resolvedSchoolName,
+            schoolLogo: schoolData.logo || student?.schoolLogo || '',
+            accentColor: schoolData.accentColor || student?.accentColor || ''
+          };
+          localStorage.setItem('student', JSON.stringify(student));
+          localStorage.setItem('school', JSON.stringify({
+            ...(JSON.parse(localStorage.getItem('school') || 'null') || {}),
+            ...schoolData,
+            name: resolvedSchoolName
+          }));
+        }
+      } catch (error) {
+        console.warn('Unable to load school profile for dashboard', error);
+      }
+
+      try {
+        const postsResponse = await fetch(window.api(`/posts/${encodeURIComponent(schoolId)}?audience=students`));
+        if (postsResponse.ok) {
+          const posts = await postsResponse.json();
+          const latestPost = Array.isArray(posts) && posts.length ? posts[0] : null;
+          const announcementText = latestPost?.text || latestPost?.message || '';
+          const announcementCount = Array.isArray(posts) ? posts.length : 0;
+          const announcementList = document.getElementById('announcementList');
+          const announcementSummary = document.getElementById('announcementSummary');
+
+          student = {
+            ...student,
+            latestAnnouncement: announcementText,
+            announcementNote: announcementText,
+            announcementCount: announcementCount
+          };
+          localStorage.setItem('student', JSON.stringify(student));
+
+          if (announcementSummary) {
+            announcementSummary.textContent = announcementText || 'Your latest school notices will appear here.';
+          }
+
+          if (announcementList) {
+            if (announcementCount > 0) {
+              announcementList.innerHTML = posts.slice(0, 4).map((post) => `
+                <div class="announcement-item">
+                  <strong>${(post.text || post.message || 'School announcement').slice(0, 120)}${(post.text || post.message || '').length > 120 ? '…' : ''}</strong>
+                  <div class="muted">${new Date(post.createdAt || Date.now()).toLocaleString()}</div>
+                </div>
+              `).join('');
+            } else {
+              announcementList.innerHTML = '<div class="announcement-item">No announcements yet. Check back later.</div>';
+            }
+          }
+
+          updateAnnouncementBadge();
+        }
+      } catch (error) {
+        console.warn('Unable to load student announcements', error);
+      }
+
+      try {
+        const resultStatusResponse = await fetch(window.api(`/student-result-status/${encodeURIComponent(studentId)}?schoolId=${encodeURIComponent(schoolId)}`));
+        if (resultStatusResponse.ok) {
+          const status = await resultStatusResponse.json();
+          const latestResult = document.getElementById('latestResult');
+          const examReadiness = document.getElementById('examReadiness');
+          const resultsCount = document.getElementById('resultsCount');
+          if (latestResult) {
+            latestResult.textContent = status?.label || 'Awaiting update';
+          }
+          if (examReadiness) {
+            examReadiness.textContent = status?.assigned ? (status?.unlocked ? 'Ready' : 'Locked') : 'Pending';
+          }
+          if (resultsCount) {
+            resultsCount.textContent = status?.assigned ? '1 result' : '0 results';
+          }
+        }
+      } catch (error) {
+        console.warn('Unable to load result status', error);
+      }
+
+      try {
+        const paymentResponse = await fetch(window.api(`/student-payment-status/${encodeURIComponent(studentId)}?schoolId=${encodeURIComponent(schoolId)}`));
+        if (paymentResponse.ok) {
+          const payment = await paymentResponse.json();
+          const feesPaid = document.getElementById('feesPaid');
+          if (feesPaid) {
+            const amount = Number(payment?.amount || payment?.paidAmount || 0);
+            feesPaid.textContent = `${Number.isFinite(amount) ? amount.toLocaleString('en-NG') : '0'} NGN`;
+          }
+        }
+      } catch (error) {
+        console.warn('Unable to load payment status', error);
+      }
+
+      try {
+        const subjectsResponse = await fetch(window.api(`/student-subjects/${encodeURIComponent(studentId)}?schoolId=${encodeURIComponent(schoolId)}`));
+        if (subjectsResponse.ok) {
+          const subjects = await subjectsResponse.json();
+          const coursesCount = document.getElementById('coursesCount');
+          if (coursesCount) {
+            coursesCount.textContent = `${Array.isArray(subjects) ? subjects.length : 0} courses`;
+          }
+        }
+      } catch (error) {
+        console.warn('Unable to load student subjects', error);
+      }
+    }
+
     function closeSidebar() {
       const layout = document.getElementById('layout');
       layout.classList.remove('sidebar-open');
@@ -1056,14 +1174,14 @@
       document.getElementById('profileSnapshot').textContent = `${student?.schoolName || 'School'} • ${student?.className || student?.class || 'N/A'} • ${student?.studentId || 'N/A'}`;
       document.getElementById('studentIdValue').textContent = student?.studentId || '--';
       document.getElementById('classValue').textContent = student?.className || student?.class || '--';
-      document.getElementById('coursesCount').textContent = `${student?.coursesRegistered || 9} courses`;
+      document.getElementById('coursesCount').textContent = `${student?.coursesRegistered || 0} courses`;
       document.getElementById('resultsCount').textContent = `${student?.resultsPublished || 0} results`;
-      document.getElementById('feesPaid').textContent = `${student?.feesPaid || '226,040'} NGN`;
+      document.getElementById('feesPaid').textContent = `${student?.feesPaid || '0'} NGN`;
       const initials = name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
       const sidebarAvatar = document.getElementById('sidebarAvatar');
       const sidebarInitialsEl = document.getElementById('sidebarInitials');
       const storedSchool = JSON.parse(localStorage.getItem('school') || 'null') || {};
-      const schoolLogo = storedSchool.logo || '';
+      const schoolLogo = storedSchool.logo || student?.schoolLogo || '';
       const schoolName = student?.schoolName || storedSchool.name || student?.schoolId || 'School';
       const studentPhoto = student?.photo || student?.avatar || student?.image || '';
       const sidebarNameEl = document.getElementById('sidebarName');
@@ -1089,7 +1207,7 @@
       }
       document.getElementById('portalValue').textContent = student?.portalStatus || 'Active';
       document.getElementById('accessValue').textContent = student?.resultAccess || 'Enabled';
-      document.getElementById('attendanceValue').textContent = student?.attendance || '96%';
+      document.getElementById('attendanceValue').textContent = student?.attendance || student?.attendanceRate || '96%';
       document.getElementById('latestResult').textContent = student?.latestResult || 'Awaiting update';
       document.getElementById('examReadiness').textContent = student?.examReadiness || 'Ready';
       document.getElementById('announcementSummary').textContent = student?.announcementNote || 'Your latest school notices will appear here.';
@@ -1107,7 +1225,7 @@
           window.location.href = 'student-login.html';
         });
       }
-      console.log('[Dashboard] Data populated:', { name, schoolName, studentId: student?.studentId, className: student?.className });
+      loadLiveDashboardData();
     }
 
     function setupProfileForm() {
