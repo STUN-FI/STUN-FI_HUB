@@ -4,44 +4,283 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>STUN-FI HUB | Academic History</title>
-  <link rel='stylesheet' href='styles.css'>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
   <script src="js/config.js"></script>
   <script src="js/global-loader.js"></script>
+  <style>
+    .history-shell {
+      max-width: 1120px;
+      margin: 28px auto;
+      padding: 0 16px 28px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .history-header h1 {
+      margin: 0 0 10px;
+      font-size: 2.1rem;
+    }
+
+    .history-header .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .history-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .history-summary {
+      display: grid;
+      gap: 14px;
+    }
+
+    .history-summary .summary-card {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .history-info-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .history-info-list .info-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      background: #f8fafc;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .history-info-list .info-item strong {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .history-actions {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+    }
+
+    .history-actions .form-group {
+      display: grid;
+      gap: 8px;
+    }
+
+    .history-actions label {
+      color: #6b7280;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+
+    .history-actions select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      color: #111827;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .history-content-card {
+      padding: 22px;
+      min-height: 320px;
+    }
+
+    .history-content-card h3 {
+      margin-top: 0;
+    }
+
+    .history-content-card .section-block {
+      margin-top: 20px;
+    }
+
+    .history-content-card .section-block h4 {
+      margin-bottom: 12px;
+    }
+
+    .history-content-card .notes {
+      color: #6b7280;
+      margin-bottom: 14px;
+    }
+
+    .history-profile-meta {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .history-profile-meta .meta-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      align-items: center;
+    }
+
+    .history-profile-meta .meta-row span {
+      color: #6b7280;
+      font-size: 0.95rem;
+    }
+
+    .history-profile-meta .meta-row strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .history-records {
+      display: grid;
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    .history-record {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .history-record strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .history-record .record-line {
+      color: #475569;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .history-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(102, 204, 204, 0.12);
+      color: #0f766e;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 900px) {
+      .history-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .history-header h1 {
+        font-size: 1.75rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div style="max-width:1000px;margin:28px auto;padding:0 0 22px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px;">
+  <div class="history-shell">
+    <div class="history-header">
       <div>
-        <h3 style="margin:0 0 8px;">Academic History</h3>
-        <p class="muted" style="margin:0;">View past sessions, terms and promotion decisions.</p>
+        <p class="muted" style="margin:0 0 10px; text-transform: uppercase; letter-spacing: 0.1em; font-size:0.82rem;">Student portal</p>
+        <h1>Academic History</h1>
+        <p class="muted" style="margin:0; max-width:680px;">Review your past sessions, results and promotion decisions in one place.</p>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
+      <div class="header-actions">
         <button class="secondary-btn" type="button" onclick="window.location.href='student-dashboard.html'">Back to Dashboard</button>
-        <button class="danger-btn" type="button" onclick="localStorage.removeItem('student');window.location.href='student-login.html'">Logout</button>
+        <button class="danger-btn" id="historyLogoutBtn" type="button">Logout</button>
       </div>
     </div>
 
-    <div class="card" style="padding:22px;">
-      <div style="display:flex;gap:12px;margin-top:18px;align-items:end;">
-        <div style="flex:1">
-          <label style="display:block;color:#6b7280;margin-bottom:6px">Session</label>
-          <select id="historySession" style="width:100%"></select>
+    <div class="history-grid">
+      <section class="card history-summary">
+        <div class="summary-card">
+          <h3>Student profile</h3>
+          <p class="muted" style="margin:0;">Authenticated student information used to load history records.</p>
         </div>
-        <div style="width:180px">
-          <label style="display:block;color:#6b7280;margin-bottom:6px">Term</label>
+        <div class="history-info-list">
+          <div class="info-item">
+            <span>Name</span>
+            <strong id="historyStudentName">Loading…</strong>
+          </div>
+          <div class="info-item">
+            <span>School</span>
+            <strong id="historySchoolName">Loading…</strong>
+          </div>
+          <div class="info-item">
+            <span>Class</span>
+            <strong id="historyClassName">Loading…</strong>
+          </div>
+          <div class="info-item">
+            <span>Available sessions</span>
+            <strong id="historySessionCount">Loading…</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="card history-actions">
+        <div>
+          <h3>Load history</h3>
+          <p class="muted" style="margin:0 0 16px;">Choose a session and term, then click load to refresh the report.</p>
+        </div>
+        <div class="form-group">
+          <label for="historySession">Session</label>
+          <select id="historySession"></select>
+        </div>
+        <div class="form-group">
+          <label for="historyTerm">Term</label>
           <select id="historyTerm">
             <option>1st Term</option>
             <option>2nd Term</option>
             <option selected>3rd Term</option>
           </select>
         </div>
-        <div>
-          <button class="primary-btn" id="loadHistoryBtn">Load</button>
+        <div class="action-row">
+          <button class="primary-btn" id="loadHistoryBtn">Load history</button>
         </div>
-      </div>
-
-      <div id="historyContent" style="margin-top:18px"></div>
+      </section>
     </div>
+
+    <section class="card history-content-card">
+      <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:18px;">
+        <div>
+          <h3 style="margin:0 0 6px;">Academic record</h3>
+          <p class="muted" style="margin:0;">Promotion decisions, term results and timeline for the selected session.</p>
+        </div>
+        <div class="muted" style="font-size:0.95rem;">Results are refreshed from your school’s record.</div>
+      </div>
+      <div id="historyContent"></div>
+    </section>
   </div>
 
   <script src="student-history.js"></script>

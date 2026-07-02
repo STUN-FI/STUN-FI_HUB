@@ -10,8 +10,31 @@
     try{ const r = await fetch(url, opts); return await r.json(); }catch(e){ console.error(e); toast('Network error'); }
   }
 
+  function logout() {
+    localStorage.removeItem('student');
+    localStorage.removeItem('school');
+    window.location.href = 'student-login.html';
+  }
+
+  function populateStudentInfo() {
+    const name = student?.name || student?.studentName || student?.fullName || 'Student';
+    const schoolName = student?.schoolName || student?.school || student?.schoolId || 'School';
+    const className = student?.className || student?.studentClass || student?.class || 'N/A';
+    const studentNameEl = el('historyStudentName');
+    const schoolNameEl = el('historySchoolName');
+    const classNameEl = el('historyClassName');
+    const sessionCountEl = el('historySessionCount');
+    if (studentNameEl) studentNameEl.textContent = name;
+    if (schoolNameEl) schoolNameEl.textContent = schoolName;
+    if (classNameEl) classNameEl.textContent = className;
+    if (sessionCountEl) sessionCountEl.textContent = '0';
+  }
+
   async function init(){
+    populateStudentInfo();
     await loadSessions();
+    const logoutBtn = el('historyLogoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
     el('loadHistoryBtn').addEventListener('click', loadHistory);
     loadHistory();
   }
@@ -19,12 +42,23 @@
   async function loadSessions(){
     const sessions = await fetchJSON(API + '/session-history/' + student.schoolId + '?limit=50');
     const sel = el('historySession'); sel.innerHTML = '';
+    const sessionCountEl = el('historySessionCount');
+
     if(Array.isArray(sessions) && sessions.length){
-      sessions.forEach(s=>{ const o = document.createElement('option'); o.value = s.session; o.textContent = s.session + (s.isActive? ' • Active':''); sel.appendChild(o); });
-      // select first (most recent)
+      sessions.forEach(s=>{
+        const o = document.createElement('option');
+        o.value = s.session;
+        o.textContent = s.session + (s.isActive ? ' • Active' : '');
+        sel.appendChild(o);
+      });
       sel.value = sessions[0].session;
+      if (sessionCountEl) sessionCountEl.textContent = String(sessions.length);
     } else {
-      const o = document.createElement('option'); o.value='2025/2026'; o.textContent='2025/2026'; sel.appendChild(o);
+      const o = document.createElement('option');
+      o.value = '2025/2026';
+      o.textContent = '2025/2026';
+      sel.appendChild(o);
+      if (sessionCountEl) sessionCountEl.textContent = '0';
     }
   }
 
@@ -39,11 +73,22 @@
   }
 
   function renderResults(results, session, term){
-    if(!Array.isArray(results) || !results.length) return '<div class="empty-state">No results for this session/term.</div>';
-    let html = '<div class="card"><h4>Results</h4>';
-    results.filter(r=>r.term===term).forEach(r=>{
-      html += `<div style="padding:10px;border-bottom:1px solid #f0f0f0;"><strong>${r.session} • ${r.term}</strong>
-        <div style="color:#6b7280">Average: ${Number(r.average||0).toFixed(2)} • Position: ${r.position||'—'} • Promotion: ${r.promotionStatus||'pending'}</div>
+    if(!Array.isArray(results) || !results.length) {
+      return '<div class="empty-state">No results found for this session.</div>';
+    }
+
+    const filtered = results.filter(r => r.term === term);
+    if(!filtered.length) {
+      return `<div class="empty-state">No results found for ${term} of ${session}. Please select a different session or term.</div>`;
+    }
+
+    let html = '<div class="history-records">';
+    filtered.forEach(r => {
+      html += `<div class="history-record">
+        <strong>${r.session} • ${r.term}</strong>
+        <div class="record-line">Average: ${Number(r.average || 0).toFixed(2)}</div>
+        <div class="record-line">Position: ${r.position || '—'}</div>
+        <div class="record-line">Promotion status: ${r.promotionStatus || 'pending'}</div>
       </div>`;
     });
     html += '</div>';
@@ -55,12 +100,12 @@
       return '<div class="empty-state">No promotion change history available.</div>';
     }
 
-    let html = '<div class="card"><h4>Promotion History</h4>';
+    let html = '<div class="history-records">';
     history.forEach(entry => {
-      html += `<div style="padding:10px;border-bottom:1px solid #f0f0f0;">
-        <strong>${entry.changedBy || 'System'}</strong>
-        <div style="color:#6b7280;font-size:13px;margin-top:4px;">${new Date(entry.changedAt).toLocaleDateString()} • ${entry.changeType}</div>
-        <div style="margin-top:6px;">${entry.previousStatus || 'pending'} ${entry.previousNextClass ? '→ ' + entry.previousNextClass : ''} to ${entry.newStatus || 'pending'} ${entry.newNextClass ? '→ ' + entry.newNextClass : ''}</div>
+      html += `<div class="history-record">
+        <strong>${entry.changedBy || 'System'} • ${new Date(entry.changedAt).toLocaleDateString()}</strong>
+        <div class="record-line">Type: ${entry.changeType || 'update'}</div>
+        <div class="record-line">${entry.previousStatus || 'pending'} ${entry.previousNextClass ? '→ ' + entry.previousNextClass : ''} to ${entry.newStatus || 'pending'} ${entry.newNextClass ? '→ ' + entry.newNextClass : ''}</div>
       </div>`;
     });
     html += '</div>';
