@@ -319,30 +319,6 @@
       overflow: hidden;
     }
 
-    .main-watermark {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.08;
-    }
-
-    .main-watermark img {
-      max-width: min(320px, 45%);
-      max-height: min(320px, 45%);
-      width: auto;
-      height: auto;
-      filter: grayscale(100%);
-      object-fit: contain;
-    }
-
-    .main-panel > * {
-      position: relative;
-      z-index: 1;
-    }
-
     .topbar {
       position: sticky;
       top: 0;
@@ -470,6 +446,7 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 16px;
       margin-top: 10px;
+      margin-bottom: 28px;
     }
 
     .overview-card {
@@ -504,17 +481,30 @@
 
     .overview-card .card-top ion-icon {
       font-size: 1.5rem;
-      color: var(--accent);
       min-width: 42px;
       min-height: 42px;
       display: grid;
       place-items: center;
       border-radius: 14px;
-      background: var(--accent-soft);
+      background: rgba(255,255,255,0.06);
+      color: #60a5fa;
     }
 
     .overview-card {
-      border-color: var(--accent-soft);
+      border-color: rgba(255,255,255,0.08);
+    }
+
+    .overview-card.courses .card-top ion-icon {
+      background: rgba(59,130,246,0.16);
+      color: #2563eb;
+    }
+    .overview-card.results .card-top ion-icon {
+      background: rgba(34,211,238,0.18);
+      color: #0ea5e9;
+    }
+    .overview-card.fees .card-top ion-icon {
+      background: rgba(74,222,128,0.18);
+      color: #22c55e;
     }
 
     .overview-card.fees,
@@ -699,7 +689,11 @@
       .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .panel-grid { grid-template-columns: 1fr; }
       .overview-cards { grid-template-columns: 1fr; }
-      .tab-row { flex-direction: column; }
+      .tab-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
       .tab-btn { width: 100%; }
     }
 
@@ -709,7 +703,11 @@
       .stats-grid { grid-template-columns: 1fr; }
       .overview-cards { grid-template-columns: 1fr; }
       .overview-card { min-height: auto; padding: 18px; }
-      .tab-row { gap: 8px; }
+      .tab-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
       .tab-btn { width: 100%; }
     }
   </style>
@@ -755,7 +753,6 @@
     </aside>
 
     <main class="main-panel">
-      <div class="main-watermark" id="mainWatermark"></div>
       <header class="topbar">
         <div class="topbar-left">
           <h1>Welcome, <span id="topName">Student</span></h1>
@@ -805,7 +802,7 @@
 
       <div class="tab-row" role="tablist" aria-label="Student sections">
         <button class="tab-btn active" type="button" data-tab="overview"><ion-icon name="grid-outline"></ion-icon>Overview</button>
-        <button class="tab-btn" type="button" data-tab="results"><ion-icon name="document-text-outline"></ion-icon>Results</button>
+        <button class="tab-btn" type="button" data-tab="results"><ion-icon name="document-text-outline"></ion-icon>Analysis</button>
         <button class="tab-btn" type="button" data-tab="announcements"><ion-icon name="megaphone-outline"></ion-icon>Announcements<span class="tab-badge" id="announcementTabBadge" aria-hidden="true"></span></button>
         <button class="tab-btn" type="button" data-tab="settings"><ion-icon name="create-outline"></ion-icon>Update Profile</button>
       </div>
@@ -960,6 +957,12 @@
       } catch (error) {
         console.warn('Unable to read school accent color', error);
       }
+      try {
+        const storedStudent = JSON.parse(localStorage.getItem('student') || 'null');
+        if (storedStudent && storedStudent.accentColor) return storedStudent.accentColor;
+      } catch (error) {
+        console.warn('Unable to read student accent color', error);
+      }
       return localStorage.getItem('dashboardAccent') || '#66cccc';
     }
 
@@ -1101,6 +1104,9 @@
             ...schoolData,
             name: resolvedSchoolName
           }));
+          applyAccent(getStoredAccent());
+          const accentLabelEl = document.getElementById('accentLabel');
+          if (accentLabelEl) accentLabelEl.textContent = getStoredAccent().toUpperCase();
         }
       } catch (error) {
         console.warn('Unable to load school profile for dashboard', error);
@@ -1213,16 +1219,25 @@
     }
 
     function populateDashboard() {
-      const name = student?.name || student?.studentName || 'Student';
-      document.getElementById('topName').textContent = name;
-      document.getElementById('heroText').textContent = `${name}, your school portal is ready. Review results, announcements, and preferences from here.`;
-      document.getElementById('profileSnapshot').textContent = `${student?.schoolName || 'School'} • ${student?.className || student?.class || 'N/A'} • ${student?.studentId || 'N/A'}`;
-      document.getElementById('studentIdValue').textContent = student?.studentId || '--';
-      document.getElementById('classValue').textContent = student?.className || student?.class || '--';
+      const name = student?.name || student?.studentName || student?.fullName || student?.displayName || 'Student';
+      const studentId = student?.studentId || student?.regNumber || student?.registrationNumber || student?.admissionNumber || '--';
+      const classLabel = student?.className || student?.studentClass || student?.class || '';
+      const classArm = [classLabel, student?.arm].filter(Boolean).join(' ').trim();
+      const schoolDisplayName = student?.schoolName || student?.school || student?.schoolId || '';
+      const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      };
+
+      setText('topName', name);
+      setText('heroText', `${name}, your school portal is ready. Review results, announcements, and preferences from here.`);
+      setText('profileSnapshot', `${schoolDisplayName || 'School'} • ${classArm || 'N/A'} • ${studentId || 'N/A'}`);
+      setText('studentIdValue', studentId);
+      setText('classValue', classArm || '--');
       const subjectCountValue = Number(student?.subjectCount ?? student?.coursesRegistered ?? 0);
-      document.getElementById('coursesCount').textContent = `${subjectCountValue} subject${subjectCountValue === 1 ? '' : 's'}`;
-      document.getElementById('resultsCount').textContent = `${student?.resultsPublished || 0} results`;
-      document.getElementById('feesPaid').textContent = `${student?.feesPaid || '226,040'} NGN`;
+      setText('coursesCount', `${subjectCountValue} subject${subjectCountValue === 1 ? '' : 's'}`);
+      setText('resultsCount', `${student?.resultsPublished || 0} results`);
+      setText('feesPaid', `${student?.feesPaid || '226,040'} NGN`);
       const initials = name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
       const sidebarAvatar = document.getElementById('sidebarAvatar');
       const sidebarInitialsEl = document.getElementById('sidebarInitials');
@@ -1238,25 +1253,27 @@
       if (sidebarNameEl) sidebarNameEl.textContent = name || 'Student';
       if (sidebarSchoolTitleEl) sidebarSchoolTitleEl.textContent = schoolName || 'School';
       if (sidebarSchoolNameEl) sidebarSchoolNameEl.textContent = schoolName || 'School';
-      if (sidebarStudentIdEl) sidebarStudentIdEl.textContent = (student?.studentId || '--').toUpperCase();
-      if (sidebarClassEl) sidebarClassEl.textContent = (student?.className || student?.class || '--').toUpperCase();
-      if (schoolLogo) {
+      if (sidebarStudentIdEl) sidebarStudentIdEl.textContent = studentId.toUpperCase();
+      if (sidebarClassEl) sidebarClassEl.textContent = classLabel.toUpperCase();
+      if (schoolLogo && sidebarAvatar) {
         sidebarAvatar.innerHTML = `<img src="${schoolLogo}" alt="${schoolName} logo">`;
-        const watermark = document.getElementById('mainWatermark');
-        if (watermark) {
-          watermark.innerHTML = `<img src="${schoolLogo}" alt="${schoolName} watermark">`;
-        }
-      } else if (studentPhoto) {
+      } else if (studentPhoto && sidebarAvatar) {
         sidebarAvatar.innerHTML = `<img src="${studentPhoto}" alt="${name} profile">`;
-      } else {
-        if (sidebarInitialsEl) sidebarInitialsEl.textContent = initials || 'ST';
+      } else if (sidebarInitialsEl) {
+        sidebarInitialsEl.textContent = initials || 'ST';
       }
-      document.getElementById('portalValue').textContent = student?.portalStatus || 'Active';
-      document.getElementById('accessValue').textContent = student?.resultAccess || 'Enabled';
-      document.getElementById('attendanceValue').textContent = student?.attendance || student?.attendanceRate || '96%';
-      document.getElementById('latestResult').textContent = student?.latestResult || 'Awaiting update';
-      document.getElementById('examReadiness').textContent = student?.examReadiness || 'Ready';
-      document.getElementById('announcementSummary').textContent = student?.announcementNote || 'Your latest school notices will appear here.';
+      const portalValueEl = document.getElementById('portalValue');
+      if (portalValueEl) portalValueEl.textContent = student?.portalStatus || 'Active';
+      const accessValueEl = document.getElementById('accessValue');
+      if (accessValueEl) accessValueEl.textContent = student?.resultAccess || 'Enabled';
+      const attendanceValueEl = document.getElementById('attendanceValue');
+      if (attendanceValueEl) attendanceValueEl.textContent = student?.attendance || student?.attendanceRate || '96%';
+      const latestResultEl = document.getElementById('latestResult');
+      if (latestResultEl) latestResultEl.textContent = student?.latestResult || 'Awaiting update';
+      const examReadinessEl = document.getElementById('examReadiness');
+      if (examReadinessEl) examReadinessEl.textContent = student?.examReadiness || 'Ready';
+      const announcementSummaryEl = document.getElementById('announcementSummary');
+      if (announcementSummaryEl) announcementSummaryEl.textContent = student?.announcementNote || 'Your latest school notices will appear here.';
       const accentLabelEl = document.getElementById('accentLabel');
       if (accentLabelEl) {
         accentLabelEl.textContent = getStoredAccent().toUpperCase();
