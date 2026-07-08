@@ -1,11 +1,5 @@
 (function(){
-  const API_BASE = (window.api && typeof window.api === 'function')
-    ? window.api('')
-    : (window.API_BASE || window.location.origin);
-  const buildUrl = (path) => {
-    if (!path.startsWith('/')) path = '/' + path;
-    return API_BASE.replace(/\/$/, '') + path;
-  };
+  const API = window.API_BASE;
   const student = JSON.parse(localStorage.getItem('student') || 'null');
   if(!student || !student.studentId || !student.schoolId){ window.location.href = 'student-login.html'; }
 
@@ -30,8 +24,6 @@
     const schoolNameEl = el('historySchoolName');
     const classNameEl = el('historyClassName');
     const sessionCountEl = el('historySessionCount');
-    const pageTitle = document.querySelector('.history-header h1');
-    if (pageTitle) pageTitle.textContent = `${name}'s Academic History`;
     if (studentNameEl) studentNameEl.textContent = name;
     if (schoolNameEl) schoolNameEl.textContent = schoolName;
     if (classNameEl) classNameEl.textContent = className;
@@ -48,7 +40,7 @@
   }
 
   async function loadSessions(){
-    const sessions = await fetchJSON(buildUrl('/session-history/' + student.schoolId + '?limit=50'));
+    const sessions = await fetchJSON(API + '/session-history/' + student.schoolId + '?limit=50');
     const sel = el('historySession'); sel.innerHTML = '';
     const sessionCountEl = el('historySessionCount');
 
@@ -126,7 +118,7 @@
 
     el('historyContent').innerHTML = '<div class="empty-state">Loading history...</div>';
 
-    const data = await fetchJSON(buildUrl(`/student-academic-history/${encodeURIComponent(student.studentId)}/${encodeURIComponent(student.schoolId)}`));
+    const data = await fetchJSON(API + `/student-academic-history/${encodeURIComponent(student.studentId)}/${encodeURIComponent(student.schoolId)}`);
     if(!data){ el('historyContent').innerHTML = '<div class="empty-state">Error loading history.</div>'; return; }
 
     const promotions = Array.isArray(data.promotions) ? data.promotions : [];
@@ -135,14 +127,6 @@
 
     const promoForSession = promotions.find(p=>p.session===session) || null;
     const resultsForSession = results.filter(r=>r.session===session);
-
-    const promotionText = promoForSession ? (promoForSession.promotionStatus || 'Pending').toUpperCase() : 'Pending';
-    const selectedSessionLabel = el('historySelectedSession');
-    const selectedTermLabel = el('historySelectedTerm');
-    const promotionStatusLabel = el('historyPromotionStatus');
-    if (selectedSessionLabel) selectedSessionLabel.textContent = session || 'N/A';
-    if (selectedTermLabel) selectedTermLabel.textContent = term || 'N/A';
-    if (promotionStatusLabel) promotionStatusLabel.textContent = promotionText;
 
     let out = '';
     out += '<h4>Promotion Decision</h4>' + renderPromotion(promoForSession);

@@ -117,17 +117,6 @@
       color: var(--accent);
     }
 
-    .brand-card .sidebar-school-logo {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      object-fit: contain;
-      display: block;
-      margin-bottom: 10px;
-      background: rgba(255,255,255,0.12);
-      padding: 8px;
-    }
-
     .brand-card p {
       margin: 3px 0 0;
       font-size: 0.85rem;
@@ -345,13 +334,6 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
       margin-bottom: 20px;
-    }
-
-    .topbar::before,
-    .topbar::after,
-    .main-panel::before {
-      display: none !important;
-      content: none !important;
     }
 
     .topbar-left h1 {
@@ -735,7 +717,6 @@
   <div class="layout" id="layout">
     <aside class="sidebar" id="sidebar">
       <div class="brand-card school-brand-card">
-        <img id="sidebarSchoolLogo" class="sidebar-school-logo" src="img/stunfi-logo-white.png" alt="School Logo">
         <div>
           <h3 id="sidebarSchoolTitle">STUN-FI HUB</h3>
           <p>Student portal</p>
@@ -1075,41 +1056,23 @@
       }
     }
 
-    function normalizeSubjectItem(subject) {
-      if (!subject) return { subject: 'Unknown subject' };
-      if (typeof subject === 'string') {
-        return { subject };
-      }
-      return {
-        subject: subject.subject || subject.name || subject.title || 'Unknown subject',
-        className: subject.className || subject.class || subject.classroom || '',
-        arm: subject.arm || subject.stream || '',
-        teacher: {
-          name: subject.teacher?.name || subject.teacherName || subject.instructor || 'TBA',
-          email: subject.teacher?.email || subject.teacherEmail || '',
-          phone: subject.teacher?.phone || subject.teacherPhone || ''
-        }
-      };
-    }
-
     function renderSubjectAssignments(subjects) {
       const subjectList = document.getElementById('subjectList');
       if (!subjectList) return;
-      const normalized = Array.isArray(subjects) ? subjects.map(normalizeSubjectItem) : [];
-      if (!normalized.length) {
+      if (!Array.isArray(subjects) || subjects.length === 0) {
         subjectList.innerHTML = '<div class="announcement-item">No subjects assigned yet.</div>';
         return;
       }
 
-      subjectList.innerHTML = normalized.map((subject) => {
-        const teacherName = subject.teacher.name || 'TBA';
-        const teacherEmail = subject.teacher.email ? `Email: ${subject.teacher.email}` : '';
-        const teacherPhone = subject.teacher.phone ? `Phone: ${subject.teacher.phone}` : '';
+      subjectList.innerHTML = subjects.map((subject) => {
+        const teacherName = subject?.teacher?.name || 'TBA';
+        const teacherEmail = subject?.teacher?.email ? `Email: ${subject.teacher.email}` : '';
+        const teacherPhone = subject?.teacher?.phone ? `Phone: ${subject.teacher.phone}` : '';
         const teacherContact = [teacherEmail, teacherPhone].filter(Boolean).join(' • ');
 
         return `
           <div class="announcement-item">
-            <strong>${subject.subject}</strong>
+            <strong>${subject.subject || 'Unknown subject'}</strong>
             <div class="muted">Class: ${subject.className || '--'}${subject.arm ? ' • ' + subject.arm : ''}</div>
             <div class="muted">Teacher: ${teacherName}</div>
             ${teacherContact ? `<div class="muted">${teacherContact}</div>` : ''}
@@ -1144,7 +1107,6 @@
           applyAccent(getStoredAccent());
           const accentLabelEl = document.getElementById('accentLabel');
           if (accentLabelEl) accentLabelEl.textContent = getStoredAccent().toUpperCase();
-          populateDashboard();
         }
       } catch (error) {
         console.warn('Unable to load school profile for dashboard', error);
@@ -1227,44 +1189,22 @@
       }
 
       try {
-        const storedSchool = JSON.parse(localStorage.getItem('school') || 'null') || {};
-        let subjects = [];
-
-        if (Array.isArray(student?.subjects) && student.subjects.length) {
-          subjects = student.subjects;
-        } else if (Array.isArray(storedSchool.assignedSubjects) && storedSchool.assignedSubjects.length) {
-          subjects = storedSchool.assignedSubjects;
-        } else if (Array.isArray(storedSchool.subjects) && storedSchool.subjects.length) {
-          subjects = storedSchool.subjects;
-        } else {
-          const subjectsResponse = await fetch(window.api(`/student-subjects/${encodeURIComponent(studentId)}?schoolId=${encodeURIComponent(schoolId)}`));
-          if (subjectsResponse.ok) {
-            subjects = await subjectsResponse.json();
+        const subjectsResponse = await fetch(window.api(`/student-subjects/${encodeURIComponent(studentId)}?schoolId=${encodeURIComponent(schoolId)}`));
+        if (subjectsResponse.ok) {
+          const subjects = await subjectsResponse.json();
+          const coursesCount = document.getElementById('coursesCount');
+          if (coursesCount) {
+            const subjectCount = Array.isArray(subjects) ? subjects.length : 0;
+            student = {
+              ...student,
+              subjectCount,
+              subjects: Array.isArray(subjects) ? subjects : []
+            };
+            localStorage.setItem('student', JSON.stringify(student));
+            coursesCount.textContent = `${subjectCount} subject${subjectCount === 1 ? '' : 's'}`;
           }
+          renderSubjectAssignments(subjects);
         }
-
-        const coursesCount = document.getElementById('coursesCount');
-        const subjectCount = Array.isArray(subjects) ? subjects.length : 0;
-
-        const normalizedSubjects = Array.isArray(subjects) ? subjects : [];
-        student = {
-          ...student,
-          subjectCount,
-          subjects: normalizedSubjects
-        };
-        localStorage.setItem('student', JSON.stringify(student));
-
-        if (Array.isArray(normalizedSubjects) && normalizedSubjects.length && !Array.isArray(storedSchool.assignedSubjects)) {
-          localStorage.setItem('school', JSON.stringify({
-            ...storedSchool,
-            assignedSubjects: normalizedSubjects
-          }));
-        }
-
-        if (coursesCount) {
-          coursesCount.textContent = `${subjectCount} subject${subjectCount === 1 ? '' : 's'}`;
-        }
-        renderSubjectAssignments(normalizedSubjects);
       } catch (error) {
         console.warn('Unable to load student subjects', error);
         renderSubjectAssignments([]);
@@ -1315,14 +1255,6 @@
       if (sidebarSchoolNameEl) sidebarSchoolNameEl.textContent = schoolName || 'School';
       if (sidebarStudentIdEl) sidebarStudentIdEl.textContent = studentId.toUpperCase();
       if (sidebarClassEl) sidebarClassEl.textContent = classLabel.toUpperCase();
-      if (schoolLogo) {
-        const sidebarSchoolLogo = document.getElementById('sidebarSchoolLogo');
-        if (sidebarSchoolLogo) {
-          sidebarSchoolLogo.src = schoolLogo;
-          sidebarSchoolLogo.alt = `${schoolName} logo`;
-        }
-      }
-
       if (schoolLogo && sidebarAvatar) {
         sidebarAvatar.innerHTML = `<img src="${schoolLogo}" alt="${schoolName} logo">`;
       } else if (studentPhoto && sidebarAvatar) {
