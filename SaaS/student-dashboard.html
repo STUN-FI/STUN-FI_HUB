@@ -1241,27 +1241,39 @@
       try {
         const session = student?.session || localStorage.getItem('studentSession') || '2025/2026';
         const term = student?.term || localStorage.getItem('studentTerm') || '1st Term';
-        const subjectsResponse = await fetch(window.api(`/student-subjects/${encodeURIComponent(studentId)}?schoolId=${encodeURIComponent(schoolId)}&session=${encodeURIComponent(session)}&term=${encodeURIComponent(term)}`));
+        let subjectsResponse = await fetch(window.api(`/student-subjects/${encodeURIComponent(studentId)}?schoolId=${encodeURIComponent(schoolId)}&session=${encodeURIComponent(session)}&term=${encodeURIComponent(term)}`));
+        let subjects = [];
+
         if (subjectsResponse.ok) {
-          const subjects = await subjectsResponse.json();
-          const coursesCount = document.getElementById('coursesCount');
-          if (coursesCount) {
-            const subjectCount = Array.isArray(subjects) ? subjects.length : 0;
-            student = {
-              ...student,
-              subjectCount,
-              subjects: Array.isArray(subjects) ? subjects : [],
-              session,
-              term
-            };
-            localStorage.setItem('student', JSON.stringify(student));
-            coursesCount.textContent = `${subjectCount} subject${subjectCount === 1 ? '' : 's'}`;
-          }
-          renderSubjectAssignments(subjects);
+          subjects = await subjectsResponse.json();
         } else {
           console.warn('Student subjects response not ok', subjectsResponse.status);
-          renderSubjectAssignments([]);
         }
+
+        if (!Array.isArray(subjects) || subjects.length === 0) {
+          console.warn('No subjects found for session/term; falling back to all student subjects');
+          subjectsResponse = await fetch(window.api(`/student-subjects/${encodeURIComponent(studentId)}?schoolId=${encodeURIComponent(schoolId)}&session=all&term=all`));
+          if (subjectsResponse.ok) {
+            subjects = await subjectsResponse.json();
+          } else {
+            subjects = [];
+          }
+        }
+
+        const coursesCount = document.getElementById('coursesCount');
+        if (coursesCount) {
+          const subjectCount = Array.isArray(subjects) ? subjects.length : 0;
+          student = {
+            ...student,
+            subjectCount,
+            subjects: Array.isArray(subjects) ? subjects : [],
+            session,
+            term
+          };
+          localStorage.setItem('student', JSON.stringify(student));
+          coursesCount.textContent = `${subjectCount} subject${subjectCount === 1 ? '' : 's'}`;
+        }
+        renderSubjectAssignments(subjects);
       } catch (error) {
         console.warn('Unable to load student subjects', error);
         renderSubjectAssignments([]);

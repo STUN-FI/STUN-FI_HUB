@@ -1333,15 +1333,17 @@ app.get("/student-subjects/:studentId", async (req, res) => {
   try {
     const studentId = (req.params.studentId || "").trim();
     const schoolId = (req.query.schoolId || "").trim();
-    const session = (req.query.session || "2025/2026").trim();
-    const term = (req.query.term || "1st Term").trim();
+    const session = req.query.session?.toString().trim();
+    const term = req.query.term?.toString().trim();
 
-    const subjects = await SubjectEnrollment.find({
+    const query = {
       studentId,
-      schoolId,
-      session,
-      term
-    }).sort({ subject: 1 });
+      schoolId
+    };
+    if (session && session !== "all") query.session = session;
+    if (term && term !== "all") query.term = term;
+
+    const subjects = await SubjectEnrollment.find(query).sort({ subject: 1 });
 
     const teachers = await Teacher.find({ schoolId }).lean();
 
