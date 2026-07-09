@@ -1258,36 +1258,49 @@ app.post("/assign-subjects-to-student", async (req, res) => {
     const subjects = Array.isArray(req.body.subjects) ? req.body.subjects : [];
     const session = (req.body.session || "2025/2026").trim();
     const term = (req.body.term || "1st Term").trim();
+    const className = (req.body.className || "").trim();
+    const arm = (req.body.arm || "").trim();
 
     if (!studentId || !schoolId || !subjects.length) {
       return res.status(400).json({ message: "Student, school and subjects are required" });
     }
 
     const student = await Student.findOne({ studentId, schoolId });
+    const fallbackClassName = student?.className || className || "";
+    const fallbackArm = student?.arm || arm || "";
 
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+    const docs = subjects
+      .map(subject => subject.trim())
+      .filter(Boolean)
+      .map(subject => ({
+        studentId,
+        schoolId,
+        subject,
+        className: fallbackClassName,
+        arm: fallbackArm,
+        session,
+        term
+      }));
+
+    if (!docs.length) {
+      return res.status(400).json({ message: "At least one valid subject is required" });
     }
 
-    const docs = subjects.map(subject => ({
-      studentId,
-      schoolId,
-      subject: subject.trim(),
-      className: student.className,
-      arm: student.arm,
-      session,
-      term
-    }));
-
-    await SubjectEnrollment.insertMany(docs);
+    const result = await SubjectEnrollment.insertMany(docs, { ordered: false });
 
     res.json({
       message: "Subjects assigned successfully",
-      subjects: docs
+      insertedCount: result?.length || docs.length,
+      subjects: docs,
+      studentFound: !!student
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Error assigning subjects" });
+    console.error("Error assigning subjects:", error);
+    const duplicateKey = error?.code === 11000 || /duplicate key/i.test(error?.message || "");
+    res.status(duplicateKey ? 409 : 500).json({
+      message: duplicateKey ? "Some subjects were already assigned" : "Error assigning subjects",
+      error: error?.message || "Unknown error"
+    });
   }
 });
 
