@@ -1239,7 +1239,9 @@
       }
 
       try {
-        const subjectsResponse = await fetch(window.api(`/student-subjects/${encodeURIComponent(studentId)}?schoolId=${encodeURIComponent(schoolId)}`));
+        const session = student?.session || localStorage.getItem('studentSession') || '2025/2026';
+        const term = student?.term || localStorage.getItem('studentTerm') || '1st Term';
+        const subjectsResponse = await fetch(window.api(`/student-subjects/${encodeURIComponent(studentId)}?schoolId=${encodeURIComponent(schoolId)}&session=${encodeURIComponent(session)}&term=${encodeURIComponent(term)}`));
         if (subjectsResponse.ok) {
           const subjects = await subjectsResponse.json();
           const coursesCount = document.getElementById('coursesCount');
@@ -1248,7 +1250,9 @@
             student = {
               ...student,
               subjectCount,
-              subjects: Array.isArray(subjects) ? subjects : []
+              subjects: Array.isArray(subjects) ? subjects : [],
+              session,
+              term
             };
             localStorage.setItem('student', JSON.stringify(student));
             coursesCount.textContent = `${subjectCount} subject${subjectCount === 1 ? '' : 's'}`;
