@@ -6,14 +6,88 @@
   function el(id){ return document.getElementById(id); }
   function toast(msg){ alert(msg); }
 
+  function getStoredTheme() {
+    return localStorage.getItem('studentDashboardTheme')
+      || localStorage.getItem('studentResultTheme')
+      || localStorage.getItem('dashboardTheme')
+      || 'light';
+  }
+
+  function getStoredAccent() {
+    try {
+      const school = JSON.parse(localStorage.getItem('school') || 'null');
+      if (school && school.accentColor) return school.accentColor;
+    } catch (error) {
+      console.warn('Unable to read school accent color', error);
+    }
+    try {
+      const storedStudent = JSON.parse(localStorage.getItem('student') || 'null');
+      if (storedStudent && storedStudent.accentColor) return storedStudent.accentColor;
+    } catch (error) {
+      console.warn('Unable to read student accent color', error);
+    }
+    return localStorage.getItem('dashboardAccent') || '#66cccc';
+  }
+
+  function adjustColor(hex, amount) {
+    let color = (hex || '#66cccc').replace('#', '');
+    let value = parseInt(color, 16);
+    let r = (value >> 16) + amount;
+    let g = ((value >> 8) & 0x00FF) + amount;
+    let b = (value & 0x0000FF) + amount;
+    r = Math.max(0, Math.min(255, r));
+    g = Math.max(0, Math.min(255, g));
+    b = Math.max(0, Math.min(255, b));
+    return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+  }
+
+  function applyStoredTheme() {
+    document.body.classList.toggle('dark', getStoredTheme() === 'dark');
+  }
+
+  function applyStoredAccent() {
+    const accent = getStoredAccent();
+    document.documentElement.style.setProperty('--accent', accent);
+    document.documentElement.style.setProperty('--accent-hover', adjustColor(accent, -18));
+  }
+
+  function syncThemeFromStorage(event) {
+    if (!event.key) return;
+    if (['studentDashboardTheme', 'studentResultTheme', 'dashboardTheme', 'dashboardAccent', 'school', 'student'].includes(event.key)) {
+      applyStoredTheme();
+      applyStoredAccent();
+    }
+  }
+
   async function fetchJSON(url, opts){
     try{ const r = await fetch(url, opts); return await r.json(); }catch(e){ console.error(e); toast('Network error'); }
   }
 
-  function logout() {
+  function showLogoutModal() {
+    const modal = el('logoutModal');
+    if (modal) {
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden', 'false');
+    }
+  }
+
+  function hideLogoutModal() {
+    const modal = el('logoutModal');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  function confirmLogout() {
+    hideLogoutModal();
     localStorage.removeItem('student');
     localStorage.removeItem('school');
     window.location.href = 'student-login.html';
+  }
+
+  function logout() {
+    showLogoutModal();
   }
 
   function populateStudentInfo() {
@@ -31,6 +105,9 @@
   }
 
   async function init(){
+    applyStoredTheme();
+    applyStoredAccent();
+    window.addEventListener('storage', syncThemeFromStorage);
     populateStudentInfo();
     await loadSessions();
     const logoutBtn = el('historyLogoutBtn');

@@ -860,7 +860,7 @@
       <div class="sidebar-actions">
         <button class="theme-btn" onclick="toggleTheme()" id="themeToggle"><ion-icon name="moon-outline"></ion-icon> Dark Mode</button>
         <button class="secondary-btn" onclick="goBack()">Back to Dashboard</button>
-        <button class="danger-btn" onclick="logout()">Logout</button>
+        <button class="danger-btn" onclick="showLogoutModal()">Logout</button>
       </div>
     </aside>
 
@@ -935,6 +935,19 @@
         </div>
       </div>
     </main>
+  </div>
+
+  <div class="modal-overlay" id="logoutModal" aria-hidden="true">
+    <div class="modal small">
+      <div class="modal-content">
+        <h3>Confirm logout</h3>
+        <p>Are you sure you want to log out of the result portal?</p>
+        <div class="modal-actions">
+          <button class="secondary-btn" type="button" onclick="hideLogoutModal()">Cancel</button>
+          <button class="danger-btn" type="button" onclick="confirmLogout()">Logout</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1051,6 +1064,7 @@
       if (save) {
         localStorage.setItem('studentResultTheme', theme);
         localStorage.setItem('studentDashboardTheme', theme);
+        localStorage.setItem('dashboardTheme', theme);
       }
       updateThemeButton();
     }
@@ -1066,7 +1080,24 @@
       btn.innerHTML = document.body.classList.contains("dark") ? '<ion-icon name="sunny-outline"></ion-icon> Light Mode' : '<ion-icon name="moon-outline"></ion-icon> Dark Mode';
     }
 
-    function logout() {
+    function showLogoutModal() {
+      const modal = document.getElementById('logoutModal');
+      if (modal) {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+
+    function hideLogoutModal() {
+      const modal = document.getElementById('logoutModal');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    function confirmLogout() {
+      hideLogoutModal();
       localStorage.removeItem("student");
       window.location.href = "student-login.html";
     }

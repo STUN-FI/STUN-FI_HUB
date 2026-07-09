@@ -24,3 +24,8 @@ window.api = window.api || function(path) {
   if (!path.startsWith('/')) path = '/' + path;
   return window.API_BASE.replace(/\/$/, '') + path;
 };
+
+window.continueWithGoogle = window.continueWithGoogle || function() {
+  const authUrl = window.API_BASE.replace(/\/$/, '') + '/auth/google';
+  window.location.href = authUrl;
+};

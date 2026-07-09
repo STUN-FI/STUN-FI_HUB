@@ -414,20 +414,40 @@
 
   .stat-card {
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .stat-card .card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .stat-card .card-top ion-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--accent);
+    background: rgba(102, 204, 204, 0.14);
+    border-radius: 12px;
+    padding: 8px;
+    flex-shrink: 0;
   }
 
   .stat-card h4 {
-    margin: 0 0 10px;
+    margin: 0;
     color: var(--muted);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .stat-card p {
     margin: 0;
-    font-size: 1.65rem;
+    font-size: 1.45rem;
     font-weight: 900;
     color: var(--text);
+    line-height: 1.2;
   }
 
   .tabs {
@@ -1638,6 +1658,62 @@
     border-radius: 18px;
     padding: 14px;
   }
+
+  .student-card {
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--card);
+    padding: 16px;
+    display: grid;
+    gap: 14px;
+  }
+
+  .student-card .student-summary {
+    display: grid;
+    gap: 12px;
+  }
+
+  .student-card .student-summary-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: start;
+  }
+
+  .student-card .student-summary strong {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+
+  .student-card .student-action-toggle {
+    border-radius: 14px;
+    min-width: auto;
+    padding: 10px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .student-card .student-action-panel {
+    display: none;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .student-card.actions-open .student-action-panel {
+    display: grid;
+  }
+
+  .student-card.actions-open .student-action-toggle ion-icon {
+    transform: rotate(180deg);
+  }
+
+  .student-card .student-action-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
 </style>
   <script src="js/config.js"></script>
   <script src="js/global-loader.js"></script>
@@ -1985,6 +2061,19 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="logoutModal" aria-hidden="true">
+  <div class="modal small">
+    <div class="modal-content">
+      <h3>Confirm logout</h3>
+      <p>Are you sure you want to log out of the school dashboard?</p>
+      <div class="modal-actions">
+        <button class="secondary-btn" type="button" onclick="hideLogoutModal()">Cancel</button>
+        <button class="danger-btn" type="button" onclick="confirmLogout()">Logout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="layout">
   <aside class="sidebar" id="sidebar">
     <button class="sidebar-close" onclick="closeSidebar()"><ion-icon name="close-outline"></ion-icon></button>
@@ -2014,7 +2103,7 @@
       <button class="secondary-btn" onclick="openStartSessionModal()"><ion-icon name="add-outline"></ion-icon> Start New Session</button>
       <button class="theme-btn" onclick="openSessionsModal()"><ion-icon name="calendar-outline"></ion-icon> Sessions</button>
       <button class="theme-btn" onclick="toggleTheme()" id="themeToggle"><ion-icon name="moon-outline"></ion-icon> Dark Mode</button>
-      <button class="logout-btn" onclick="logout()"><ion-icon name="log-out-outline"></ion-icon> Logout</button>
+      <button class="logout-btn" onclick="showLogoutModal()"><ion-icon name="log-out-outline"></ion-icon> Logout</button>
     </div>
   </aside>
 
@@ -2055,19 +2144,31 @@
 
     <section class="stats">
       <div class="stat-card">
-        <h4>Total Students</h4>
+        <div class="card-top">
+          <ion-icon name="people-outline"></ion-icon>
+          <h4>Total Students</h4>
+        </div>
         <p id="totalStudents">0</p>
       </div>
       <div class="stat-card">
-        <h4>Total Teachers</h4>
+        <div class="card-top">
+          <ion-icon name="school-outline"></ion-icon>
+          <h4>Total Teachers</h4>
+        </div>
         <p id="totalTeachers">0</p>
       </div>
       <div class="stat-card">
-        <h4>School Classes</h4>
+        <div class="card-top">
+          <ion-icon name="library-outline"></ion-icon>
+          <h4>School Classes</h4>
+        </div>
         <p id="totalClasses">0</p>
       </div>
       <div class="stat-card">
-        <h4>Capacity</h4>
+        <div class="card-top">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <h4>Capacity</h4>
+        </div>
         <p id="schoolCapacity">0 / 0</p>
       </div>
     </section>
@@ -2693,6 +2794,27 @@ window.addEventListener("load", () => {
     document.querySelector(".layout").classList.add("closed");
   }
 });
+
+function showLogoutModal() {
+  const modal = document.getElementById("logoutModal");
+  if (modal) {
+    modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
+  }
+}
+
+function hideLogoutModal() {
+  const modal = document.getElementById("logoutModal");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+  }
+}
+
+function confirmLogout() {
+  hideLogoutModal();
+  logout();
+}
 
 function logout() {
   localStorage.removeItem("token");
@@ -3494,7 +3616,7 @@ function renderTeachers() {
     if (teacher.assignments && teacher.assignments.length) {
       assignmentsHTML = teacher.assignments.map(a => `
         <div class="component-chip">
-          ${a.subject} â€” ${a.className} ${a.arm || ""}
+          ${a.subject} — ${a.className} ${a.arm || ""}
         </div>
       `).join("");
     } else {
@@ -3503,20 +3625,24 @@ function renderTeachers() {
 
     const li = document.createElement("li");
     li.innerHTML = `
-      <div class="item-row">
-        <div class="avatar">${getInitials(teacher.name)}</div>
-        <div>
-          <div class="item-title">${teacher.name}</div>
-
-          <div class="item-meta">
-            Email: ${teacher.email}
+      <div class="student-card">
+        <div class="student-summary">
+          <div class="student-summary-header">
+            <div>
+              <strong>${teacher.name}</strong>
+              <div class="item-meta">Email: ${teacher.email}</div>
+            </div>
+            <button type="button" class="student-action-toggle secondary-btn" onclick="toggleStudentActions(this)">
+              <ion-icon name="chevron-down-outline"></ion-icon>
+              Actions
+            </button>
           </div>
-
-          <div style="margin-top:8px;">
+          <div style="display: grid; gap: 6px; font-size: 0.85rem; color: var(--muted); margin-top: 8px;">
             ${assignmentsHTML}
           </div>
-
-          <div class="item-actions">
+        </div>
+        <div class="student-action-panel">
+          <div class="student-action-buttons">
             <button class="mini-btn btn-subjects" onclick="openAssignModal('${teacher.teacherId}')">Add Assignment</button>
             <button class="mini-btn btn-edit" onclick="openTeacherEdit('${teacher.teacherId}', '${teacher.name.replace(/'/g, "\\'")}', '${(teacher.email || "").replace(/'/g, "\\'")}', '', '', '')">Edit</button>
             <button class="mini-btn btn-view" onclick="viewTeacherSubjects('${teacher.teacherId}')">View Subjects</button>
@@ -3673,6 +3799,31 @@ async function confirmTeacherDelete() {
   }
 }
 
+let currentSubscriptionLimit = null;
+
+function resolveCapacityLimit() {
+  const schoolObj = JSON.parse(localStorage.getItem("school") || "null") || {};
+  const subscriptionLimit = currentSubscriptionLimit ?? schoolObj.subscription?.studentLimit ?? schoolObj.capacity ?? null;
+
+  if (typeof subscriptionLimit === "number" && Number.isFinite(subscriptionLimit) && subscriptionLimit > 0) {
+    return subscriptionLimit;
+  }
+
+  const parsedLimit = parseInt(subscriptionLimit, 10);
+  if (Number.isFinite(parsedLimit) && parsedLimit > 0) {
+    return parsedLimit;
+  }
+
+  const planName = String(schoolObj.subscription?.planName || schoolObj.planName || "").toLowerCase();
+  const planLimits = { small: 300, medium: 1000, large: 3000, enterprise: Infinity };
+
+  if (planLimits[planName] !== undefined) {
+    return planLimits[planName];
+  }
+
+  return 200;
+}
+
 function updateStats() {
   document.getElementById("totalStudents").innerText = students.length;
   document.getElementById("totalTeachers").innerText = teachers.length;
@@ -3682,11 +3833,10 @@ function updateStats() {
 
   document.getElementById("totalClasses").innerText = uniqueClasses.size;
 
-  // Capacity: show filled students / total capacity (fallback to 200)
-  const schoolObj = JSON.parse(localStorage.getItem("school") || "null") || {};
-  const totalCapacity = parseInt(schoolObj.capacity) || 200;
+  const totalCapacity = resolveCapacityLimit();
   const filled = students.length;
-  document.getElementById("schoolCapacity").innerText = `${filled} / ${totalCapacity}`;
+  const displayCapacity = totalCapacity === Infinity ? "∞" : totalCapacity;
+  document.getElementById("schoolCapacity").innerText = `${filled} / ${displayCapacity}`;
 }
 
 function closeScoreModal() {
@@ -4093,26 +4243,34 @@ function openClassStudentsModal(className, arm, studentList) {
   const html = `
     <div style="display: grid; gap: 12px;">
       ${studentList.map((student) => `
-        <div style="border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--card);">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-            <div>
-              <strong>${student.name || "-"}</strong>
-              <div style="font-size: 0.85rem; color: var(--muted);">Reg: ${student.regNumber || "-"}</div>
-              <div style="font-size: 0.85rem; color: var(--muted);">ID: ${student.studentId || "-"}</div>
+        <div class="student-card">
+          <div class="student-summary">
+            <div class="student-summary-header">
+              <div>
+                <strong>${student.name || "-"}</strong>
+                <div style="font-size: 0.85rem; color: var(--muted);">Reg: ${student.regNumber || "-"}</div>
+                <div style="font-size: 0.85rem; color: var(--muted);">ID: ${student.studentId || "-"}</div>
+              </div>
+              <button type="button" class="student-action-toggle secondary-btn" onclick="toggleStudentActions(this)">
+                <ion-icon name="chevron-down-outline"></ion-icon>
+                Actions
+              </button>
             </div>
-            <div>
-              <div style="font-size: 0.85rem; color: var(--muted);">Email: ${student.email || "Not activated"}</div>
-              <div style="font-size: 0.85rem; color: var(--muted);">Phone: ${student.phone || "Not provided"}</div>
+            <div style="display: grid; gap: 6px; font-size: 0.85rem; color: var(--muted);">
+              <div>Email: ${student.email || "Not activated"}</div>
+              <div>Phone: ${student.phone || "Not provided"}</div>
             </div>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <button class="mini-btn btn-edit" onclick="openStudentEdit('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}', '${(student.className || "").replace(/'/g, "\\'")}', '${(student.arm || "").replace(/'/g, "\\'")}')">Edit</button>
-            <button class="mini-btn btn-view" onclick="openScoreModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Scores</button>
-            <button class="mini-btn btn-unlock" onclick="quickUnlockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Unlock</button>
-            <button class="mini-btn btn-lock" onclick="quickLockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Lock</button>
-            <button class="mini-btn btn-subjects" onclick="openSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Assign Subj</button>
-            <button class="mini-btn btn-view" onclick="openViewSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Subj</button>
-            <button class="mini-btn btn-unpaid" onclick="openStudentDelete('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}')">Delete</button>
+          <div class="student-action-panel">
+            <div class="student-action-buttons">
+              <button class="mini-btn btn-edit" onclick="openStudentEdit('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}', '${(student.className || "").replace(/'/g, "\\'")}', '${(student.arm || "").replace(/'/g, "\\'")}')">Edit</button>
+              <button class="mini-btn btn-view" onclick="openScoreModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Scores</button>
+              <button class="mini-btn btn-unlock" onclick="quickUnlockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Unlock</button>
+              <button class="mini-btn btn-lock" onclick="quickLockResult('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Lock</button>
+              <button class="mini-btn btn-subjects" onclick="openSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">Assign Subj</button>
+              <button class="mini-btn btn-view" onclick="openViewSubjectModal('${student.studentId}', '${student.name.replace(/'/g, "\\'")}')">View Subj</button>
+              <button class="mini-btn btn-unpaid" onclick="openStudentDelete('${student.regNumber}', '${student.name.replace(/'/g, "\\'")}')">Delete</button>
+            </div>
           </div>
         </div>
       `).join("")}
@@ -4121,6 +4279,20 @@ function openClassStudentsModal(className, arm, studentList) {
 
   document.getElementById("classStudentsBody").innerHTML = html;
   openModal("classStudentsModal");
+}
+
+function toggleStudentActions(button) {
+  const card = button.closest('.student-card');
+  if (!card) return;
+  const panel = card.querySelector('.student-action-panel');
+  if (!panel) return;
+  const isOpen = !card.classList.contains('actions-open');
+  card.classList.toggle('actions-open', isOpen);
+  panel.style.display = isOpen ? 'grid' : 'none';
+  const icon = button.querySelector('ion-icon');
+  if (icon) {
+    icon.name = isOpen ? 'chevron-up-outline' : 'chevron-down-outline';
+  }
 }
 
 
@@ -5061,8 +5233,9 @@ async function loadSubscription() {
     const sub = data.subscription;
     const statusBadge = data.status;
     const current = data.currentCount || 0;
-    const limit = data.limit || 300;
-    const percentage = Math.min((current / limit) * 100, 100);
+    const limit = Number.isFinite(Number(data.limit)) ? Number(data.limit) : (sub?.studentLimit || 300);
+    currentSubscriptionLimit = limit;
+    const percentage = limit === Infinity ? 0 : Math.min((current / limit) * 100, 100);
     
     // Status badge color
     let badgeColor = "#22c55e"; // green for active/trial
@@ -5093,6 +5266,8 @@ async function loadSubscription() {
     } else {
       expiryEl.innerText = "No expiry date";
     }
+
+    updateStats();
     
   } catch (error) {
     console.log(error);

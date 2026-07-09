@@ -1303,19 +1303,27 @@ function findTeacherForEnrollment(enrollment, teachers) {
 
     if (Array.isArray(teacher.assignments) && teacher.assignments.length) {
       const match = teacher.assignments.find((assignment) => {
-        const matchSubject = (assignment.subject || "").trim().toLowerCase() === subject;
-        const matchClass = (assignment.className || "").trim().toLowerCase() === className;
-        const matchArm = !assignment.arm || (assignment.arm || "").trim().toLowerCase() === arm;
-        return matchSubject && matchClass && matchArm;
+          const matchSubject = (assignment.subject || "").trim().toLowerCase() === subject;
+          const matchClass = (assignment.className || "").trim().toLowerCase() === className;
+          // Enforce strict arm matching: assignment.arm must exactly match enrollment.arm
+          const matchArm = (assignment.arm || "").toString().trim().toLowerCase() === arm;
+          return matchSubject && matchClass && matchArm;
       });
       if (match) {
         return { name: teacherName, email, phone };
       }
     }
 
-    if ((teacher.subject || "").trim().toLowerCase() === subject && (teacher.className || "").trim().toLowerCase() === className) {
-      return { name: teacherName, email, phone };
-    }
+      // Legacy single-assignment fields should also respect arm when present
+      const legacySubject = (teacher.subject || "").trim().toLowerCase();
+      const legacyClass = (teacher.className || "").trim().toLowerCase();
+      const legacyArm = (teacher.arm || "").toString().trim().toLowerCase();
+      if (legacySubject === subject && legacyClass === className) {
+        if (!legacyArm || legacyArm === arm) {
+          return { name: teacherName, email, phone };
+        }
+        // if legacyArm exists but doesn't match, do not return
+      }
   }
 
   return null;

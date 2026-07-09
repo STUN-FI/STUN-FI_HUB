@@ -890,7 +890,7 @@
         <ion-icon name="settings-outline"></ion-icon>
         <span>Settings</span>
       </button>
-      <button class="nav-item" onclick="logout()">
+      <button class="nav-item" onclick="showLogoutModal()">
         <ion-icon name="log-out-outline"></ion-icon>
         <span>Logout</span>
       </button>
@@ -1823,12 +1823,31 @@
     }
 
 
-    async function logout() {
-      if (confirm('Are you sure you want to logout?')) {
-        localStorage.removeItem('isAdmin');
-        localStorage.removeItem('adminName');
-        window.location.href = 'admin-login.html';
+    function showLogoutModal() {
+      const modal = document.getElementById('logoutModal');
+      if (modal) {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
       }
+    }
+
+    function hideLogoutModal() {
+      const modal = document.getElementById('logoutModal');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    function confirmLogout() {
+      hideLogoutModal();
+      logout();
+    }
+
+    function logout() {
+      localStorage.removeItem('isAdmin');
+      localStorage.removeItem('adminName');
+      window.location.href = 'admin-login.html';
     }
 
     // Show menu toggle on mobile

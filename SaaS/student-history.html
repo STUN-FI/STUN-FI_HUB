@@ -10,151 +10,242 @@
   <script src="js/config.js"></script>
   <script src="js/global-loader.js"></script>
   <style>
+    :root {
+      --accent: #66cccc;
+      --accent-hover: #54b8b8;
+      --accent-soft: rgba(102, 204, 204, 0.16);
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --card-2: #f8fafc;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --danger: #ef4444;
+      --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    body.dark {
+      --bg: #07111f;
+      --card: #111827;
+      --card-2: #0f172a;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --line: rgba(255,255,255,0.08);
+      --shadow: 0 26px 70px rgba(0,0,0,0.35);
+    }
+
     .history-shell {
       max-width: 1120px;
-      margin: 28px auto;
-      padding: 0 16px 28px;
+      margin: 32px auto;
+      padding: 0 20px 32px;
     }
 
     .history-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      gap: 18px;
+      gap: 22px;
       flex-wrap: wrap;
-      margin-bottom: 24px;
+      align-items: flex-start;
+      margin-bottom: 28px;
+    }
+
+    .history-header .eyebrow {
+      display: inline-block;
+      margin-bottom: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      color: #475569;
     }
 
     .history-header h1 {
-      margin: 0 0 10px;
-      font-size: 2.1rem;
+      font-size: clamp(2rem, 2.4vw, 3rem);
+      margin: 0;
+      line-height: 1.05;
+    }
+
+    .history-header .subtitle {
+      margin: 12px 0 0;
+      max-width: 720px;
+      color: #6b7280;
+      font-size: 1rem;
+      line-height: 1.7;
     }
 
     .history-header .header-actions {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button,
+    .primary-btn,
+    .secondary-btn,
+    .danger-btn {
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: 0.2s ease;
+      padding: 12px 14px;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      background: var(--accent);
+      color: white;
+    }
+
+    .primary-btn:hover,
+    .secondary-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .danger-btn {
+      background: var(--danger);
+      color: white;
     }
 
     .history-grid {
       display: grid;
       grid-template-columns: 1.5fr 1fr;
-      gap: 18px;
-      margin-bottom: 24px;
+      gap: 22px;
+      margin-bottom: 28px;
     }
 
-    .history-summary {
-      display: grid;
-      gap: 14px;
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.06);
+      padding: 26px;
     }
 
-    .history-summary .summary-card {
-      display: grid;
-      gap: 12px;
-      padding: 18px;
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 1.15rem;
+      color: var(--text);
     }
 
-    .history-info-list {
+    .card .muted {
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.8;
+    }
+
+    .card-heading {
       display: grid;
       gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .history-summary .history-info-list {
+      display: grid;
+      gap: 12px;
     }
 
     .history-info-list .info-item {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
       align-items: center;
-      gap: 10px;
-      padding: 14px 16px;
-      background: #f8fafc;
-      border-radius: 16px;
-      border: 1px solid #e5e7eb;
+      padding: 16px 20px;
+      border-radius: 18px;
+      background: var(--card-2);
+      border: 1px solid var(--line);
+    }
+
+    .history-info-list .info-item span {
+      color: var(--muted);
+      font-weight: 600;
     }
 
     .history-info-list .info-item strong {
+      font-size: 0.98rem;
       font-weight: 700;
       color: var(--text);
+      text-align: right;
     }
 
     .history-actions {
       display: grid;
-      gap: 16px;
-      padding: 18px;
+      gap: 20px;
     }
 
     .history-actions .form-group {
       display: grid;
-      gap: 8px;
+      gap: 10px;
     }
 
     .history-actions label {
-      color: #6b7280;
+      color: var(--muted);
       font-size: 0.95rem;
-      margin-bottom: 4px;
+      font-weight: 600;
     }
 
     .history-actions select {
       width: 100%;
-      padding: 12px 14px;
-      border-radius: 14px;
-      border: 1px solid #d1d5db;
-      background: #fff;
-      color: #111827;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--text);
+      font-size: 0.96rem;
+      box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
     }
 
     .action-row {
       display: flex;
-      gap: 10px;
+      justify-content: flex-start;
+      gap: 12px;
       flex-wrap: wrap;
-      align-items: flex-end;
+      margin-top: 4px;
     }
 
     .history-content-card {
-      padding: 22px;
-      min-height: 320px;
+      padding: 28px;
+      min-height: 360px;
     }
 
-    .history-content-card h3 {
-      margin-top: 0;
-    }
-
-    .history-content-card .section-block {
-      margin-top: 20px;
-    }
-
-    .history-content-card .section-block h4 {
-      margin-bottom: 12px;
-    }
-
-    .history-content-card .notes {
-      color: #6b7280;
-      margin-bottom: 14px;
-    }
-
-    .history-profile-meta {
-      display: grid;
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .history-profile-meta .meta-row {
+    .history-content-card .content-top {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: #f8fafc;
-      border: 1px solid #e5e7eb;
-      align-items: center;
+      align-items: flex-start;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
     }
 
-    .history-profile-meta .meta-row span {
-      color: #6b7280;
+    .history-content-card .content-top h3 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .history-content-card .note {
+      color: var(--muted);
       font-size: 0.95rem;
+      min-width: 220px;
+      text-align: right;
     }
 
-    .history-profile-meta .meta-row strong {
-      color: var(--text);
-      font-weight: 700;
+    .history-content-card .empty-state {
+      padding: 22px;
+      border-radius: 18px;
+      background: var(--card-2);
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      margin-top: 12px;
     }
 
     .history-records {
@@ -164,69 +255,100 @@
     }
 
     .history-record {
-      padding: 18px;
-      border-radius: 18px;
-      border: 1px solid #e5e7eb;
-      background: #ffffff;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+      padding: 20px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      box-shadow: 0 14px 36px rgba(15, 23, 42, 0.05);
     }
 
     .history-record strong {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       font-size: 1rem;
+      color: var(--text);
     }
 
     .history-record .record-line {
-      color: #475569;
-      font-size: 0.95rem;
-      line-height: 1.6;
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.75;
+      margin-bottom: 8px;
     }
 
     .history-pill {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 8px 12px;
+      gap: 8px;
+      padding: 10px 14px;
       border-radius: 999px;
-      background: rgba(102, 204, 204, 0.12);
+      background: rgba(102, 204, 204, 0.16);
       color: #0f766e;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.86rem;
     }
 
     @media (max-width: 900px) {
       .history-grid {
         grid-template-columns: 1fr;
       }
+
+      .history-content-card .content-top {
+        align-items: flex-start;
+      }
+
+      .history-content-card .note {
+        text-align: left;
+      }
     }
 
     @media (max-width: 640px) {
+      .history-header {
+        gap: 14px;
+      }
+
       .history-header h1 {
-        font-size: 1.75rem;
+        font-size: 2rem;
+      }
+
+      .card {
+        padding: 22px;
       }
     }
   </style>
 </head>
 <body>
+  <div class="modal-overlay" id="logoutModal" aria-hidden="true">
+    <div class="modal small">
+      <div class="modal-content">
+        <h3>Confirm logout</h3>
+        <p>Are you sure you want to log out of your academic history page?</p>
+        <div class="modal-actions">
+          <button class="secondary-btn" type="button" onclick="hideLogoutModal()">Cancel</button>
+          <button class="danger-btn" type="button" onclick="confirmLogout()">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="history-shell">
     <div class="history-header">
       <div>
-        <p class="muted" style="margin:0 0 10px; text-transform: uppercase; letter-spacing: 0.1em; font-size:0.82rem;">Student portal</p>
+        <span class="eyebrow">Student portal</span>
         <h1>Academic History</h1>
-        <p class="muted" style="margin:0; max-width:680px;">Review your past sessions, results and promotion decisions in one place.</p>
+        <p class="subtitle">Review your past sessions, results and promotion decisions in one place.</p>
       </div>
       <div class="header-actions">
-        <button class="secondary-btn" type="button" onclick="window.location.href='student-dashboard.html'">Back to Dashboard</button>
+        <button class="secondary-btn" type="button" onclick="window.location.href='student-dashboard.html'">Back to dashboard</button>
         <button class="danger-btn" id="historyLogoutBtn" type="button">Logout</button>
       </div>
     </div>
 
     <div class="history-grid">
       <section class="card history-summary">
-        <div class="summary-card">
+        <div class="card-heading">
           <h3>Student profile</h3>
-          <p class="muted" style="margin:0;">Authenticated student information used to load history records.</p>
+          <p class="muted">Authenticated student information used to load history records.</p>
         </div>
         <div class="history-info-list">
           <div class="info-item">
@@ -249,9 +371,9 @@
       </section>
 
       <section class="card history-actions">
-        <div>
+        <div class="card-heading">
           <h3>Load history</h3>
-          <p class="muted" style="margin:0 0 16px;">Choose a session and term, then click load to refresh the report.</p>
+          <p class="muted">Choose a session and term, then click load to refresh the report.</p>
         </div>
         <div class="form-group">
           <label for="historySession">Session</label>
@@ -272,12 +394,12 @@
     </div>
 
     <section class="card history-content-card">
-      <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:18px;">
+      <div class="content-top">
         <div>
-          <h3 style="margin:0 0 6px;">Academic record</h3>
-          <p class="muted" style="margin:0;">Promotion decisions, term results and timeline for the selected session.</p>
+          <h3>Academic record</h3>
+          <p class="muted">Promotion decisions, term results and timeline for the selected session.</p>
         </div>
-        <div class="muted" style="font-size:0.95rem;">Results are refreshed from your school’s record.</div>
+        <div class="note">Results are refreshed from your school’s record.</div>
       </div>
       <div id="historyContent"></div>
     </section>

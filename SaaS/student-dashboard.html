@@ -73,9 +73,11 @@
       flex-direction: column;
       gap: 18px;
       border-right: 1px solid rgba(255,255,255,0.08);
-      position: relative;
-      min-height: 100vh;
-      max-height: 100vh;
+      /* Keep sidebar visible while the main panel scrolls */
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100vh;
       overflow-y: auto;
       overflow-x: hidden;
       transition: transform 0.3s ease, opacity 0.3s ease;
@@ -316,13 +318,14 @@
       padding: 20px 22px 28px;
       min-width: 0;
       position: relative;
-      overflow: hidden;
+      /* Make main panel scrollable independently of the sidebar */
+      max-height: 100vh;
+      overflow: auto;
     }
 
+    /* Topbar should not be sticky on large screens; allow it to scroll with the page */
     .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
+      position: relative;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -391,12 +394,48 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      position: relative;
     }
 
     .tab-btn ion-icon {
       font-size: 1.1rem;
       display: inline-flex;
       vertical-align: middle;
+    }
+
+    .tab-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 0.8rem;
+      height: 0.8rem;
+      border-radius: 999px;
+      background: var(--danger);
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.65);
+      opacity: 0;
+      pointer-events: none;
+      flex-shrink: 0;
+      transform: translate(25%, -25%);
+    }
+
+    .tab-badge.has-notification {
+      opacity: 1;
+      animation: badgePulse 1s infinite ease-out;
+    }
+
+    @keyframes badgePulse {
+      0% {
+        transform: translate(25%, -25%) scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.9);
+      }
+      50% {
+        transform: translate(25%, -25%) scale(1.12);
+        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0.08);
+      }
+      100% {
+        transform: translate(25%, -25%) scale(1);
+        box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+      }
     }
 
     .tab-btn.active {
@@ -683,6 +722,7 @@
         opacity: 1;
         pointer-events: auto;
       }
+      .topbar { position: relative; top: auto; z-index: auto; }
       .topbar { flex-direction: column; }
       .topbar-actions { justify-content: flex-start; }
       .hero-card { grid-template-columns: 1fr; }
@@ -751,6 +791,19 @@
         <button class="logout-btn" type="button" id="logoutButton">Logout</button>
       </div>
     </aside>
+
+    <div class="modal-overlay" id="logoutModal" aria-hidden="true">
+      <div class="modal small">
+        <div class="modal-content">
+          <h3>Confirm logout</h3>
+          <p>Are you sure you want to log out of your student dashboard?</p>
+          <div class="modal-actions">
+            <button class="secondary-btn" type="button" onclick="hideLogoutModal()">Cancel</button>
+            <button class="danger-btn" type="button" onclick="confirmLogout()">Logout</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <main class="main-panel">
       <header class="topbar">
@@ -947,7 +1000,10 @@
     };
 
     function getStoredTheme() {
-      return localStorage.getItem('studentDashboardTheme') || localStorage.getItem('dashboardTheme') || 'light';
+      return localStorage.getItem('studentDashboardTheme')
+        || localStorage.getItem('studentResultTheme')
+        || localStorage.getItem('dashboardTheme')
+        || 'light';
     }
 
     function getStoredAccent() {
@@ -1000,6 +1056,7 @@
       }
       if (save) {
         localStorage.setItem('studentDashboardTheme', theme);
+        localStorage.setItem('studentResultTheme', theme);
         localStorage.setItem('dashboardTheme', theme);
       }
       applyAccent(getStoredAccent());
@@ -1019,6 +1076,9 @@
         const panel = document.getElementById(`panel-${name}`);
         if (panel) panel.style.display = name === tab ? '' : 'none';
       });
+      // Show assigned subjects only on the Overview tab
+      const subjectPanel = document.getElementById('subjectAssignmentsPanel');
+      if (subjectPanel) subjectPanel.style.display = tab === 'overview' ? '' : 'none';
       if (tab === 'announcements') {
         const badge = document.getElementById('announcementTabBadge');
         if (badge) {
@@ -1047,13 +1107,8 @@
       const announcementText = student?.latestAnnouncement || student?.announcementNote || '';
       const count = Number(student?.announcementCount) || (announcementText ? 1 : 0);
 
-      if (count > 0) {
-        badge.textContent = count > 1 ? String(count) : '';
-        badge.classList.add('has-notification');
-      } else {
-        badge.textContent = '';
-        badge.classList.remove('has-notification');
-      }
+      badge.textContent = '';
+      badge.classList.toggle('has-notification', count > 0);
     }
 
     function renderSubjectAssignments(subjects) {
@@ -1282,13 +1337,32 @@
       setupProfileForm();
       const logoutButton = document.getElementById('logoutButton');
       if (logoutButton) {
-        logoutButton.addEventListener('click', () => {
-          localStorage.removeItem('student');
-          localStorage.removeItem('school');
-          window.location.href = 'student-login.html';
-        });
+        logoutButton.addEventListener('click', showLogoutModal);
       }
       loadLiveDashboardData();
+    }
+
+    function showLogoutModal() {
+      const modal = document.getElementById('logoutModal');
+      if (modal) {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+
+    function hideLogoutModal() {
+      const modal = document.getElementById('logoutModal');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    function confirmLogout() {
+      hideLogoutModal();
+      localStorage.removeItem('student');
+      localStorage.removeItem('school');
+      window.location.href = 'student-login.html';
     }
 
     function setupProfileForm() {

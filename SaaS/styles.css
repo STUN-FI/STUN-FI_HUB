@@ -5,6 +5,13 @@
   --accent-strong: rgba(102, 204, 204, 0.94);
   --shadow-soft: 0 18px 48px rgba(15, 23, 42, 0.12);
   --shadow-ring: 0 0 0 1px rgba(148, 163, 184, 0.12);
+  --bg: #f8fafc;
+  --text: #111827;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --info: var(--accent);
 }
 
 html {
@@ -41,6 +48,41 @@ button:hover,
 .theme-btn:hover,
 .simple-btn:hover {
   transform: translateY(-1px);
+}
+
+.google-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 16px;
+  margin-top: 14px;
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  font-weight: 800;
+  text-transform: none;
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.google-btn:hover {
+  background: #f4f7fb;
+}
+
+body.dark .google-btn {
+  background: #111827;
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.dark .google-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.google-btn ion-icon {
+  font-size: 1.1rem;
 }
 
 .card,
@@ -87,6 +129,103 @@ select:focus {
 input:not([type="email"]):not([type="password"]):not(#password):not(#confirmPassword):not(#schoolPassword):not(#newPassword):not(#contact),
 textarea {
   text-transform: uppercase;
+}
+
+.form-feedback,
+.output,
+#status,
+#msg,
+.form-message {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-top: 14px;
+  background: rgba(102, 204, 204, 0.08);
+  color: var(--text);
+}
+
+.form-feedback:not(:empty),
+.output:not(:empty),
+#status:not(:empty),
+#msg:not(:empty),
+.form-message:not(:empty) {
+  display: inline-flex;
+}
+
+.form-feedback::before,
+.output::before,
+#status::before,
+#msg::before,
+.form-message::before {
+  content: "";
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.form-feedback.success::before,
+.output.success::before,
+#status.success::before,
+#msg.success::before,
+.form-message.success::before {
+  background: rgba(34, 197, 94, 0.25);
+  box-shadow: inset 0 0 0 2px rgba(34, 197, 94, 0.75);
+}
+
+.form-feedback.error::before,
+.output.error::before,
+#status.error::before,
+#msg.error::before,
+.form-message.error::before {
+  background: rgba(239, 68, 68, 0.25);
+  box-shadow: inset 0 0 0 2px rgba(239, 68, 68, 0.75);
+}
+
+.form-feedback.info::before,
+.output.info::before,
+#status.info::before,
+#msg.info::before,
+.form-message.info::before {
+  background: rgba(102, 204, 204, 0.25);
+  box-shadow: inset 0 0 0 2px rgba(102, 204, 204, 0.75);
+}
+
+.form-feedback.success,
+.output.success,
+#status.success,
+#msg.success,
+.form-message.success {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--success);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.form-feedback.error,
+.output.error,
+#status.error,
+#msg.error,
+.form-message.error {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.form-feedback.info,
+.output.info,
+#status.info,
+#msg.info,
+.form-message.info {
+  background: rgba(102, 204, 204, 0.12);
+  color: var(--info);
+  border-color: rgba(102, 204, 204, 0.25);
 }
 
 /* Explicitly disable uppercase for email/contact/password fields, even when password toggles to text */
