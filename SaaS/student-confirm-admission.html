@@ -516,6 +516,14 @@
 
     let recordFound = false;
 
+    function showOutput(message, type = '') {
+      const output = document.getElementById('output');
+      if (!output) return;
+      output.className = 'output' + (type ? ' ' + type : '');
+      output.innerText = message || '';
+      output.style.display = message ? 'block' : 'none';
+    }
+
     async function checkStudentRecord() {
       const output = document.getElementById("output");
       const recordCard = document.getElementById("recordCard");
@@ -533,6 +541,7 @@
 
       if (!schoolId || !studentId) {
         toast("School ID and Student ID are required.", "error");
+        showOutput("School ID and Student ID are required.", 'error');
         return;
       }
 
@@ -564,17 +573,19 @@
 
           if (data.activated) {
             toast("This student account is already activated. You can login instead.", "info");
+            showOutput("This student account is already activated. You can login instead.", 'info');
           } else {
             activationSection.style.display = "block";
             toast("You have been admitted. Complete your account activation below.", "success");
+            showOutput("You have been admitted. Complete your account activation below.", 'success');
           }
         } else {
           toast(data.message || "Student record not found.", "error");
+          showOutput(data.message || "Student record not found.", 'error');
         }
       } catch (error) {
         console.log(error);
-        output.classList.add("error");
-        output.innerText = "Server error. Please try again.";
+        showOutput("Server error. Please try again.", 'error');
       }
     }
 
@@ -592,6 +603,7 @@
 
       if (!recordFound) {
         toast("Please confirm your admission first.", "error");
+        showOutput("Please confirm your admission first.", 'error');
         return;
       }
 
@@ -602,6 +614,7 @@
 
       if (!password || !confirmPassword) {
         toast("Please fill the password fields.", "error");
+        showOutput("Please fill the password fields.", 'error');
         return;
       }
 
@@ -629,16 +642,19 @@
 
         if (response.ok) {
           toast("Admission confirmed successfully. Redirecting to login...", "success");
+          showOutput("Admission confirmed successfully. Redirecting to login...", 'success');
 
           setTimeout(() => {
             window.location.href = "student-login.html";
           }, 1800);
         } else {
           toast(data.message || "Could not confirm admission.", "error");
+          showOutput(data.message || "Could not confirm admission.", 'error');
         }
       } catch (error) {
         console.log(error);
         toast("Server error. Please try again.", "error");
+        showOutput("Server error. Please try again.", 'error');
       }
     }
 
