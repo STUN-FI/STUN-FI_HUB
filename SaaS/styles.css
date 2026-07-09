@@ -341,6 +341,7 @@ input#contact {
   opacity: 0;
   transform: translateY(6px);
   transition: opacity 240ms ease 80ms, transform 240ms ease 80ms;
+}
 
 /* Force uppercase display for school/student/reg inputs across forms */
 input[id*="schoolid" i], input[name*="schoolid" i],
@@ -352,7 +353,6 @@ input[id*="registration" i], input[name*="registration" i],
 input[id*="regnumber" i], input[name*="regnumber" i] {
   text-transform: uppercase;
 }
-}
 .modal-overlay.active .modal .modal-content,
 .modal-overlay.active .modal-card .modal-content,
 .modal.visible .modal-content,
@@ -360,6 +360,40 @@ input[id*="regnumber" i], input[name*="regnumber" i] {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Ensure modal action buttons are consistently styled (override user-agent defaults) */
+.modal .modal-actions button,
+.modal .modal-actions .primary-btn,
+.modal .modal-actions .secondary-btn,
+.modal .modal-actions .danger-btn {
+  min-width: 120px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  transition: background-color 160ms ease, transform 120ms ease;
+}
+
+.modal .modal-actions .primary-btn {
+  background: var(--accent);
+  color: white;
+}
+
+.modal .modal-actions .secondary-btn {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+
+.modal .modal-actions .danger-btn {
+  background: var(--danger);
+  color: white;
+}
+
+.modal .modal-actions button:focus { outline: none; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
 
 /* Minimal / Dashboard-like theme overrides for Admin */
 .minimal-ui {

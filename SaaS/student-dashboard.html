@@ -704,6 +704,44 @@
       visibility: visible;
     }
 
+    /* Modal & overlay styles (copied from dashboard.html to ensure consistent behavior) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 9998;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 760px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal h3 { margin-top: 0; color: var(--text); }
+    .modal p { color: var(--muted); }
+
+    .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .modal-actions button { min-width: 140px; }
+
+    /* Small modal variation */
+    .modal.small { max-width: 420px; }
+
+
     @media (max-width: 980px) {
       .layout { grid-template-columns: 1fr; }
       .layout.collapsed { grid-template-columns: 1fr; }
