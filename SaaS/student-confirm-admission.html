@@ -521,7 +521,9 @@
       if (!output) return;
       output.className = 'output' + (type ? ' ' + type : '');
       output.innerText = message || '';
-      output.style.display = message ? 'block' : 'none';
+      // Let stylesheet control display (use CSS .output:not(:empty) rule)
+      if (message) output.style.display = '';
+      else output.style.display = 'none';
     }
 
     async function checkStudentRecord() {
