@@ -1727,7 +1727,6 @@
     </div>
   </div>
 
-<div class="toast-wrap" id="toastWrap"></div>
 <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
 
 <div class="modal-overlay" id="studentEditModal">
@@ -2671,15 +2670,6 @@ async function addAssignment() {
     console.error(err);
     toast("Server error", "error");
   }
-}
-
-function toast(message, type = "info") {
-  const wrap = document.getElementById("toastWrap");
-  const div = document.createElement("div");
-  div.className = `toast ${type}`;
-  div.innerText = message;
-  wrap.appendChild(div);
-  setTimeout(() => div.remove(), 2800);
 }
 
 function getInitials(name) {

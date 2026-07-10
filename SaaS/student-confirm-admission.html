@@ -434,35 +434,6 @@
       input.type = input.type === "password" ? "text" : "password";
     }
 
-    function toast(message, type = "info") {
-      const wrap = document.getElementById("toastWrap");
-      if (!wrap) return;
-
-      const toast = document.createElement("div");
-      toast.className = `toast ${type}`;
-      toast.setAttribute('role','status');
-
-      const icon = document.createElement("span");
-      icon.className = 'icon';
-      icon.textContent = type === "success" ? "✔" : type === "error" ? "✖" : "ℹ";
-
-      const text = document.createElement('div');
-      text.className = 'toast-text';
-      text.textContent = message;
-
-      toast.appendChild(icon);
-      toast.appendChild(text);
-
-      wrap.appendChild(toast);
-      // Auto-remove with CSS-friendly fade
-      setTimeout(() => {
-        toast.style.transition = "opacity 200ms ease, transform 200ms ease";
-        toast.style.opacity = "0";
-        toast.style.transform = "translateY(-6px)";
-        setTimeout(() => toast.remove(), 220);
-      }, 3200);
-    }
-
     async function detectSchool() {
       const email = document.getElementById("email");
       if (!email) return;
@@ -666,7 +637,6 @@
   </script>
 
   <script src="common.js"></script>
-  <div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true"></div>
 </body>
 </html>
 

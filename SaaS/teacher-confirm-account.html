@@ -427,13 +427,19 @@
 
     let recordFound = false;
 
+    function showOutput(message, type = '') {
+      const output = document.getElementById('output');
+      if (!output) return;
+      output.className = 'output' + (type ? ' ' + type : '');
+      output.innerText = message || '';
+      if (message) output.style.display = '';
+      else output.style.display = 'none';
+    }
+
     async function checkTeacherRecord() {
-      const output = document.getElementById("output");
       const recordCard = document.getElementById("recordCard");
       const passwordSection = document.getElementById("passwordSection");
 
-      output.className = "output";
-      output.innerText = "";
       recordCard.style.display = "none";
       passwordSection.style.display = "none";
       recordFound = false;
@@ -442,8 +448,9 @@
       const contact = document.getElementById("contact").value.trim();
 
       if (!schoolId || !contact) {
-        output.classList.add("error");
-        output.innerText = "School ID and registered email/phone are required.";
+        const msg = "School ID and registered email/phone are required.";
+        toast(msg, "error");
+        showOutput(msg, "error");
         return;
       }
 
@@ -474,49 +481,52 @@
           recordFound = true;
 
           if (data.activated) {
-            output.classList.add("info");
-            output.innerText = "This teacher account is already activated. You can login instead.";
+            const msg = "This teacher account is already activated. You can login instead.";
+            toast(msg, "info");
+            showOutput(msg, "info");
           } else {
             passwordSection.style.display = "block";
-            output.classList.add("success");
-            output.innerText = "Record found. Create your password to activate your account.";
+            const msg = "Record found. Create your password to activate your account.";
+            toast(msg, "success");
+            showOutput(msg, "success");
           }
         } else {
-          output.classList.add("error");
-          output.innerText = data.message || "Teacher record not found.";
+          const msg = data.message || "Teacher record not found.";
+          toast(msg, "error");
+          showOutput(msg, "error");
         }
       } catch (error) {
         console.log(error);
-        output.classList.add("error");
-        output.innerText = "Server error. Please try again.";
+        const msg = "Server error. Please try again.";
+        toast(msg, "error");
+        showOutput(msg, "error");
       }
     }
 
     async function confirmTeacherAccount() {
-      const output = document.getElementById("output");
-      output.className = "output";
-      output.innerText = "";
-
       const schoolId = document.getElementById("schoolId").value.trim();
       const contact = document.getElementById("contact").value.trim();
       const password = document.getElementById("password").value.trim();
       const confirmPassword = document.getElementById("confirmPassword").value.trim();
 
       if (!recordFound) {
-        output.classList.add("error");
-        output.innerText = "Please check your teacher record first.";
+        const msg = "Please check your teacher record first.";
+        toast(msg, "error");
+        showOutput(msg, "error");
         return;
       }
 
       if (!password || !confirmPassword) {
-        output.classList.add("error");
-        output.innerText = "Please fill the password fields.";
+        const msg = "Please fill the password fields.";
+        toast(msg, "error");
+        showOutput(msg, "error");
         return;
       }
 
       if (password !== confirmPassword) {
-        output.classList.add("error");
-        output.innerText = "Passwords do not match.";
+        const msg = "Passwords do not match.";
+        toast(msg, "error");
+        showOutput(msg, "error");
         return;
       }
 
@@ -536,20 +546,23 @@
         const data = await response.json();
 
         if (response.ok) {
-          output.classList.add("success");
-          output.innerText = "Teacher account activated successfully. Redirecting to login...";
+          const msg = "Teacher account activated successfully. Redirecting to login...";
+          toast(msg, "success");
+          showOutput(msg, "success");
 
           setTimeout(() => {
             window.location.href = "teacher-login.html";
           }, 1800);
         } else {
-          output.classList.add("error");
-          output.innerText = data.message || "Could not activate account.";
+          const msg = data.message || "Could not activate account.";
+          toast(msg, "error");
+          showOutput(msg, "error");
         }
       } catch (error) {
         console.log(error);
-        output.classList.add("error");
-        output.innerText = "Server error. Please try again.";
+        const msg = "Server error. Please try again.";
+        toast(msg, "error");
+        showOutput(msg, "error");
       }
     }
 

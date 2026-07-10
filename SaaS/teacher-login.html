@@ -362,18 +362,23 @@
       input.type = input.type === "password" ? "text" : "password";
     }
 
-    async function loginTeacher() {
-      const output = document.getElementById("output");
-      output.className = "output";
-      output.innerText = "";
+    function showOutput(message, type = '') {
+      const output = document.getElementById('output');
+      if (!output) return;
+      output.className = 'output' + (type ? ' ' + type : '');
+      output.innerText = message || '';
+      if (message) output.style.display = '';
+      else output.style.display = 'none';
+    }
 
+    async function loginTeacher() {
       const schoolId = document.getElementById("schoolId").value.trim();
       const contact = document.getElementById("contact").value.trim();
       const password = document.getElementById("password").value.trim();
 
       if (!schoolId || !contact || !password) {
-        output.classList.add("error");
-        output.innerText = "Please fill all fields.";
+        toast("Please fill all fields.", "error");
+        showOutput("Please fill all fields.", "error");
         return;
       }
 
@@ -398,22 +403,24 @@
           localStorage.setItem("token", data.token);
           localStorage.setItem("teacher", JSON.stringify(data.teacher));
 
-          output.classList.add("success");
-          output.innerText = "Login successful. Redirecting...";
+          toast("Login successful. Redirecting...", "success");
+          showOutput("Login successful. Redirecting...", "success");
 
           setTimeout(() => {
             window.location.href = "teacher-dashboard.html";
           }, 1000);
         } else {
           window.hideLoader?.();
-          output.classList.add("error");
-          output.innerText = data.message || "Login failed.";
+          const msg = data.message || "Login failed.";
+          toast(msg, "error");
+          showOutput(msg, "error");
         }
       } catch (error) {
         console.log(error);
         window.hideLoader?.();
-        output.classList.add("error");
-        output.innerText = "Server error. Please try again.";
+        const msg = "Server error. Please try again.";
+        toast(msg, "error");
+        showOutput(msg, "error");
       }
     }
 

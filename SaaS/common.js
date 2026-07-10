@@ -68,9 +68,69 @@ document.addEventListener('keydown', function (event) {
   });
 });
 
+function ensureToastWrap() {
+  let wrap = document.getElementById('toastWrap');
+  if (wrap) return wrap;
+
+  wrap = document.createElement('div');
+  wrap.className = 'toast-wrap';
+  wrap.id = 'toastWrap';
+  wrap.setAttribute('aria-live', 'polite');
+  wrap.setAttribute('aria-atomic', 'true');
+
+  const appendWrap = () => {
+    if (!document.body.contains(wrap)) {
+      document.body.appendChild(wrap);
+    }
+  };
+
+  if (document.body) {
+    appendWrap();
+  } else {
+    document.addEventListener('DOMContentLoaded', appendWrap, { once: true });
+  }
+
+  return wrap;
+}
+
+function toast(message, type = 'info', duration = 3200) {
+  const wrap = ensureToastWrap();
+  if (!wrap) return null;
+
+  const toastEl = document.createElement('div');
+  toastEl.className = `toast ${type}`;
+  toastEl.setAttribute('role', 'status');
+
+  const icon = document.createElement('span');
+  icon.className = 'icon';
+  icon.textContent = type === 'success' ? '✔' : type === 'error' ? '✖' : 'ℹ';
+
+  const text = document.createElement('div');
+  text.className = 'toast-text';
+  text.textContent = message;
+
+  toastEl.appendChild(icon);
+  toastEl.appendChild(text);
+  wrap.appendChild(toastEl);
+
+  setTimeout(() => {
+    toastEl.style.transition = 'opacity 200ms ease, transform 200ms ease';
+    toastEl.style.opacity = '0';
+    toastEl.style.transform = 'translateY(-6px)';
+    setTimeout(() => toastEl.remove(), 220);
+  }, duration);
+
+  return toastEl;
+}
+
 // Expose helpers globally for existing inline scripts to call
 window.openModal = openModal;
 window.closeModal = closeModal;
+window.toast = toast;
+window.ensureToastWrap = ensureToastWrap;
+
+// Create the toast container immediately if possible so pages can use it right away.
+ensureToastWrap();
 
 // Helper to wrap async functions with loader
 window.withLoader = function(asyncFn) {
