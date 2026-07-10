@@ -40,16 +40,19 @@ const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
   secure: false,
+  requireTLS: true,
+  family: 4,
   auth: {
     user: emailUser,
-    pass: emailPass
+    pass: emailPass,
+    authMethod: 'LOGIN'
   },
   tls: {
     rejectUnauthorized: false
   },
-  connectionTimeout: 30000,
-  greetingTimeout: 30000,
-  socketTimeout: 30000
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 15000
 });
 
 if (!emailUser || !emailPass) {
@@ -1914,8 +1917,11 @@ app.post("/student-forgot-password", async (req, res) => {
 
     res.json({ message: "Reset link sent to email" });
   } catch (error) {
-    console.error("Student reset email failed:", error && error.message ? error.message : error);
-    res.status(500).json({ message: "Error sending student reset email" });
+    console.error("Student reset email failed:", error && error.message ? error.message : error, { stack: error && error.stack ? error.stack : null });
+    const message = process.env.NODE_ENV !== 'production'
+      ? (error && error.message ? error.message : "Error sending student reset email")
+      : "Error sending student reset email";
+    res.status(500).json({ message });
   }
 });
 
