@@ -58,6 +58,63 @@ if (!geminiApiKey) {
 app.use(cors());
 app.use(express.json({ limit: "20mb" }));
 
+// Lightweight Google OAuth endpoints so frontend "Continue with Google" buttons work.
+// Requires GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to fully complete the flow.
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+
+app.get('/auth/google', (req, res) => {
+  if (!GOOGLE_CLIENT_ID) {
+    return res.status(500).send('Google OAuth not configured (GOOGLE_CLIENT_ID missing).');
+  }
+
+  const redirectUri = `${req.protocol}://${req.get('host')}/auth/google/callback`;
+  const scope = encodeURIComponent('openid email profile');
+  const state = encodeURIComponent(req.query.redirect || '/');
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}&access_type=online&state=${state}`;
+  return res.redirect(authUrl);
+});
+
+app.get('/auth/google/callback', async (req, res) => {
+  const code = req.query.code;
+  const state = req.query.state || '/';
+
+  if (!code) return res.status(400).send('Missing code parameter');
+  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+    // Informative response — developer can configure env to complete the flow
+    return res.status(501).send('Google OAuth callback received but server is not configured with client credentials (GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET).');
+  }
+
+  try {
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: `${req.protocol}://${req.get('host')}/auth/google/callback`,
+        grant_type: 'authorization_code'
+      })
+    });
+
+    const tokenData = await tokenRes.json();
+    if (!tokenRes.ok) {
+      console.error('Google token exchange error', tokenData);
+      return res.status(502).json({ message: 'Token exchange failed', details: tokenData });
+    }
+
+    // For now, simply redirect back to the frontend with the id_token as a query param (developer can swap for a real session)
+    const idToken = tokenData.id_token;
+    const redirectTo = state || '/';
+    const separator = redirectTo.includes('?') ? '&' : '?';
+    return res.redirect(`${redirectTo}${separator}google_id_token=${encodeURIComponent(idToken || '')}`);
+  } catch (err) {
+    console.error('Google callback error', err);
+    return res.status(500).send('Internal server error during Google callback');
+  }
+});
+
 // Use the MONGO_URI variable defined above (not a separate dbURI)
 const maskedMongoUri = MONGO_URI
   ? MONGO_URI.replace(/(mongodb(?:\+srv)?:\/\/)([^:]+):([^@]+)@/, '$1<user>:<pass>@')
