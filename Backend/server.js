@@ -58,6 +58,13 @@ if (!geminiApiKey) {
 app.use(cors());
 app.use(express.json({ limit: "20mb" }));
 
+// Helper to determine the public base URL for links in emails.
+// Prefers explicit `BASE_URL` env var (set in production), falls back to request host for local testing.
+function getBaseUrl(req) {
+  if (process.env.BASE_URL && process.env.BASE_URL.trim()) return process.env.BASE_URL.replace(/\/$/, '');
+  return `${req.protocol}://${req.get('host')}`;
+}
+
 // Lightweight Google OAuth endpoints so frontend "Continue with Google" buttons work.
 // Requires GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to fully complete the flow.
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
@@ -1778,7 +1785,8 @@ app.post("/teacher-forgot-password", async (req, res) => {
     teacher.resetTokenExpiry = Date.now() + 15 * 60 * 1000;
     await teacher.save();
 
-    const resetLink = `${process.env.BASE_URL}/reset-password.html?token=${token}&type=teacher`;
+    const baseUrl = getBaseUrl(req);
+    const resetLink = `${baseUrl}/reset-password.html?token=${token}&type=teacher`;
 
     if (!emailUser || !emailPass) {
       console.error("Teacher password reset email blocked because SMTP credentials are missing.", { EMAIL_USER_SET: !!emailUser, EMAIL_PASS_SET: !!emailPass });
@@ -1865,7 +1873,8 @@ app.post("/student-forgot-password", async (req, res) => {
     student.resetTokenExpiry = Date.now() + 15 * 60 * 1000;
     await student.save();
 
-    const resetLink = `${process.env.BASE_URL}/reset-password.html?token=${token}&type=student`;
+    const baseUrl = getBaseUrl(req);
+    const resetLink = `${baseUrl}/reset-password.html?token=${token}&type=student`;
 
     if (!emailUser || !emailPass) {
       console.error("Student password reset email blocked because SMTP credentials are missing.", { EMAIL_USER_SET: !!emailUser, EMAIL_PASS_SET: !!emailPass });
@@ -1982,7 +1991,8 @@ app.post("/school-forgot-password", async (req, res) => {
     school.resetTokenExpiry = Date.now() + 15 * 60 * 1000;
     await school.save();
 
-    const resetLink = `${process.env.BASE_URL}/reset-password.html?token=${token}&type=school`;
+    const baseUrl = getBaseUrl(req);
+    const resetLink = `${baseUrl}/reset-password.html?token=${token}&type=school`;
 
     if (!emailUser || !emailPass) {
       console.error("School password reset email blocked because SMTP credentials are missing.", { EMAIL_USER_SET: !!emailUser, EMAIL_PASS_SET: !!emailPass });
