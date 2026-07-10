@@ -37,11 +37,19 @@ if (process.env.NODE_ENV === 'production') {
 const emailUser = process.env.EMAIL_USER || "stunfihub@gmail.com";
 const emailPass = process.env.EMAIL_PASS || "fxsjcbfkndfypxhf";
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
   auth: {
     user: emailUser,
     pass: emailPass
-  }
+  },
+  tls: {
+    rejectUnauthorized: false
+  },
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
+  socketTimeout: 30000
 });
 
 if (!emailUser || !emailPass) {
