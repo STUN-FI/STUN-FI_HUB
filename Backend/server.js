@@ -77,9 +77,22 @@ app.use(cors());
 app.use(express.json({ limit: "20mb" }));
 
 // Helper to determine the public base URL for links in emails.
-// Prefers explicit `BASE_URL` env var (set in production), falls back to request host for local testing.
+// Prefers explicit `BASE_URL` env var (set in production), otherwise uses the
+// request Origin/Referer header when the frontend is calling the API, and only
+// falls back to the backend host for local or non-browser test requests.
 function getBaseUrl(req) {
   if (process.env.BASE_URL && process.env.BASE_URL.trim()) return process.env.BASE_URL.replace(/\/$/, '');
+
+  const originHeader = req.headers.origin || req.headers.referer || '';
+  if (originHeader) {
+    try {
+      const parsed = new URL(originHeader);
+      if (parsed.origin) return parsed.origin.replace(/\/$/, '');
+    } catch (error) {
+      // Ignore malformed/referrer values and fall through to request host.
+    }
+  }
+
   return `${req.protocol}://${req.get('host')}`;
 }
 
