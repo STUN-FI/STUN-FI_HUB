@@ -37,9 +37,10 @@ if (process.env.NODE_ENV === 'production') {
 const emailUser = process.env.EMAIL_USER || "stunfihub@gmail.com";
 const emailPass = process.env.EMAIL_PASS || "fxsjcbfkndfypxhf";
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
   port: 465,
   secure: true,
+  family: 4,
   auth: {
     user: emailUser,
     pass: emailPass
@@ -47,6 +48,9 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false
   },
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 30000,
   debug: process.env.NODE_ENV !== 'production'
 });
 
