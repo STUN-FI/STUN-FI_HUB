@@ -1846,13 +1846,18 @@ app.post("/teacher-forgot-password", async (req, res) => {
     const baseUrl = getBaseUrl(req);
     const resetLink = `${baseUrl}/reset-password.html?token=${token}&type=teacher`;
 
-    if (!emailUser || !emailPass) {
+    if (emailProvider === "resend" && !resendApiKey) {
+      console.error("Teacher password reset email blocked because Resend credentials are missing.", { RESEND_API_KEY_SET: !!resendApiKey });
+      return res.status(500).json({ message: "Email service is not configured on the server" });
+    }
+
+    if (emailProvider !== "resend" && (!emailUser || !emailPass)) {
       console.error("Teacher password reset email blocked because SMTP credentials are missing.", { EMAIL_USER_SET: !!emailUser, EMAIL_PASS_SET: !!emailPass });
       return res.status(500).json({ message: "Email service is not configured on the server" });
     }
 
     await transporter.sendMail({
-      from: `"STUN-FI HUB" <${emailUser}>`,
+      from: `"STUN-FI HUB" <${mailFrom}>`,
       to: email,
       subject: "Password Reset - STUN-FI HUB",
       html: `
@@ -1934,13 +1939,18 @@ app.post("/student-forgot-password", async (req, res) => {
     const baseUrl = getBaseUrl(req);
     const resetLink = `${baseUrl}/reset-password.html?token=${token}&type=student`;
 
-    if (!emailUser || !emailPass) {
+    if (emailProvider === "resend" && !resendApiKey) {
+      console.error("Student password reset email blocked because Resend credentials are missing.", { RESEND_API_KEY_SET: !!resendApiKey });
+      return res.status(500).json({ message: "Email service is not configured on the server" });
+    }
+
+    if (emailProvider !== "resend" && (!emailUser || !emailPass)) {
       console.error("Student password reset email blocked because SMTP credentials are missing.", { EMAIL_USER_SET: !!emailUser, EMAIL_PASS_SET: !!emailPass });
       return res.status(500).json({ message: "Email service is not configured on the server" });
     }
 
     await transporter.sendMail({
-      from: `"STUN-FI HUB" <${emailUser}>`,
+      from: `"STUN-FI HUB" <${mailFrom}>`,
       to: email,
       subject: "Password Reset - STUN-FI HUB",
       html: `
@@ -2055,13 +2065,18 @@ app.post("/school-forgot-password", async (req, res) => {
     const baseUrl = getBaseUrl(req);
     const resetLink = `${baseUrl}/reset-password.html?token=${token}&type=school`;
 
-    if (!emailUser || !emailPass) {
+    if (emailProvider === "resend" && !resendApiKey) {
+      console.error("School password reset email blocked because Resend credentials are missing.", { RESEND_API_KEY_SET: !!resendApiKey });
+      return res.status(500).json({ message: "Email service is not configured on the server" });
+    }
+
+    if (emailProvider !== "resend" && (!emailUser || !emailPass)) {
       console.error("School password reset email blocked because SMTP credentials are missing.", { EMAIL_USER_SET: !!emailUser, EMAIL_PASS_SET: !!emailPass });
       return res.status(500).json({ message: "Email service is not configured on the server" });
     }
 
     await transporter.sendMail({
-      from: `"STUN-FI HUB" <${emailUser}>`,
+      from: `"STUN-FI HUB" <${mailFrom}>`,
       to: email,
       subject: "Password Reset - STUN-FI HUB",
       html: `
