@@ -37,22 +37,25 @@ if (process.env.NODE_ENV === 'production') {
 const emailUser = process.env.EMAIL_USER || "stunfihub@gmail.com";
 const emailPass = process.env.EMAIL_PASS || "fxsjcbfkndfypxhf";
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  requireTLS: true,
-  family: 4,
+  service: "gmail",
+  port: 465,
+  secure: true,
   auth: {
     user: emailUser,
-    pass: emailPass,
-    authMethod: 'LOGIN'
+    pass: emailPass
   },
   tls: {
     rejectUnauthorized: false
   },
-  connectionTimeout: 15000,
-  greetingTimeout: 15000,
-  socketTimeout: 15000
+  debug: process.env.NODE_ENV !== 'production'
+});
+
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("SMTP transporter verification failed:", error && error.message ? error.message : error);
+  } else {
+    console.log("SMTP transporter verified successfully", success);
+  }
 });
 
 if (!emailUser || !emailPass) {
