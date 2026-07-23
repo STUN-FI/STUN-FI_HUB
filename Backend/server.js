@@ -34,35 +34,62 @@ if (process.env.NODE_ENV === 'production') {
   console.log("  GEMINI_API_KEY:", process.env.GEMINI_API_KEY ? "SET" : "NOT SET");
 }
 
+const emailProvider = (process.env.EMAIL_PROVIDER || "gmail").toLowerCase();
 const emailUser = process.env.EMAIL_USER || "stunfihub@gmail.com";
 const emailPass = process.env.EMAIL_PASS || "fxsjcbfkndfypxhf";
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  family: 4,
-  auth: {
-    user: emailUser,
-    pass: emailPass
-  },
-  tls: {
-    rejectUnauthorized: false
-  },
-  connectionTimeout: 15000,
-  greetingTimeout: 15000,
-  socketTimeout: 30000,
-  debug: process.env.NODE_ENV !== 'production'
-});
+const resendApiKey = process.env.RESEND_API_KEY || "";
+const mailFrom = process.env.EMAIL_FROM || process.env.RESEND_FROM || emailUser;
+
+const transporter = nodemailer.createTransport(
+  emailProvider === "resend"
+    ? {
+        host: "smtp.resend.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: "resend",
+          pass: resendApiKey
+        },
+        tls: {
+          rejectUnauthorized: false
+        },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 30000,
+        debug: process.env.NODE_ENV !== 'production'
+      }
+    : {
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        family: 4,
+        auth: {
+          user: emailUser,
+          pass: emailPass
+        },
+        tls: {
+          rejectUnauthorized: false
+        },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 30000,
+        debug: process.env.NODE_ENV !== 'production'
+      }
+);
 
 transporter.verify((error, success) => {
   if (error) {
-    console.error("SMTP transporter verification failed:", error && error.message ? error.message : error);
+    console.error(`[SMTP:${emailProvider}] transporter verification failed:`, error && error.message ? error.message : error);
   } else {
-    console.log("SMTP transporter verified successfully", success);
+    console.log(`[SMTP:${emailProvider}] transporter verified successfully`, success);
   }
 });
 
-if (!emailUser || !emailPass) {
+if (emailProvider === "resend" && !resendApiKey) {
+  console.warn("RESEND_API_KEY is not configured. Forgot password email delivery will fail when using Resend.");
+}
+
+if (emailProvider !== "resend" && (!emailUser || !emailPass)) {
   console.warn("EMAIL_USER or EMAIL_PASS is not configured. Forgot password email delivery will fail.");
 }
 
