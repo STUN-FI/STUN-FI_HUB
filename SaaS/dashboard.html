@@ -2176,7 +2176,6 @@
       <button class="tab-btn active" onclick="showTab('students', this)">Students</button>
       <button class="tab-btn" onclick="showTab('teachers', this)">Teachers</button>
       <button class="tab-btn" onclick="showTab('announcements', this)">Announcements</button>
-      <button class="tab-btn" onclick="showTab('timetable', this)">Timetable</button>
       <button class="tab-btn" onclick="showTab('settings', this)">Settings</button>
     </div>
 
@@ -2343,123 +2342,6 @@
           <div class="collapsible-content" id="postSectionContent">
             <div class="scroll-card-body">
               <div id="postList"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="timetableTab" class="tab-panel">
-      <div class="grid">
-        <div class="card">
-          <h3>School Timetable</h3>
-          <p class="muted" style="margin-top: -4px; margin-bottom: 18px;">Create one class timetable entry at a time. The same schedule is shown on teacher and student dashboards.</p>
-
-          <div class="form-group">
-            <label for="timetableClass">Class</label>
-            <input id="timetableClass" placeholder="e.g. JSS1" maxlength="6">
-          </div>
-
-          <div class="form-group">
-            <label for="timetableArm">Arm</label>
-            <input id="timetableArm" placeholder="e.g. A" maxlength="1">
-          </div>
-
-          <div class="form-group">
-            <label for="timetableDay">Day</label>
-            <select id="timetableDay">
-              <option value="Monday">Monday</option>
-              <option value="Tuesday">Tuesday</option>
-              <option value="Wednesday">Wednesday</option>
-              <option value="Thursday">Thursday</option>
-              <option value="Friday">Friday</option>
-              <option value="Saturday">Saturday</option>
-              <option value="Sunday">Sunday</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="timetableSubject">Subject</label>
-            <input id="timetableSubject" placeholder="e.g. Mathematics">
-          </div>
-
-          <div class="form-group">
-            <label for="timetableTeacher">Teacher</label>
-            <select id="timetableTeacher">
-              <option value="">Select teacher</option>
-            </select>
-          </div>
-
-          <div class="form-group" style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-            <div>
-              <label for="timetableStart">Start Time</label>
-              <input id="timetableStart" type="time">
-            </div>
-            <div>
-              <label for="timetableEnd">End Time</label>
-              <input id="timetableEnd" type="time">
-            </div>
-          </div>
-
-          <div class="form-group" style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-            <div>
-              <label for="timetableSession">Session</label>
-              <select id="timetableSession">
-                <option value="2025/2026">2025/2026</option>
-                <option value="2026/2027">2026/2027</option>
-                <option value="2027/2028">2027/2028</option>
-              </select>
-            </div>
-            <div>
-              <label for="timetableTerm">Term</label>
-              <select id="timetableTerm">
-                <option value="1st Term">1st Term</option>
-                <option value="2nd Term">2nd Term</option>
-                <option value="3rd Term">3rd Term</option>
-              </select>
-            </div>
-          </div>
-
-          <button class="primary-btn" onclick="saveTimetableEntry()"><ion-icon name="calendar-outline"></ion-icon> Save timetable entry</button>
-        </div>
-
-        <div class="card">
-          <div class="section-header">
-            <button class="section-toggle" id="timetableSectionToggle" onclick="toggleSection('timetableSectionToggle', 'timetableSectionContent')">
-              <span class="arrow"><ion-icon name="chevron-down-outline"></ion-icon></span> Saved timetable
-            </button>
-            <div class="score-toolbar">
-              <select id="schoolTimetableSessionSelect" onchange="loadSchoolTimetable()">
-                <option value="2025/2026">2025/2026</option>
-                <option value="2026/2027">2026/2027</option>
-                <option value="2027/2028">2027/2028</option>
-              </select>
-              <select id="schoolTimetableTermSelect" onchange="loadSchoolTimetable()">
-                <option value="1st Term">1st Term</option>
-                <option value="2nd Term">2nd Term</option>
-                <option value="3rd Term">3rd Term</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="collapsible-content" id="timetableSectionContent">
-            <div class="table-wrapper">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Day</th>
-                    <th>Class</th>
-                    <th>Arm</th>
-                    <th>Subject</th>
-                    <th>Teacher</th>
-                    <th>Time</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody id="schoolTimetableBody">
-                  <tr><td colspan="7" class="empty-state">Loading timetable...</td></tr>
-                </tbody>
-              </table>
             </div>
           </div>
         </div>
@@ -3695,140 +3577,9 @@ async function loadTeachers() {
 
     teachers = data;
     renderTeachers();
-    populateTimetableTeacherSelect();
     updateStats();
   } catch (error) {
     console.log(error);
-  }
-}
-
-function populateTimetableTeacherSelect() {
-  const select = document.getElementById("timetableTeacher");
-  if (!select) return;
-
-  const options = (teachers || [])
-    .filter((teacher) => teacher && teacher.teacherId)
-    .map((teacher) => `<option value="${escapeHtml(teacher.teacherId)}">${escapeHtml(teacher.name || teacher.teacherId)}</option>`)
-    .join("");
-
-  select.innerHTML = `<option value="">Select teacher</option>${options}`;
-}
-
-async function saveTimetableEntry() {
-  const className = document.getElementById("timetableClass")?.value.trim();
-  const arm = document.getElementById("timetableArm")?.value.trim();
-  const day = document.getElementById("timetableDay")?.value.trim();
-  const subject = document.getElementById("timetableSubject")?.value.trim();
-  const teacherId = document.getElementById("timetableTeacher")?.value.trim();
-  const startTime = document.getElementById("timetableStart")?.value.trim();
-  const endTime = document.getElementById("timetableEnd")?.value.trim();
-  const session = document.getElementById("timetableSession")?.value.trim() || "2025/2026";
-  const term = document.getElementById("timetableTerm")?.value.trim() || "1st Term";
-
-  if (!className || !day || !subject || !teacherId || !startTime || !endTime) {
-    toast("Please complete all timetable fields.", "error");
-    return;
-  }
-
-  try {
-    const response = await fetch(window.API_BASE + "/school/" + encodeURIComponent(currentSchoolId) + "/timetable", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ className, arm, day, subject, teacherId, startTime, endTime, session, term })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Could not save timetable entry");
-    }
-
-    toast("Timetable entry saved successfully.", "success");
-    document.getElementById("timetableClass").value = "";
-    document.getElementById("timetableArm").value = "";
-    document.getElementById("timetableSubject").value = "";
-    document.getElementById("timetableTeacher").value = "";
-    document.getElementById("timetableStart").value = "";
-    document.getElementById("timetableEnd").value = "";
-    await loadSchoolTimetable();
-  } catch (error) {
-    console.error(error);
-    toast(error.message || "Error saving timetable entry.", "error");
-  }
-}
-
-async function loadSchoolTimetable() {
-  const body = document.getElementById("schoolTimetableBody");
-  const session = document.getElementById("schoolTimetableSessionSelect")?.value || "2025/2026";
-  const term = document.getElementById("schoolTimetableTermSelect")?.value || "1st Term";
-
-  if (body) {
-    body.innerHTML = `<tr><td colspan="7" class="empty-state">Loading timetable...</td></tr>`;
-  }
-
-  try {
-    const response = await fetch(
-      window.API_BASE + "/school/" + encodeURIComponent(currentSchoolId) + "/timetable?session=" + encodeURIComponent(session) + "&term=" + encodeURIComponent(term)
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Unable to load timetable entries");
-    }
-
-    renderSchoolTimetable(Array.isArray(data) ? data : []);
-  } catch (error) {
-    console.error(error);
-    if (body) {
-      body.innerHTML = `<tr><td colspan="7" class="empty-state">Unable to load timetable.</td></tr>`;
-    }
-  }
-}
-
-function renderSchoolTimetable(entries) {
-  const body = document.getElementById("schoolTimetableBody");
-  if (!body) return;
-
-  if (!entries.length) {
-    body.innerHTML = `<tr><td colspan="7" class="empty-state">No timetable entries saved yet.</td></tr>`;
-    return;
-  }
-
-  const teacherById = Object.fromEntries((teachers || []).map((teacher) => [teacher.teacherId, teacher.name || teacher.teacherId]));
-
-  body.innerHTML = entries.map((entry) => `
-    <tr>
-      <td>${escapeHtml(entry.day || "")}</td>
-      <td>${escapeHtml(entry.className || "")}</td>
-      <td>${escapeHtml(entry.arm || "")}</td>
-      <td>${escapeHtml(entry.subject || "")}</td>
-      <td>${escapeHtml(teacherById[entry.teacherId] || entry.teacherId || "")}</td>
-      <td>${escapeHtml(entry.startTime || "")} - ${escapeHtml(entry.endTime || "")}</td>
-      <td><button class="mini-btn btn-unpaid" onclick="deleteTimetableEntry('${entry._id || ''}')">Delete</button></td>
-    </tr>
-  `).join("");
-}
-
-async function deleteTimetableEntry(entryId) {
-  if (!entryId) return;
-
-  try {
-    const response = await fetch(window.API_BASE + "/school/" + encodeURIComponent(currentSchoolId) + "/timetable/" + encodeURIComponent(entryId), {
-      method: "DELETE"
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Unable to delete timetable entry");
-    }
-
-    toast("Timetable entry deleted.", "success");
-    await loadSchoolTimetable();
-  } catch (error) {
-    console.error(error);
-    toast(error.message || "Error deleting timetable entry.", "error");
   }
 }
 
@@ -5544,7 +5295,6 @@ async function init() {
     loadNotifications()
   ]);
   renderActivities();
-  await loadSchoolTimetable();
   setTimeout(() => loadPosts("students"), 500);
 }
 
