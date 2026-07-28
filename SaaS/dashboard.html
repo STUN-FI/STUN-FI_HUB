@@ -3396,7 +3396,7 @@ function renderClassGroupSummary(groups) {
     viewBtn.innerText = "View students";
     viewBtn.addEventListener("click", () => openClassStudentsModal(group.className, group.arm, group.students));
 
-    if (!isThirdTerm) {
+    if (isThirdTerm) {
       const assignBtn = document.createElement("button");
       assignBtn.className = "mini-btn assign-btn";
       assignBtn.type = "button";
@@ -4380,6 +4380,12 @@ async function refreshScoreModal() {
   const term = document.getElementById("scoreTermSelect").value;
   const body = document.getElementById("scoreModalBody");
   const summary = document.getElementById("scoreModalSummary");
+  const assignBtn = document.getElementById("assignResultBtn");
+  const { isThirdTerm } = getPromotionWindowState();
+
+  if (assignBtn) {
+    assignBtn.style.display = isThirdTerm ? "inline-flex" : "none";
+  }
 
   body.innerHTML = `<div class="empty-state">Loading submitted scores...</div>`;
   summary.innerHTML = `Loading summary...`;
@@ -4739,8 +4745,8 @@ async function openBulkPromotionModal(className, arm) {
   const session = document.getElementById("mainSessionSelect")?.value || "2025/2026";
   const term = document.getElementById("mainTermSelect")?.value || "1st Term";
 
-  if (term === "3rd Term") {
-    toast("Promotion actions are not available for the 3rd term. Use earlier terms for promotion decisions.", "info");
+  if (term !== "3rd Term") {
+    toast("Promotion actions are only available for the 3rd term.", "info");
     return;
   }
 
