@@ -419,6 +419,105 @@ input[id*="regnumber" i], input[name*="regnumber" i] {
 
 .modal .modal-actions button:focus { outline: none; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
 
+/* Help modal layout */
+.help-modal {
+  width: min(680px, calc(100% - 24px));
+  max-width: 680px;
+  max-height: min(84vh, 760px);
+  overflow: hidden;
+}
+
+.help-modal .modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.help-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.help-modal-title {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+.help-modal-subtitle {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.help-list {
+  display: grid;
+  gap: 12px;
+}
+
+.help-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(102, 204, 204, 0.06);
+}
+
+.help-item-bullet {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.help-item strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.96rem;
+  color: var(--text);
+}
+
+.help-item span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 560px) {
+  .help-modal {
+    width: min(100%, calc(100% - 16px));
+    max-height: 90vh;
+  }
+
+  .help-item {
+    padding: 11px 12px;
+    gap: 10px;
+  }
+
+  .help-item-bullet {
+    width: 32px;
+    height: 32px;
+    font-size: 0.95rem;
+  }
+}
+
 /* Minimal / Dashboard-like theme overrides for Admin */
 .minimal-ui {
   --bg: none;

@@ -2063,18 +2063,42 @@
 <div class="modal-overlay" id="helpModal" aria-hidden="true">
   <div class="modal help-modal">
     <div class="modal-content">
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
+      <div class="help-modal-header">
         <div>
-          <h3>Need help?</h3>
-          <p style="margin:4px 0 0; color:var(--muted);">Quick guidance for the main school dashboard actions.</p>
+          <h3 class="help-modal-title">Need help?</h3>
+          <p class="help-modal-subtitle">Quick guidance for the main school dashboard actions.</p>
         </div>
         <button class="secondary-btn" type="button" onclick="closeHelpModal()"><ion-icon name="close-outline"></ion-icon></button>
       </div>
       <div class="help-list">
-        <div class="help-item"><strong>Start a new school session</strong><span>Use Start New Session to begin a fresh academic cycle for the school.</span></div>
-        <div class="help-item"><strong>Add school members</strong><span>Use the student and teacher sections to add records, assign classes, and keep the school profile current.</span></div>
-        <div class="help-item"><strong>Review teacher scores</strong><span>Open the score review area to check submissions and decide which results should be published.</span></div>
-        <div class="help-item"><strong>Share school updates</strong><span>Create announcements and notifications from the school dashboard to keep teachers and students informed.</span></div>
+        <div class="help-item">
+          <div class="help-item-bullet">🧭</div>
+          <div>
+            <strong>Start a new school session</strong>
+            <span>Use Start New Session to begin a fresh academic cycle for the school.</span>
+          </div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-bullet">👥</div>
+          <div>
+            <strong>Add school members</strong>
+            <span>Use the student and teacher sections to add records, assign classes, and keep the school profile current.</span>
+          </div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-bullet">📝</div>
+          <div>
+            <strong>Review teacher scores</strong>
+            <span>Open the score review area to check submissions and decide which results should be published.</span>
+          </div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-bullet">📣</div>
+          <div>
+            <strong>Share school updates</strong>
+            <span>Create announcements and notifications from the school dashboard to keep teachers and students informed.</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -3324,10 +3348,18 @@ function clearSelectedStudentGroup() {
   renderStudents();
 }
 
+function getPromotionWindowState() {
+  const term = document.getElementById("mainTermSelect")?.value || "1st Term";
+  const isThirdTerm = term === "3rd Term";
+  return { term, isThirdTerm };
+}
+
 function renderClassGroupSummary(groups) {
   const summary = document.getElementById("classGroupSummary");
   const clearButton = document.getElementById("clearStudentGroupFilter");
   if (!summary) return;
+
+  const { isThirdTerm } = getPromotionWindowState();
 
   summary.innerHTML = "";
 
@@ -3364,14 +3396,16 @@ function renderClassGroupSummary(groups) {
     viewBtn.innerText = "View students";
     viewBtn.addEventListener("click", () => openClassStudentsModal(group.className, group.arm, group.students));
 
-    const assignBtn = document.createElement("button");
-    assignBtn.className = "mini-btn assign-btn";
-    assignBtn.type = "button";
-    assignBtn.innerText = "Bulk Promote";
-    assignBtn.addEventListener("click", () => openBulkPromotionModal(group.className, group.arm));
+    if (!isThirdTerm) {
+      const assignBtn = document.createElement("button");
+      assignBtn.className = "mini-btn assign-btn";
+      assignBtn.type = "button";
+      assignBtn.innerText = "Bulk Promote";
+      assignBtn.addEventListener("click", () => openBulkPromotionModal(group.className, group.arm));
+      actions.appendChild(assignBtn);
+    }
 
     actions.appendChild(viewBtn);
-    actions.appendChild(assignBtn);
     card.appendChild(actions);
     summary.appendChild(card);
   });
@@ -4704,6 +4738,11 @@ function toggleStudentActions(button) {
 async function openBulkPromotionModal(className, arm) {
   const session = document.getElementById("mainSessionSelect")?.value || "2025/2026";
   const term = document.getElementById("mainTermSelect")?.value || "1st Term";
+
+  if (term === "3rd Term") {
+    toast("Promotion actions are not available for the 3rd term. Use earlier terms for promotion decisions.", "info");
+    return;
+  }
 
   const studentGroup = students.filter((student) => {
     return (student.className || "") === className && (student.arm || "") === arm;

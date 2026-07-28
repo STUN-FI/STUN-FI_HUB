@@ -946,18 +946,42 @@
     <div class="modal-overlay" id="helpModal" aria-hidden="true">
       <div class="modal help-modal">
         <div class="modal-content">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
+          <div class="help-modal-header">
             <div>
-              <h3>Need help?</h3>
-              <p style="margin:4px 0 0; color:var(--muted);">Quick steps for the main student dashboard actions.</p>
+              <h3 class="help-modal-title">Need help?</h3>
+              <p class="help-modal-subtitle">Quick steps for the main student dashboard actions.</p>
             </div>
             <button class="secondary-btn" type="button" onclick="closeHelpModal()"><ion-icon name="close-outline"></ion-icon></button>
           </div>
           <div class="help-list">
-            <div class="help-item"><strong>Check your results</strong><span>Use Result Access from the top bar to open the latest published result for your selected session and term.</span></div>
-            <div class="help-item"><strong>Review your timetable</strong><span>Switch the session and term at the top of the page, then use the class routine section to see your weekly lessons.</span></div>
-            <div class="help-item"><strong>Stay updated</strong><span>Use the bell icon to open school notifications and keep up with announcements from your school.</span></div>
-            <div class="help-item"><strong>Update your profile</strong><span>Open Update Profile to review your personal details and make sure your account information is current.</span></div>
+            <div class="help-item">
+              <div class="help-item-bullet">📄</div>
+              <div>
+                <strong>Check your results</strong>
+                <span>Use Result Access from the top bar to open the latest published result for your selected session and term.</span>
+              </div>
+            </div>
+            <div class="help-item">
+              <div class="help-item-bullet">🗓️</div>
+              <div>
+                <strong>Review your timetable</strong>
+                <span>Switch the session and term at the top of the page, then use the class routine section to see your weekly lessons.</span>
+              </div>
+            </div>
+            <div class="help-item">
+              <div class="help-item-bullet">🔔</div>
+              <div>
+                <strong>Stay updated</strong>
+                <span>Use the bell icon to open school notifications and keep up with announcements from your school.</span>
+              </div>
+            </div>
+            <div class="help-item">
+              <div class="help-item-bullet">👤</div>
+              <div>
+                <strong>Update your profile</strong>
+                <span>Open Update Profile to review your personal details and make sure your account information is current.</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
