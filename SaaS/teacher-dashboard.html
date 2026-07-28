@@ -530,6 +530,66 @@
       gap: 12px;
     }
 
+    .notification-btn {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .notification-btn ion-icon {
+      font-size: 22px;
+      color: var(--text);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: var(--danger);
+      color: white;
+      font-size: 12px;
+      font-weight: 900;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0 5px;
+    }
+
+    .notifications-list {
+      display: grid;
+      gap: 12px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    .notification-item {
+      background: var(--card-2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .notification-item-content p {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .notification-item-content small {
+      color: var(--muted);
+    }
+
     .announcement-card {
       background: var(--card-2);
       border: 1px solid var(--line);
@@ -872,6 +932,10 @@
         <div class="topbar-actions">
           <div class="school-pill" id="teacherSchoolPill">School: --</div>
           <button class="sidebar-toggle" onclick="toggleSidebar()"><ion-icon name="menu-outline"></ion-icon></button>
+          <button class="notification-btn" id="teacherNotificationButton" onclick="openTeacherNotificationsModal()" type="button" aria-label="View notifications">
+            <ion-icon name="notifications-outline"></ion-icon>
+            <span class="notification-badge" id="teacherNotificationBadge"></span>
+          </button>
           <button class="refresh-btn" onclick="loadStudents()">Refresh</button>
         </div>
       </div>
@@ -933,24 +997,13 @@
           <div class="card">
             <div class="section-head">
               <div>
-                <h3 style="margin:0;">News / Announcements</h3>
-                <p style="margin:6px 0 0; color: var(--muted);">
-                  Updates posted by your school for teachers only.
-                </p>
+                <h3 style="margin:0;">My Teaching Schedule</h3>
+                <p style="margin:6px 0 0; color: var(--muted);">Your weekly timetable from the school admin portal.</p>
               </div>
-
-              <button class="refresh-btn" onclick="loadTeacherPosts()">Refresh</button>
+              <button class="refresh-btn" onclick="loadTeacherTimetable()">Refresh</button>
+              <button class="secondary-btn" onclick="printTeacherTimetable()">Print / Export PDF</button>
             </div>
 
-            <div class="scroll-card-body">
-              <div id="teacherAnnouncementList" class="announcement-list">
-                <div class="empty-state">Loading announcements...</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <h3>My Timetable</h3>
             <div class="toolbar" style="gap:10px; flex-wrap:wrap; margin-bottom:12px;">
               <select id="teacherTimetableSessionSelect" onchange="loadTeacherTimetable()">
                 <option value="2025/2026">2025/2026</option>
@@ -963,6 +1016,9 @@
                 <option value="3rd Term">3rd Term</option>
               </select>
             </div>
+
+            <div id="teacherTodayClasses" style="margin-bottom: 14px;"></div>
+
             <div class="scroll-card-body">
               <div class="table-wrap">
                 <table class="data-table">
@@ -973,10 +1029,11 @@
                       <th>Arm</th>
                       <th>Subject</th>
                       <th>Time</th>
+                      <th>Venue</th>
                     </tr>
                   </thead>
                   <tbody id="teacherTimetableBody">
-                    <tr><td colspan="5" class="empty-state">Loading timetable...</td></tr>
+                    <tr><td colspan="6" class="empty-state">Loading timetable...</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -985,6 +1042,23 @@
         </div>
       </div>
     </main>
+  </div>
+
+  <div class="modal-overlay" id="teacherNotificationsModal" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
+          <div>
+            <h3>Notifications</h3>
+            <p style="margin:4px 0 0; color:var(--muted);">Recent messages from your school.</p>
+          </div>
+          <button class="secondary-btn" onclick="closeTeacherNotificationsModal()"><ion-icon name="close-outline"></ion-icon></button>
+        </div>
+        <div class="notifications-list" id="teacherNotificationsList">
+          <div class="empty-state">Loading notifications...</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="modal-overlay" id="logoutModal" aria-hidden="true">
@@ -1007,6 +1081,53 @@
     let students = [];
     let draftRows = [];
     let componentColumns = ["Classwork", "Assignment", "Test", "Exam"];
+
+    function clearTeacherDashboardData() {
+      students = [];
+      draftRows = [];
+      teacherNotifications = [];
+      teacherTimetableEntries = [];
+
+      const tableBody = document.getElementById("tableBody");
+      if (tableBody) {
+        tableBody.innerHTML = '<tr><td colspan="20" class="empty">Your session has expired. Please sign in again.</td></tr>';
+      }
+
+      const status = document.getElementById("status");
+      if (status) {
+        status.innerText = "Session expired. Please sign in again.";
+      }
+
+      const wrap = document.getElementById("teacherAnnouncementList");
+      if (wrap) {
+        wrap.innerHTML = '<div class="empty-state">Session expired. Please sign in again.</div>';
+      }
+
+      const list = document.getElementById("teacherNotificationsList");
+      if (list) {
+        list.innerHTML = '<div class="empty-state">Session expired. Please sign in again.</div>';
+      }
+
+      const body = document.getElementById("teacherTimetableBody");
+      if (body) {
+        body.innerHTML = '<tr><td colspan="6" class="empty-state">Session expired. Please sign in again.</td></tr>';
+      }
+
+      const todayWrap = document.getElementById("teacherTodayClasses");
+      if (todayWrap) {
+        todayWrap.innerHTML = '<div class="empty-state">Session expired. Please sign in again.</div>';
+      }
+
+      renderTeacherNotificationBadge();
+    }
+
+    function handleTeacherAuthFailure(response) {
+      if (!response || ![401, 403].includes(response.status)) return false;
+      localStorage.removeItem("teacher");
+      clearTeacherDashboardData();
+      window.location.href = "teacher-login.html";
+      return true;
+    }
 
     function getGrade(total) {
       if (total >= 80) return "A1";
@@ -1303,6 +1424,8 @@ function setTeacherInfo() {
       encodeURIComponent(term)
     );
 
+    if (handleTeacherAuthFailure(studentRes)) return;
+
     let studentData = [];
     if (studentRes.ok) {
       studentData = await studentRes.json();
@@ -1576,9 +1699,16 @@ function setTeacherInfo() {
 
     async function loadTeacherPosts() {
       const wrap = document.getElementById("teacherAnnouncementList");
-      if (!wrap || !teacher || !teacher.schoolId) return;
+      const list = document.getElementById("teacherNotificationsList");
+      if (!teacher || !teacher.schoolId) return;
 
-      wrap.innerHTML = `<div class="empty-state">Loading announcements...</div>`;
+      if (wrap) {
+        wrap.innerHTML = `<div class="empty-state">Loading announcements...</div>`;
+      }
+
+      if (list) {
+        list.innerHTML = `<div class="empty-state">Loading notifications...</div>`;
+      }
 
       try {
         const response = await fetch(
@@ -1587,72 +1717,45 @@ function setTeacherInfo() {
           "?audience=teachers"
         );
 
+        if (handleTeacherAuthFailure(response)) return;
+
         const posts = await response.json();
 
         if (!response.ok) {
-          wrap.innerHTML = `<div class="empty-state">${posts.message || "Could not load announcements."}</div>`;
-          return;
-        }
-
-        if (!posts.length) {
-          wrap.innerHTML = `<div class="empty-state">No announcements yet.</div>`;
-          return;
-        }
-
-        wrap.innerHTML = "";
-
-        posts.forEach((post) => {
-          const div = document.createElement("div");
-          div.className = "announcement-card";
-
-          const createdTime = new Date(post.createdAt).toLocaleString();
-
-          let mediaHtml = "";
-
-          if (post.mediaUrl) {
-            if (post.mediaType === "image") {
-              mediaHtml = `
-                <div class="announcement-media">
-                  <img src="${post.mediaUrl}" alt="Announcement image" />
-                </div>
-              `;
-            } else if (post.mediaType === "video") {
-              mediaHtml = `
-                <div class="announcement-media">
-                  <video controls>
-                    <source src="${post.mediaUrl}">
-                  </video>
-                </div>
-              `;
-            } else if (post.mediaType === "file") {
-              mediaHtml = `
-                <div class="announcement-media">
-                  <a href="${post.mediaUrl}" target="_blank">Download ${post.fileName || "file"}</a>
-                </div>
-              `;
-            } else {
-              mediaHtml = `
-                <div class="announcement-media">
-                  <a href="${post.mediaUrl}" target="_blank">View attachment</a>
-                </div>
-              `;
-            }
+          if (wrap) {
+            wrap.innerHTML = `<div class="empty-state">${posts.message || "Could not load announcements."}</div>`;
           }
+          return;
+        }
 
-          div.innerHTML = `
-            <div class="announcement-top">
-              <div class="announcement-title">School Announcement</div>
-              <div class="announcement-time">${createdTime}</div>
-            </div>
-            <div class="announcement-body">${post.text || ""}</div>
-            ${mediaHtml}
-          `;
+        const normalized = Array.isArray(posts) ? posts : [];
+        teacherNotifications = normalized.map((post) => ({
+          ...post,
+          read: post.read || teacherNotificationsViewed
+        }));
 
-          wrap.appendChild(div);
-        });
+        renderTeacherNotificationBadge();
+        renderTeacherNotificationsList();
+
+        if (!normalized.length) {
+          if (wrap) wrap.innerHTML = `<div class="empty-state">No announcements yet.</div>`;
+          if (list) list.innerHTML = `<div class="empty-state">No notifications yet.</div>`;
+          return;
+        }
+
+        if (wrap) {
+          wrap.innerHTML = "";
+          normalized.forEach((post) => {
+            const div = document.createElement("div");
+            div.className = "announcement-card";
+            div.innerHTML = buildAnnouncementMarkup(post);
+            wrap.appendChild(div);
+          });
+        }
       } catch (error) {
         console.log(error);
-        wrap.innerHTML = `<div class="empty-state">Error loading announcements.</div>`;
+        if (wrap) wrap.innerHTML = `<div class="empty-state">Error loading announcements.</div>`;
+        if (list) list.innerHTML = `<div class="empty-state">Error loading notifications.</div>`;
       }
     }
 
@@ -1668,56 +1771,256 @@ function setTeacherInfo() {
       });
     }
 
+    let teacherTimetableEntries = [];
+    let teacherNotifications = [];
+    let teacherNotificationsViewed = false;
+
+    function openTeacherNotificationsModal() {
+      teacherNotificationsViewed = true;
+      renderTeacherNotificationBadge();
+      openModal("teacherNotificationsModal");
+      loadTeacherPosts();
+    }
+
+    function closeTeacherNotificationsModal() {
+      closeModal("teacherNotificationsModal");
+    }
+
+    function renderTeacherNotificationBadge() {
+      const badge = document.getElementById("teacherNotificationBadge");
+      if (!badge) return;
+
+      const count = teacherNotifications.filter((item) => !item.read).length;
+      if (count > 0) {
+        badge.innerText = count > 9 ? "9+" : count;
+        badge.style.display = "inline-flex";
+      } else {
+        badge.style.display = "none";
+      }
+    }
+
+    function buildAnnouncementMarkup(post) {
+      const createdTime = post.createdAt ? new Date(post.createdAt).toLocaleString() : "Unknown time";
+      let mediaHtml = "";
+
+      if (post.mediaUrl) {
+        if (post.mediaType === "image") {
+          mediaHtml = `
+            <div class="announcement-media">
+              <img src="${post.mediaUrl}" alt="Announcement image" />
+            </div>
+          `;
+        } else if (post.mediaType === "video") {
+          mediaHtml = `
+            <div class="announcement-media">
+              <video controls>
+                <source src="${post.mediaUrl}">
+              </video>
+            </div>
+          `;
+        } else if (post.mediaType === "file") {
+          mediaHtml = `
+            <div class="announcement-media">
+              <a href="${post.mediaUrl}" target="_blank">Download ${post.fileName || "file"}</a>
+            </div>
+          `;
+        } else {
+          mediaHtml = `
+            <div class="announcement-media">
+              <a href="${post.mediaUrl}" target="_blank">View attachment</a>
+            </div>
+          `;
+        }
+      }
+
+      return `
+        <div class="announcement-top">
+          <div class="announcement-title">${escapeHtml(post.title || "School Announcement")}</div>
+          <div class="announcement-time">${escapeHtml(createdTime)}</div>
+        </div>
+        <div class="announcement-body">${escapeHtml(post.text || "")}</div>
+        ${mediaHtml}
+      `;
+    }
+
+    function renderTeacherNotificationsList() {
+      const list = document.getElementById("teacherNotificationsList");
+      if (!list) return;
+
+      if (!teacherNotifications.length) {
+        list.innerHTML = `<div class="empty-state">No notifications yet.</div>`;
+        return;
+      }
+
+      list.innerHTML = teacherNotifications.map((item) => `
+        <div class="notification-item">
+          <div class="notification-item-content">
+            ${buildAnnouncementMarkup(item)}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function printTeacherTimetable() {
+      const title = `${teacher?.name || "Teacher"} Timetable`;
+      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const sortedEntries = (teacherTimetableEntries || []).slice().sort((a, b) => {
+        const dayDiff = days.indexOf(a.dayOfWeek || "") - days.indexOf(b.dayOfWeek || "");
+        if (dayDiff !== 0) return dayDiff;
+        return (a.startTime || "").localeCompare(b.startTime || "");
+      });
+
+      const printRows = days.map((day) => {
+        const dayEntries = sortedEntries.filter((entry) => entry.dayOfWeek === day);
+        const body = dayEntries.length
+          ? dayEntries.map((entry) => `
+              <div style="border:1px solid #d1d5db; border-radius:10px; padding:10px; margin-bottom:8px; background:#f8fafc;">
+                <div style="font-weight:700;">${escapeHtml(entry.subjectName || entry.subject || "Subject")}</div>
+                <div style="font-size:12px; color:#64748b; margin-top:4px;">${escapeHtml(entry.className || "Class")} ${escapeHtml(entry.arm || "")}</div>
+                <div style="font-size:12px; color:#64748b; margin-top:2px;">${escapeHtml(entry.startTime || "")} - ${escapeHtml(entry.endTime || "")}</div>
+                <div style="font-size:12px; color:#64748b; margin-top:2px;">Venue: ${escapeHtml(entry.venue || "Classroom")}</div>
+              </div>
+            `).join("")
+          : '<div style="color:#64748b; font-style:italic;">No slot</div>';
+
+        return `
+          <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff; min-height:140px;">
+            <div style="font-weight:700; margin-bottom:8px;">${escapeHtml(day)}</div>
+            ${body}
+          </div>
+        `;
+      }).join("");
+
+      const printWindow = window.open("", "_blank", "width=900,height=700");
+      if (!printWindow) {
+        toast("Please allow popups to print or export the timetable.", "error");
+        return;
+      }
+
+      printWindow.document.write(`
+        <!doctype html>
+        <html>
+          <head>
+            <meta charset="utf-8" />
+            <title>${escapeHtml(title)}</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 24px; color: #111827; }
+              h1 { margin: 0 0 8px; font-size: 22px; }
+              .subtitle { color: #64748b; margin-bottom: 18px; }
+              .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+            </style>
+          </head>
+          <body>
+            <h1>${escapeHtml(title)}</h1>
+            <div class="subtitle">Generated from the teacher dashboard</div>
+            <div class="grid">${printRows}</div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      }, 250);
+    }
+
     async function loadTeacherTimetable() {
       const body = document.getElementById("teacherTimetableBody");
+      const todayWrap = document.getElementById("teacherTodayClasses");
       const session = document.getElementById("teacherTimetableSessionSelect")?.value || "2025/2026";
       const term = document.getElementById("teacherTimetableTermSelect")?.value || "1st Term";
 
       if (body) {
-        body.innerHTML = `<tr><td colspan="5" class="empty-state">Loading timetable...</td></tr>`;
+        body.innerHTML = `<tr><td colspan="6" class="empty-state">Loading timetable...</td></tr>`;
+      }
+
+      if (todayWrap) {
+        todayWrap.innerHTML = '<div class="empty-state">Loading today\'s classes...</div>';
       }
 
       try {
-        const response = await fetch(
-          window.API_BASE + "/teacher-timetable/" + encodeURIComponent(teacher.teacherId) +
-          "?schoolId=" + encodeURIComponent(teacher.schoolId) +
-          "&session=" + encodeURIComponent(session) +
-          "&term=" + encodeURIComponent(term)
-        );
+        const response = await fetch(window.api(`/api/teacher/timetable?schoolId=${encodeURIComponent(teacher.schoolId)}&session=${encodeURIComponent(session)}&term=${encodeURIComponent(term)}`), {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") || ""}`
+          }
+        });
+        if (handleTeacherAuthFailure(response)) return;
+
         const data = await response.json();
 
         if (!response.ok) {
-          if (body) {
-            body.innerHTML = `<tr><td colspan="5" class="empty-state">${escapeHtml(data.message || "Unable to load timetable.")}</td></tr>`;
-          }
-          return;
+          throw new Error(data.message || "Unable to load timetable.");
         }
 
-        renderTeacherTimetable(Array.isArray(data) ? data : []);
+        teacherTimetableEntries = Array.isArray(data.data) ? data.data : [];
+        renderTeacherTimetable(teacherTimetableEntries);
       } catch (error) {
         console.log(error);
         if (body) {
-          body.innerHTML = `<tr><td colspan="5" class="empty-state">Error loading timetable.</td></tr>`;
+          body.innerHTML = `<tr><td colspan="6" class="empty-state">${escapeHtml(error.message || "Error loading timetable.")}</td></tr>`;
+        }
+        if (todayWrap) {
+          todayWrap.innerHTML = '<div class="empty-state">Unable to load today\'s classes.</div>';
         }
       }
     }
 
     function renderTeacherTimetable(entries) {
       const body = document.getElementById("teacherTimetableBody");
+      const todayWrap = document.getElementById("teacherTodayClasses");
       if (!body) return;
 
-      if (!entries || !entries.length) {
-        body.innerHTML = `<tr><td colspan="5" class="empty-state">No timetable entries available.</td></tr>`;
+      const sortedEntries = (Array.isArray(entries) ? entries : []).slice().sort((a, b) => {
+        const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const dayDiff = dayOrder.indexOf(a.dayOfWeek || "") - dayOrder.indexOf(b.dayOfWeek || "");
+        if (dayDiff !== 0) return dayDiff;
+        return (a.startTime || "").localeCompare(b.startTime || "");
+      });
+
+      if (!sortedEntries.length) {
+        body.innerHTML = `<tr><td colspan="6" class="empty-state">No timetable entries available.</td></tr>`;
+        if (todayWrap) {
+          todayWrap.innerHTML = '<div class="empty-state">No classes scheduled yet.</div>';
+        }
         return;
       }
 
-      body.innerHTML = entries.map((entry) => `
+      const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
+      const todayEntries = sortedEntries.filter((entry) => entry.dayOfWeek === today);
+
+      if (todayWrap) {
+        if (!todayEntries.length) {
+          todayWrap.innerHTML = `<div class="empty-state">No classes scheduled for ${escapeHtml(today)} yet.</div>`;
+        } else {
+          todayWrap.innerHTML = `
+            <div style="border:1px solid var(--line); border-radius:14px; background: var(--card-2); padding:14px;">
+              <div style="font-weight:700; margin-bottom:8px;">Today's Upcoming / Ongoing Classes</div>
+              ${todayEntries.map((entry) => `
+                <div style="display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-top:1px solid var(--line);">
+                  <div>
+                    <div style="font-weight:700;">${escapeHtml(entry.subjectName || entry.subject || "Subject")}</div>
+                    <div class="muted">${escapeHtml(entry.className || "Class")} ${escapeHtml(entry.arm || "")}</div>
+                  </div>
+                  <div style="text-align:right;">
+                    <div style="font-weight:700;">${escapeHtml(entry.startTime || "")} - ${escapeHtml(entry.endTime || "")}</div>
+                    <div class="muted">${escapeHtml(entry.venue || "Classroom")}</div>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          `;
+        }
+      }
+
+      body.innerHTML = sortedEntries.map((entry) => `
         <tr>
-          <td>${escapeHtml(entry.day || "")}</td>
+          <td>${escapeHtml(entry.dayOfWeek || "")}</td>
           <td>${escapeHtml(entry.className || "")}</td>
           <td>${escapeHtml(entry.arm || "")}</td>
-          <td>${escapeHtml(entry.subject || "")}</td>
+          <td>${escapeHtml(entry.subjectName || entry.subject || "")}</td>
           <td>${escapeHtml(entry.startTime || "")} - ${escapeHtml(entry.endTime || "")}</td>
+          <td>${escapeHtml(entry.venue || "Classroom")}</td>
         </tr>
       `).join("");
     }

@@ -689,6 +689,77 @@
 
     .muted { color: var(--muted); }
 
+    .notifications-list {
+      display: grid;
+      gap: 12px;
+      max-height: 70vh;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .announcement-card {
+      background: var(--card-2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    .announcement-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .announcement-title {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .announcement-time {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .announcement-body {
+      color: var(--muted);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      margin-bottom: 10px;
+    }
+
+    .announcement-media {
+      margin-top: 10px;
+      max-width: 100%;
+      overflow: hidden;
+    }
+
+    .announcement-media img,
+    .announcement-media video {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      max-height: min(320px, 55vh);
+      height: auto;
+      object-fit: contain;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--card);
+    }
+
+    .announcement-media a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .announcement-media a:hover {
+      text-decoration: underline;
+    }
+
     .sidebar-overlay {
       position: fixed;
       inset: 0;
@@ -830,6 +901,23 @@
       </div>
     </aside>
 
+    <div class="modal-overlay" id="studentNotificationsModal" aria-hidden="true">
+      <div class="modal">
+        <div class="modal-content">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
+            <div>
+              <h3>Notifications</h3>
+              <p style="margin:4px 0 0; color:var(--muted);">Recent announcements from your school.</p>
+            </div>
+            <button class="secondary-btn" type="button" onclick="closeStudentNotificationsModal()"><ion-icon name="close-outline"></ion-icon></button>
+          </div>
+          <div class="notifications-list" id="studentNotificationsList">
+            <div class="empty-state">Loading notifications...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal-overlay" id="logoutModal" aria-hidden="true">
       <div class="modal small">
         <div class="modal-content">
@@ -853,6 +941,10 @@
           <button class="menu-btn" type="button" onclick="toggleSidebar()">
             <ion-icon name="menu-outline"></ion-icon>
             <span>Menu</span>
+          </button>
+          <button class="notification-btn" type="button" onclick="openStudentNotificationsModal()" aria-label="View notifications">
+            <ion-icon name="notifications-outline"></ion-icon>
+            <span class="notification-badge" id="studentNotificationBadge"></span>
           </button>
           <button class="result-btn" type="button" onclick="window.location.href='student-result.html'">
             <ion-icon name="document-text-outline"></ion-icon>
@@ -894,7 +986,6 @@
       <div class="tab-row" role="tablist" aria-label="Student sections">
         <button class="tab-btn active" type="button" data-tab="overview"><ion-icon name="grid-outline"></ion-icon>Overview</button>
         <button class="tab-btn" type="button" data-tab="results"><ion-icon name="document-text-outline"></ion-icon>Analysis</button>
-        <button class="tab-btn" type="button" data-tab="announcements"><ion-icon name="megaphone-outline"></ion-icon>Announcements<span class="tab-badge" id="announcementTabBadge" aria-hidden="true"></span></button>
         <button class="tab-btn" type="button" data-tab="settings"><ion-icon name="create-outline"></ion-icon>Update Profile</button>
       </div>
 
@@ -911,11 +1002,49 @@
           </div>
         </section>
 
+        <section class="panel-card" style="margin-bottom:16px;">
+          <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom:10px;">
+            <div>
+              <h3 style="margin:0;">Academic Context</h3>
+              <p class="muted" style="margin:6px 0 0;">Switch the session and term to view the correct records.</p>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+              <label style="display:flex; flex-direction:column; gap:4px; font-size:0.9rem; color:var(--muted);">
+                Session
+                <select id="studentDashboardSessionSelect" onchange="loadLiveDashboardData()" style="padding:8px 10px; border-radius:8px; border:1px solid var(--line);">
+                  <option value="2025/2026">2025/2026</option>
+                  <option value="2026/2027">2026/2027</option>
+                  <option value="2027/2028">2027/2028</option>
+                </select>
+              </label>
+              <label style="display:flex; flex-direction:column; gap:4px; font-size:0.9rem; color:var(--muted);">
+                Term
+                <select id="studentDashboardTermSelect" onchange="loadLiveDashboardData()" style="padding:8px 10px; border-radius:8px; border:1px solid var(--line);">
+                  <option value="1st Term">1st Term</option>
+                  <option value="2nd Term">2nd Term</option>
+                  <option value="3rd Term">3rd Term</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </section>
+
         <section class="panel-card" id="subjectAssignmentsPanel">
           <h3>Assigned subjects</h3>
           <div class="announcement-list" id="subjectList">
             <div class="announcement-item">Loading subject assignments…</div>
           </div>
+        </section>
+
+        <section class="panel-card" id="routinePanel">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div>
+              <h3 style="margin:0;">Class Routine</h3>
+              <p class="muted" id="routineSummary" style="margin:6px 0 0;">Loading your class timetable…</p>
+            </div>
+            <button class="secondary-btn" onclick="printStudentTimetable()">Print / Export PDF</button>
+          </div>
+          <div id="routineGrid" style="display:grid; gap:12px; margin-top:12px;"></div>
         </section>
 
         <section class="panel-grid" id="panel-results" style="display:none">
@@ -939,19 +1068,6 @@
                 <span>Review your progress over time.</span>
               </a>
             </div>
-          </div>
-        </section>
-
-        <section class="panel-grid" id="panel-announcements" style="display:none">
-          <div class="panel-card">
-            <h3>Announcements</h3>
-            <div class="announcement-list" id="announcementList">
-              <div class="announcement-item">No announcements yet. Check back later.</div>
-            </div>
-          </div>
-          <div class="panel-card">
-            <h3>School Updates</h3>
-            <p class="muted" id="announcementSummary">Your latest school notices will appear here.</p>
           </div>
         </section>
 
@@ -1105,20 +1221,12 @@
         const matches = el.getAttribute('data-tab') === tab;
         el.classList.toggle('active', matches);
       });
-      ['overview', 'results', 'announcements', 'settings'].forEach((name) => {
+      ['overview', 'results', 'settings'].forEach((name) => {
         const panel = document.getElementById(`panel-${name}`);
         if (panel) panel.style.display = name === tab ? '' : 'none';
       });
-      // Show assigned subjects only on the Overview tab
       const subjectPanel = document.getElementById('subjectAssignmentsPanel');
       if (subjectPanel) subjectPanel.style.display = tab === 'overview' ? '' : 'none';
-      if (tab === 'announcements') {
-        const badge = document.getElementById('announcementTabBadge');
-        if (badge) {
-          badge.classList.remove('has-notification');
-          badge.textContent = '';
-        }
-      }
     }
 
     function toggleSidebar() {
@@ -1133,15 +1241,150 @@
       }
     }
 
+    let studentNotifications = [];
+    let studentNotificationsViewed = false;
+
+    function clearStudentDashboardData() {
+      studentNotifications = [];
+      studentTimetableEntries = [];
+
+      const routineSummary = document.getElementById('routineSummary');
+      if (routineSummary) {
+        routineSummary.textContent = 'Your session has expired. Please sign in again.';
+      }
+
+      const routineGrid = document.getElementById('routineGrid');
+      if (routineGrid) {
+        routineGrid.innerHTML = '<div class="announcement-item">Your session has expired. Please sign in again.</div>';
+      }
+
+      const subjectList = document.getElementById('subjectList');
+      if (subjectList) {
+        subjectList.innerHTML = '<div class="announcement-item">Your session has expired. Please sign in again.</div>';
+      }
+
+      const notificationsList = document.getElementById('studentNotificationsList');
+      if (notificationsList) {
+        notificationsList.innerHTML = '<div class="empty-state">Your session has expired. Please sign in again.</div>';
+      }
+
+      const coursesCount = document.getElementById('coursesCount');
+      if (coursesCount) coursesCount.textContent = '-- subjects';
+
+      const resultsCount = document.getElementById('resultsCount');
+      if (resultsCount) resultsCount.textContent = '-- results';
+
+      const feesPaid = document.getElementById('feesPaid');
+      if (feesPaid) feesPaid.textContent = '-- NGN';
+
+      updateAnnouncementBadge();
+    }
+
+    function handleStudentAuthFailure(response) {
+      if (!response || ![401, 403].includes(response.status)) return false;
+      localStorage.removeItem('student');
+      localStorage.removeItem('token');
+      localStorage.removeItem('school');
+      clearStudentDashboardData();
+      window.location.href = 'student-login.html';
+      return true;
+    }
+
     function updateAnnouncementBadge() {
       const badge = document.getElementById('announcementTabBadge');
-      if (!badge) return;
+      const headerBadge = document.getElementById('studentNotificationBadge');
+      if (!badge && !headerBadge) return;
 
       const announcementText = student?.latestAnnouncement || student?.announcementNote || '';
       const count = Number(student?.announcementCount) || (announcementText ? 1 : 0);
 
-      badge.textContent = '';
-      badge.classList.toggle('has-notification', count > 0);
+      if (badge) {
+        badge.textContent = '';
+        badge.classList.toggle('has-notification', count > 0);
+      }
+      if (headerBadge) {
+        headerBadge.textContent = count > 9 ? '9+' : count;
+        headerBadge.style.display = count > 0 ? 'inline-flex' : 'none';
+      }
+    }
+
+    function openStudentNotificationsModal() {
+      studentNotificationsViewed = true;
+      updateAnnouncementBadge();
+      openModal('studentNotificationsModal');
+      loadStudentAnnouncements();
+    }
+
+    function closeStudentNotificationsModal() {
+      closeModal('studentNotificationsModal');
+    }
+
+    function buildStudentAnnouncementMarkup(post) {
+      const createdTime = post.createdAt ? new Date(post.createdAt).toLocaleString() : 'Unknown time';
+      let mediaHtml = '';
+
+      if (post.mediaUrl) {
+        if (post.mediaType === 'image') {
+          mediaHtml = `<div class="announcement-media"><img src="${post.mediaUrl}" alt="Announcement image" /></div>`;
+        } else if (post.mediaType === 'video') {
+          mediaHtml = `<div class="announcement-media"><video controls><source src="${post.mediaUrl}"></video></div>`;
+        } else if (post.mediaType === 'file') {
+          mediaHtml = `<div class="announcement-media"><a href="${post.mediaUrl}" target="_blank">Download ${post.fileName || 'file'}</a></div>`;
+        } else {
+          mediaHtml = `<div class="announcement-media"><a href="${post.mediaUrl}" target="_blank">View attachment</a></div>`;
+        }
+      }
+
+      return `
+        <div class="announcement-top">
+          <div class="announcement-title">${post.title || 'School Announcement'}</div>
+          <div class="announcement-time">${createdTime}</div>
+        </div>
+        <div class="announcement-body">${post.text || post.message || ''}</div>
+        ${mediaHtml}
+      `;
+    }
+
+    function renderStudentNotificationsList() {
+      const list = document.getElementById('studentNotificationsList');
+      if (!list) return;
+
+      if (!studentNotifications.length) {
+        list.innerHTML = '<div class="empty-state">No notifications yet.</div>';
+        return;
+      }
+
+      list.innerHTML = studentNotifications.map((post) => `
+        <div class="notification-item">
+          <div class="announcement-card">
+            ${buildStudentAnnouncementMarkup(post)}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function loadStudentAnnouncements() {
+      const list = document.getElementById('studentNotificationsList');
+      if (!student?.schoolId) return;
+
+      if (list) list.innerHTML = '<div class="empty-state">Loading notifications...</div>';
+
+      try {
+        const response = await fetch(window.api(`/posts/${encodeURIComponent(student.schoolId)}?audience=students`));
+        if (handleStudentAuthFailure(response)) return;
+
+        const posts = await response.json();
+
+        if (!response.ok) {
+          throw new Error(posts.message || 'Unable to load announcements');
+        }
+
+        studentNotifications = Array.isArray(posts) ? posts : [];
+        renderStudentNotificationsList();
+      } catch (error) {
+        console.warn('Unable to load student announcements', error);
+        if (list) list.innerHTML = '<div class="empty-state">Unable to load notifications.</div>';
+      }
     }
 
     function renderSubjectAssignments(subjects) {
@@ -1167,6 +1410,161 @@
           </div>
         `;
       }).join('');
+    }
+
+    let studentTimetableEntries = [];
+
+    function printStudentTimetable() {
+      const className = student?.className || '';
+      const arm = student?.arm || '';
+      const title = `${className} ${arm} Timetable`.trim() || 'Class Timetable';
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const sortedEntries = (studentTimetableEntries || []).slice().sort((a, b) => {
+        const dayDiff = days.indexOf(a.dayOfWeek || '') - days.indexOf(b.dayOfWeek || '');
+        if (dayDiff !== 0) return dayDiff;
+        return (a.startTime || '').localeCompare(b.startTime || '');
+      });
+
+      const printRows = days.map((day) => {
+        const dayEntries = sortedEntries.filter((entry) => entry.dayOfWeek === day);
+        const body = dayEntries.length
+          ? dayEntries.map((entry) => `
+              <div style="border:1px solid #d1d5db; border-radius:10px; padding:10px; margin-bottom:8px; background:#f8fafc;">
+                <div style="font-weight:700;">${entry.subjectName || entry.subject || 'Subject'}</div>
+                <div style="font-size:12px; color:#64748b; margin-top:4px;">Teacher: ${entry.teacherName || 'TBA'}</div>
+                <div style="font-size:12px; color:#64748b; margin-top:2px;">${entry.startTime || ''} - ${entry.endTime || ''}</div>
+                <div style="font-size:12px; color:#64748b; margin-top:2px;">Venue: ${entry.venue || 'Classroom'}</div>
+              </div>
+            `).join('')
+          : '<div style="color:#64748b; font-style:italic;">No slot</div>';
+
+        return `
+          <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff; min-height:140px;">
+            <div style="font-weight:700; margin-bottom:8px;">${day}</div>
+            ${body}
+          </div>
+        `;
+      }).join('');
+
+      const printWindow = window.open('', '_blank', 'width=900,height=700');
+      if (!printWindow) {
+        toast('Please allow popups to print or export the timetable.', 'error');
+        return;
+      }
+
+      printWindow.document.write(`
+        <!doctype html>
+        <html>
+          <head>
+            <meta charset="utf-8" />
+            <title>${title}</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 24px; color: #111827; }
+              h1 { margin: 0 0 8px; font-size: 22px; }
+              .subtitle { color: #64748b; margin-bottom: 18px; }
+              .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+            </style>
+          </head>
+          <body>
+            <h1>${title}</h1>
+            <div class="subtitle">Generated from the student dashboard</div>
+            <div class="grid">${printRows}</div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      }, 250);
+    }
+
+    function getStudentDashboardSessionTerm() {
+      const sessionSelect = document.getElementById('studentDashboardSessionSelect');
+      const termSelect = document.getElementById('studentDashboardTermSelect');
+      const fallbackSession = student?.session || localStorage.getItem('studentSession') || '2025/2026';
+      const fallbackTerm = student?.term || localStorage.getItem('studentTerm') || '1st Term';
+
+      const session = (sessionSelect?.value || fallbackSession || '2025/2026').trim();
+      const term = (termSelect?.value || fallbackTerm || '1st Term').trim();
+
+      if (sessionSelect && sessionSelect.value !== session) sessionSelect.value = session;
+      if (termSelect && termSelect.value !== term) termSelect.value = term;
+
+      return { session, term };
+    }
+
+    async function loadStudentTimetable() {
+      const routineSummary = document.getElementById('routineSummary');
+      const routineGrid = document.getElementById('routineGrid');
+      const className = student?.className || '';
+      const arm = student?.arm || '';
+      const { session, term } = getStudentDashboardSessionTerm();
+
+      if (!className || !arm) {
+        if (routineSummary) routineSummary.textContent = 'Your class and arm were not found on your profile.';
+        if (routineGrid) routineGrid.innerHTML = '<div class="announcement-item">No class routine available yet.</div>';
+        return;
+      }
+
+      if (routineSummary) routineSummary.textContent = 'Loading your class timetable…';
+      if (routineGrid) routineGrid.innerHTML = '<div class="announcement-item">Loading timetable…</div>';
+
+      try {
+        const response = await fetch(window.api(`/api/timetable/class?className=${encodeURIComponent(className)}&arm=${encodeURIComponent(arm)}&session=${encodeURIComponent(session)}&term=${encodeURIComponent(term)}`), {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token') || ''}`
+          }
+        });
+        if (handleStudentAuthFailure(response)) return;
+
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(payload.message || 'Unable to load class timetable');
+        }
+
+        const entries = Array.isArray(payload.data) ? payload.data : [];
+        studentTimetableEntries = entries;
+        if (!entries.length) {
+          if (routineSummary) routineSummary.textContent = 'No timetable created yet for your class and arm.';
+          if (routineGrid) routineGrid.innerHTML = '<div class="announcement-item">No timetable created yet.</div>';
+          return;
+        }
+
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const sortedEntries = entries.slice().sort((a, b) => {
+          const dayDiff = days.indexOf(a.dayOfWeek || '') - days.indexOf(b.dayOfWeek || '');
+          if (dayDiff !== 0) return dayDiff;
+          return (a.startTime || '').localeCompare(b.startTime || '');
+        });
+
+        if (routineSummary) {
+          routineSummary.textContent = `${className} ${arm} weekly timetable`;
+        }
+
+        if (routineGrid) {
+          routineGrid.innerHTML = days.map((day) => {
+            const dayEntries = sortedEntries.filter((entry) => entry.dayOfWeek === day);
+            return `
+              <div class="announcement-item">
+                <strong>${day}</strong>
+                ${dayEntries.length ? dayEntries.map((entry) => `
+                  <div class="muted" style="margin-top:6px;">
+                    ${entry.startTime || ''} - ${entry.endTime || ''} • ${entry.subjectName || entry.subject || 'Subject'}
+                    <br/>Teacher: ${entry.teacherName || 'TBA'} • Venue: ${entry.venue || 'Classroom'}
+                  </div>
+                `).join('') : '<div class="muted" style="margin-top:6px;">No class scheduled</div>'}
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (error) {
+        console.warn('Unable to load student timetable', error);
+        if (routineSummary) routineSummary.textContent = error.message || 'Unable to load class timetable.';
+        if (routineGrid) routineGrid.innerHTML = '<div class="announcement-item">Unable to load class routine.</div>';
+      }
     }
 
     async function loadLiveDashboardData() {
@@ -1207,9 +1605,6 @@
           const latestPost = Array.isArray(posts) && posts.length ? posts[0] : null;
           const announcementText = latestPost?.text || latestPost?.message || '';
           const announcementCount = Array.isArray(posts) ? posts.length : 0;
-          const announcementList = document.getElementById('announcementList');
-          const announcementSummary = document.getElementById('announcementSummary');
-
           student = {
             ...student,
             latestAnnouncement: announcementText,
@@ -1218,23 +1613,8 @@
           };
           localStorage.setItem('student', JSON.stringify(student));
 
-          if (announcementSummary) {
-            announcementSummary.textContent = announcementText || 'Your latest school notices will appear here.';
-          }
-
-          if (announcementList) {
-            if (announcementCount > 0) {
-              announcementList.innerHTML = posts.slice(0, 4).map((post) => `
-                <div class="announcement-item">
-                  <strong>${(post.text || post.message || 'School announcement').slice(0, 120)}${(post.text || post.message || '').length > 120 ? '…' : ''}</strong>
-                  <div class="muted">${new Date(post.createdAt || Date.now()).toLocaleString()}</div>
-                </div>
-              `).join('');
-            } else {
-              announcementList.innerHTML = '<div class="announcement-item">No announcements yet. Check back later.</div>';
-            }
-          }
-
+          studentNotifications = Array.isArray(posts) ? posts : [];
+          renderStudentNotificationsList();
           updateAnnouncementBadge();
         }
       } catch (error) {
@@ -1242,7 +1622,8 @@
       }
 
       try {
-        const resultStatusResponse = await fetch(window.api(`/student-result-status/${encodeURIComponent(studentId)}?schoolId=${encodeURIComponent(schoolId)}`));
+        const { session, term } = getStudentDashboardSessionTerm();
+        const resultStatusResponse = await fetch(window.api(`/student-result-status/${encodeURIComponent(studentId)}?schoolId=${encodeURIComponent(schoolId)}&session=${encodeURIComponent(session)}&term=${encodeURIComponent(term)}`));
         if (resultStatusResponse.ok) {
           const status = await resultStatusResponse.json();
           const latestResult = document.getElementById('latestResult');
@@ -1277,8 +1658,7 @@
       }
 
       try {
-        const session = student?.session || localStorage.getItem('studentSession') || '2025/2026';
-        const term = student?.term || localStorage.getItem('studentTerm') || '1st Term';
+        const { session, term } = getStudentDashboardSessionTerm();
         let subjectsResponse = await fetch(window.api(`/student-subjects/${encodeURIComponent(studentId)}?schoolId=${encodeURIComponent(schoolId)}&session=${encodeURIComponent(session)}&term=${encodeURIComponent(term)}`), {
           cache: 'no-store'
         });
@@ -1320,6 +1700,8 @@
         console.warn('Unable to load student subjects', error);
         renderSubjectAssignments([]);
       }
+
+      await loadStudentTimetable();
     }
 
     function closeSidebar() {
@@ -1519,6 +1901,11 @@
     document.querySelectorAll('.tab-btn, .nav-item[data-tab]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const tab = btn.getAttribute('data-tab');
+        if (tab === 'announcements') {
+          openStudentNotificationsModal();
+          if (window.innerWidth <= 980) closeSidebar();
+          return;
+        }
         if (tab) setActiveTab(tab);
         if (window.innerWidth <= 980) closeSidebar();
       });

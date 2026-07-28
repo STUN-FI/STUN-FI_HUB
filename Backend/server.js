@@ -1087,29 +1087,44 @@ const subscriptionSchema = new mongoose.Schema(
 
 subscriptionSchema.index({ status: 1, endDate: 1 });
 
-const timetableSchema = new mongoose.Schema(
+const subjectSchema = new mongoose.Schema(
   {
+    name: { type: String, required: true },
     schoolId: { type: String, required: true },
-    className: { type: String, required: true },
-    arm: { type: String, default: "" },
-    day: {
-      type: String,
-      enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-      required: true
-    },
-    subject: { type: String, required: true },
-    teacherId: { type: String, required: true },
-    startTime: { type: String, required: true },
-    endTime: { type: String, required: true },
-    session: { type: String, default: "2025/2026" },
-    term: { type: String, default: "1st Term" }
+    description: { type: String, default: "" }
   },
   { timestamps: true }
 );
 
-timetableSchema.index({ schoolId: 1, teacherId: 1, className: 1, session: 1, term: 1 });
+subjectSchema.index({ schoolId: 1, name: 1 }, { unique: true });
 
-timetableSchema.index({ schoolId: 1, className: 1, arm: 1, session: 1, term: 1 });
+const timetableSchema = new mongoose.Schema(
+  {
+    schoolId: { type: String, required: true },
+    className: { type: String, required: true },
+    arm: { type: String, required: true },
+    dayOfWeek: {
+      type: String,
+      enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      required: true
+    },
+    startTime: { type: String, required: true },
+    endTime: { type: String, required: true },
+    subjectId: { type: String, required: true },
+    subjectName: { type: String, required: true },
+    teacherId: { type: String, required: true },
+    teacherName: { type: String, required: true },
+    venue: { type: String, default: "Classroom" }
+  },
+  { timestamps: true }
+);
+
+timetableSchema.index(
+  { schoolId: 1, className: 1, arm: 1, dayOfWeek: 1, startTime: 1 },
+  { unique: true }
+);
+
+timetableSchema.index({ schoolId: 1, teacherId: 1, dayOfWeek: 1, startTime: 1, endTime: 1 });
 
 /* =========================
    MODELS
@@ -1130,11 +1145,200 @@ const PromotionSetting = mongoose.model("PromotionSetting", promotionSettingSche
 const PromotionHistory = mongoose.model("PromotionHistory", promotionHistorySchema);
 const Result = mongoose.model("Result", resultSchema);
 const Subscription = mongoose.model("Subscription", subscriptionSchema);
+const Subject = mongoose.model("Subject", subjectSchema);
 const Timetable = mongoose.model("Timetable", timetableSchema);
 
 /* =========================
    REGISTER ADMIN ROUTES
 ========================= */
+
+function normalizeId(value) {
+  if (!value) return "";
+  return String(value).trim();
+}
+
+function getDayOrder(dayOfWeek) {
+  const map = {
+    Monday: 1,
+    Tuesday: 2,
+    Wednesday: 3,
+    Thursday: 4,
+    Friday: 5,
+    Saturday: 6
+  };
+  return map[dayOfWeek] || 99;
+}
+
+function toMinutes(value = "") {
+  if (!value || typeof value !== "string") return Number.MAX_SAFE_INTEGER;
+  const [hours, minutes] = value.split(":").map((part) => Number(part));
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) return Number.MAX_SAFE_INTEGER;
+  return hours * 60 + minutes;
+}
+
+function isTimeOverlap(startA, endA, startB, endB) {
+  if (!startA || !endA || !startB || !endB) return false;
+  return toMinutes(startA) < toMinutes(endB) && toMinutes(startB) < toMinutes(endA);
+}
+
+app.post("/api/timetable/slot", verifyToken, async (req, res) => {
+  try {
+    if (!req.user || !["school", "admin"].includes(req.user.role)) {
+      return res.status(403).json({ message: "Access denied", data: null });
+    }
+
+    const schoolId = normalizeId(req.body.schoolId || req.user.schoolId);
+    if (!schoolId) {
+      return res.status(400).json({ message: "A valid school context is required", data: null });
+    }
+
+    const {
+      className,
+      arm,
+      dayOfWeek,
+      startTime,
+      endTime,
+      subjectId,
+      subjectName,
+      teacherId,
+      teacherName,
+      venue
+    } = req.body;
+
+    if (!className || !arm || !dayOfWeek || !startTime || !endTime || !subjectId || !subjectName || !teacherId || !teacherName) {
+      return res.status(400).json({ message: "Please provide all timetable slot fields", data: null });
+    }
+
+    const normalizedSubjectId = normalizeId(subjectId);
+    const normalizedTeacherId = normalizeId(teacherId);
+
+    if (!normalizedSubjectId || !normalizedTeacherId) {
+      return res.status(400).json({ message: "subjectId and teacherId are required", data: null });
+    }
+
+    const existingSlot = await Timetable.findOne({ schoolId, className, arm, dayOfWeek, startTime });
+
+    // Teacher conflict check: prevent the same teacher from being double-booked in another class
+    // during an overlapping time window on the same school day.
+    if (!existingSlot) {
+      const conflictingSlot = await Timetable.findOne({
+        schoolId,
+        teacherId: normalizedTeacherId,
+        dayOfWeek,
+        $and: [
+          { startTime: { $lt: endTime } },
+          { endTime: { $gt: startTime } }
+        ]
+      });
+
+      if (conflictingSlot) {
+        return res.status(400).json({
+          message: `Teacher ${teacherName} is already scheduled in another class at this time.`,
+          data: null
+        });
+      }
+    }
+
+    const slot = await Timetable.findOneAndUpdate(
+      { schoolId, className, arm, dayOfWeek, startTime },
+      {
+        $set: {
+          schoolId,
+          className,
+          arm,
+          dayOfWeek,
+          startTime,
+          endTime,
+          subjectId: normalizedSubjectId,
+          subjectName,
+          teacherId: normalizedTeacherId,
+          teacherName,
+          venue: venue || "Classroom"
+        }
+      },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+
+    return res.status(200).json({ message: "Timetable slot saved successfully", data: slot });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error saving timetable slot", data: null });
+  }
+});
+
+app.get("/api/timetable/class", verifyToken, async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Authentication required", data: null });
+    }
+
+    const schoolId = normalizeId(req.query.schoolId || req.user.schoolId);
+    const { className, arm } = req.query;
+    if (!className || !arm) {
+      return res.status(400).json({ message: "className and arm are required", data: null });
+    }
+
+    const slots = await Timetable.find({
+      schoolId,
+      className,
+      arm
+    }).sort({ dayOfWeek: 1, startTime: 1 });
+
+    return res.status(200).json({ message: "Timetable loaded", data: slots });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error loading class timetable", data: null });
+  }
+});
+
+app.get("/api/teacher/timetable", verifyToken, async (req, res) => {
+  try {
+    if (!req.user || !["teacher", "school", "admin"].includes(req.user.role)) {
+      return res.status(403).json({ message: "Access denied", data: null });
+    }
+
+    const teacherId = req.user.id || req.user.teacherId || req.user.teacherIdValue;
+    if (!teacherId) {
+      return res.status(400).json({ message: "Teacher identity is missing", data: null });
+    }
+
+    const schoolId = normalizeId(req.query.schoolId || req.user.schoolId);
+    const normalizedTeacherId = normalizeId(teacherId);
+    const query = {
+      ...(schoolId ? { schoolId } : {}),
+      ...(normalizedTeacherId ? { teacherId: normalizedTeacherId } : { teacherName: teacherId })
+    };
+
+    const slots = await Timetable.find(query).sort({ dayOfWeek: 1, startTime: 1 });
+    return res.status(200).json({ message: "Teacher timetable loaded", data: slots });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error loading teacher timetable", data: null });
+  }
+});
+
+app.delete("/api/timetable/slot/:slotId", verifyToken, async (req, res) => {
+  try {
+    if (!req.user || !["school", "admin"].includes(req.user.role)) {
+      return res.status(403).json({ message: "Access denied", data: null });
+    }
+
+    const schoolId = normalizeId(req.query.schoolId || req.user.schoolId);
+    if (!schoolId) {
+      return res.status(400).json({ message: "A valid school context is required", data: null });
+    }
+
+    const slot = await Timetable.findOneAndDelete({ _id: req.params.slotId, schoolId });
+    if (!slot) {
+      return res.status(404).json({ message: "Timetable slot not found", data: null });
+    }
+
+    return res.status(200).json({ message: "Timetable slot deleted successfully", data: null });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error deleting timetable slot", data: null });
+  }
+});
 
 registerAdminRoutes(app, { School, Student, Teacher, Result, Subscription, Post });
 console.log("[server] Admin routes registered");

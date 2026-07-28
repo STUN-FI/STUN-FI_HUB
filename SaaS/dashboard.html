@@ -2174,6 +2174,7 @@
 
     <div class="tabs">
       <button class="tab-btn active" onclick="showTab('students', this)">Students</button>
+      <button class="tab-btn" onclick="showTab('timetable', this)">Timetable</button>
       <button class="tab-btn" onclick="showTab('teachers', this)">Teachers</button>
       <button class="tab-btn" onclick="showTab('announcements', this)">Announcements</button>
       <button class="tab-btn" onclick="showTab('settings', this)">Settings</button>
@@ -2243,6 +2244,81 @@
               <ul class="data-list" id="studentList"></ul>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="timetableTab" class="tab-panel">
+      <div class="grid">
+        <div class="card">
+          <h3>Timetable Management</h3>
+
+          <div class="form-grid" style="display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 12px;">
+            <div class="form-group">
+              <label for="timetableClassSelect">Class</label>
+              <select id="timetableClassSelect">
+                <option value="JSS1">JSS1</option>
+                <option value="JSS2">JSS2</option>
+                <option value="JSS3">JSS3</option>
+                <option value="SS1">SS1</option>
+                <option value="SS2">SS2</option>
+                <option value="SS3">SS3</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="timetableArmInput">Arm</label>
+              <input id="timetableArmInput" placeholder="A" maxlength="1" oninput="this.value = this.value.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0,1)">
+            </div>
+
+            <div class="form-group">
+              <label for="timetableDaySelect">Day of Week</label>
+              <select id="timetableDaySelect">
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="timetableStartTime">Start Time</label>
+              <input id="timetableStartTime" type="time">
+            </div>
+
+            <div class="form-group">
+              <label for="timetableEndTime">End Time</label>
+              <input id="timetableEndTime" type="time">
+            </div>
+
+            <div class="form-group">
+              <label for="timetableSubjectInput">Subject</label>
+              <input id="timetableSubjectInput" placeholder="Mathematics">
+            </div>
+
+            <div class="form-group">
+              <label for="timetableTeacherSelect">Teacher</label>
+              <select id="timetableTeacherSelect">
+                <option value="">Select teacher</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="timetableVenueInput">Venue</label>
+              <input id="timetableVenueInput" value="Classroom">
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+            <button class="primary-btn" onclick="saveTimetableSlot()"><ion-icon name="save-outline"></ion-icon> Save Slot</button>
+            <button class="secondary-btn" onclick="loadTimetableEntries()"><ion-icon name="refresh-outline"></ion-icon> Refresh</button>
+            <button class="secondary-btn" onclick="printTimetableGrid()"><ion-icon name="print-outline"></ion-icon> Print / Export PDF</button>
+          </div>
+
+          <div id="timetableStatus" class="empty-state">Loading timetable...</div>
+          <div id="timetableGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-top:12px;"></div>
         </div>
       </div>
     </section>
@@ -2509,12 +2585,55 @@ let resultStatusMap = {};
 let paymentStatusMap = {};
 let notifications = [];
 let notificationsViewed = false;
+let currentTimetableEntries = [];
 
 if (!school || !currentSchoolId) {
   window.location.href = "login.html";
 }
 
 let currentAssignTeacherId = "";
+
+function clearDashboardData() {
+  students = [];
+  teachers = [];
+  notifications = [];
+  currentTimetableEntries = [];
+
+  const studentList = document.getElementById("studentList");
+  if (studentList) {
+    studentList.innerHTML = '<div class="empty-state">Your session has expired. Please sign in again.</div>';
+  }
+
+  const teacherList = document.getElementById("teacherList");
+  if (teacherList) {
+    teacherList.innerHTML = '<div class="empty-state">Your session has expired. Please sign in again.</div>';
+  }
+
+  const totalStudents = document.getElementById("totalStudents");
+  if (totalStudents) totalStudents.innerText = "0";
+
+  const totalTeachers = document.getElementById("totalTeachers");
+  if (totalTeachers) totalTeachers.innerText = "0";
+
+  const totalClasses = document.getElementById("totalClasses");
+  if (totalClasses) totalClasses.innerText = "0";
+
+  const schoolCapacity = document.getElementById("schoolCapacity");
+  if (schoolCapacity) schoolCapacity.innerText = "0 / 0";
+
+  renderNotificationBadge();
+  renderNotificationsList();
+}
+
+function handleAuthFailure(response) {
+  if (!response || ![401, 403].includes(response.status)) return false;
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("school");
+  clearDashboardData();
+  window.location.href = "login.html";
+  return true;
+}
 
 function openAssignModal(teacherId) {
   currentAssignTeacherId = teacherId;
@@ -2526,6 +2645,8 @@ async function loadNotifications() {
 
   try {
     const response = await fetch(window.API_BASE + `/admin/school/${encodeURIComponent(currentSchoolId)}/notifications`);
+    if (handleAuthFailure(response)) return;
+
     const data = await response.json();
 
     if (data?.success) {
@@ -3111,6 +3232,8 @@ async function loadStudents() {
       }
     );
 
+    if (handleAuthFailure(response)) return;
+
     console.log("Response status:", response.status);
 
     const data = await response.json();
@@ -3572,14 +3695,266 @@ async function addTeacher() {
 async function loadTeachers() {
   try {
     const response = await fetch(window.API_BASE + "/teachers/" + encodeURIComponent(currentSchoolId));
+    if (handleAuthFailure(response)) return;
+
     const data = await response.json();
     if (!response.ok) return;
 
     teachers = data;
     renderTeachers();
+    populateTimetableTeacherOptions();
     updateStats();
   } catch (error) {
     console.log(error);
+  }
+}
+
+function populateTimetableTeacherOptions() {
+  const select = document.getElementById("timetableTeacherSelect");
+  if (!select) return;
+
+  select.innerHTML = '<option value="">Select teacher</option>';
+
+  const visibleTeachers = Array.isArray(teachers) ? teachers : [];
+  visibleTeachers.forEach((teacher) => {
+    const option = document.createElement("option");
+    option.value = teacher.teacherId || "";
+    option.textContent = teacher.name || "Teacher";
+    select.appendChild(option);
+  });
+}
+
+async function saveTimetableSlot() {
+  const className = document.getElementById("timetableClassSelect").value;
+  const arm = document.getElementById("timetableArmInput").value.trim().toUpperCase();
+  const dayOfWeek = document.getElementById("timetableDaySelect").value;
+  const startTime = document.getElementById("timetableStartTime").value;
+  const endTime = document.getElementById("timetableEndTime").value;
+  const subjectName = document.getElementById("timetableSubjectInput").value.trim();
+  const teacherId = document.getElementById("timetableTeacherSelect").value;
+  const teacherName = document.getElementById("timetableTeacherSelect").selectedOptions[0]?.text || "";
+  const venue = document.getElementById("timetableVenueInput").value.trim() || "Classroom";
+  const session = document.getElementById("mainSessionSelect")?.value || "2025/2026";
+  const term = document.getElementById("mainTermSelect")?.value || "1st Term";
+
+  if (!className || !arm || !dayOfWeek || !startTime || !endTime || !subjectName || !teacherId || !teacherName) {
+    toast("Please complete all timetable fields", "error");
+    return;
+  }
+
+  const subjectId = subjectName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "subject";
+
+  window.showLoader?.();
+
+  try {
+    const response = await fetch(window.api("/api/timetable/slot"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token") || ""}`
+      },
+      body: JSON.stringify({
+        schoolId: currentSchoolId,
+        className,
+        arm,
+        dayOfWeek,
+        startTime,
+        endTime,
+        subjectId,
+        subjectName,
+        teacherId,
+        teacherName,
+        venue,
+        session,
+        term
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Unable to save timetable slot");
+    }
+
+    toast("Timetable slot saved successfully", "success");
+    await loadTimetableEntries();
+  } catch (error) {
+    console.log(error);
+    toast(error.message || "Unable to save timetable slot", "error");
+  } finally {
+    window.hideLoader?.();
+  }
+}
+
+async function loadTimetableEntries() {
+  const className = document.getElementById("timetableClassSelect").value;
+  const arm = document.getElementById("timetableArmInput").value.trim().toUpperCase();
+  const session = document.getElementById("mainSessionSelect")?.value || "2025/2026";
+  const term = document.getElementById("mainTermSelect")?.value || "1st Term";
+  const status = document.getElementById("timetableStatus");
+  const grid = document.getElementById("timetableGrid");
+
+  if (!className || !arm) {
+    if (status) status.innerHTML = '<div class="empty-state">Select a class and arm to load the timetable.</div>';
+    if (grid) grid.innerHTML = "";
+    return;
+  }
+
+  if (status) {
+    status.innerHTML = '<div class="empty-state">Loading timetable...</div>';
+  }
+
+  try {
+    const response = await fetch(window.api(`/api/timetable/class?className=${encodeURIComponent(className)}&arm=${encodeURIComponent(arm)}&session=${encodeURIComponent(session)}&term=${encodeURIComponent(term)}`), {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token") || ""}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Unable to load timetable");
+    }
+
+    currentTimetableEntries = Array.isArray(data.data) ? data.data : [];
+    renderTimetableGrid(currentTimetableEntries);
+    if (status) {
+      const entries = currentTimetableEntries;
+      status.innerHTML = entries.length
+        ? `<div class="empty-state">${entries.length} timetable slot${entries.length === 1 ? "" : "s"} loaded for ${className} ${arm}.</div>`
+        : '<div class="empty-state">No timetable created yet for this class and arm.</div>';
+    }
+  } catch (error) {
+    console.log(error);
+    if (status) {
+      status.innerHTML = `<div class="empty-state">${escapeHtml(error.message || "Error loading timetable")}</div>`;
+    }
+  }
+}
+
+function renderTimetableGrid(entries) {
+  const grid = document.getElementById("timetableGrid");
+  if (!grid) return;
+
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const sortedEntries = (Array.isArray(entries) ? entries : []).slice().sort((a, b) => {
+    const dayDiff = days.indexOf(a.dayOfWeek || "") - days.indexOf(b.dayOfWeek || "");
+    if (dayDiff !== 0) return dayDiff;
+    return (a.startTime || "").localeCompare(b.startTime || "");
+  });
+
+  const cards = days.map((day) => {
+    const slotEntries = sortedEntries.filter((entry) => entry.dayOfWeek === day);
+
+    return `
+      <div style="border:1px solid var(--line); border-radius:16px; padding:12px; background: var(--card-2); min-height: 160px;">
+        <div style="font-weight:700; margin-bottom:8px;">${escapeHtml(day)}</div>
+        ${slotEntries.length ? slotEntries.map((entry) => `
+          <div style="background: var(--card); border:1px solid var(--line); border-radius:12px; padding:10px; margin-bottom:8px;">
+            <div style="font-weight:700;">${escapeHtml(entry.subjectName || "Subject")}</div>
+            <div style="font-size:0.9rem; color:var(--muted); margin-top:3px;">${escapeHtml(entry.teacherName || "Teacher")}</div>
+            <div style="font-size:0.9rem; color:var(--muted); margin-top:3px;">${escapeHtml(entry.startTime || "")} - ${escapeHtml(entry.endTime || "")}</div>
+            <div style="font-size:0.9rem; color:var(--muted); margin-top:3px;">${escapeHtml(entry.venue || "Classroom")}</div>
+            <button class="danger-btn" style="margin-top:8px; padding:8px 10px;" onclick="deleteTimetableSlot('${entry._id || ""}')">Delete Slot</button>
+          </div>
+        `).join("") : '<div class="empty-state">No slot</div>'}
+      </div>
+    `;
+  }).join("");
+
+  grid.innerHTML = cards;
+}
+
+function printTimetableGrid() {
+  const className = document.getElementById("timetableClassSelect")?.value || "";
+  const arm = document.getElementById("timetableArmInput")?.value.trim().toUpperCase() || "";
+  const title = className && arm ? `${className} ${arm} Timetable` : "Class Timetable";
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const sortedEntries = (currentTimetableEntries || []).slice().sort((a, b) => {
+    const dayDiff = days.indexOf(a.dayOfWeek || "") - days.indexOf(b.dayOfWeek || "");
+    if (dayDiff !== 0) return dayDiff;
+    return (a.startTime || "").localeCompare(b.startTime || "");
+  });
+
+  const printRows = days.map((day) => {
+    const slotEntries = sortedEntries.filter((entry) => entry.dayOfWeek === day);
+    const body = slotEntries.length
+      ? slotEntries.map((entry) => `
+          <div style="border:1px solid #d1d5db; border-radius:10px; padding:10px; margin-bottom:8px; background:#f8fafc;">
+            <div style="font-weight:700;">${escapeHtml(entry.subjectName || "Subject")}</div>
+            <div style="font-size:12px; color:#64748b; margin-top:4px;">Teacher: ${escapeHtml(entry.teacherName || "Teacher")}</div>
+            <div style="font-size:12px; color:#64748b; margin-top:2px;">${escapeHtml(entry.startTime || "")} - ${escapeHtml(entry.endTime || "")}</div>
+            <div style="font-size:12px; color:#64748b; margin-top:2px;">Venue: ${escapeHtml(entry.venue || "Classroom")}</div>
+          </div>
+        `).join("")
+      : '<div style="color:#64748b; font-style:italic;">No slot</div>';
+
+    return `
+      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff; min-height:140px;">
+        <div style="font-weight:700; margin-bottom:8px;">${escapeHtml(day)}</div>
+        ${body}
+      </div>
+    `;
+  }).join("");
+
+  const printWindow = window.open("", "_blank", "width=900,height=700");
+  if (!printWindow) {
+    toast("Please allow popups to print or export the timetable.", "error");
+    return;
+  }
+
+  printWindow.document.write(`
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>${escapeHtml(title)}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 24px; color: #111827; }
+          h1 { margin: 0 0 8px; font-size: 22px; }
+          .subtitle { color: #64748b; margin-bottom: 18px; }
+          .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+          @media print { body { margin: 0; } .no-print { display: none; } }
+        </style>
+      </head>
+      <body>
+        <h1>${escapeHtml(title)}</h1>
+        <div class="subtitle">Generated from the school timetable dashboard</div>
+        <div class="grid">${printRows}</div>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  setTimeout(() => {
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  }, 250);
+}
+
+async function deleteTimetableSlot(slotId) {
+  if (!slotId) return;
+  if (!confirm("Delete this timetable slot?")) return;
+
+  try {
+    const response = await fetch(window.api(`/api/timetable/slot/${encodeURIComponent(slotId)}`), {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token") || ""}`
+      }
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Unable to delete timetable slot");
+    }
+
+    toast("Timetable slot deleted", "success");
+    await loadTimetableEntries();
+  } catch (error) {
+    console.log(error);
+    toast(error.message || "Unable to delete timetable slot", "error");
   }
 }
 
@@ -5294,6 +5669,7 @@ async function init() {
     loadTeachers(),
     loadNotifications()
   ]);
+  loadTimetableEntries();
   renderActivities();
   setTimeout(() => loadPosts("students"), 500);
 }
