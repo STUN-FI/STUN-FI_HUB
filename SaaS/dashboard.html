@@ -2060,6 +2060,26 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="helpModal" aria-hidden="true">
+  <div class="modal help-modal">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
+        <div>
+          <h3>Need help?</h3>
+          <p style="margin:4px 0 0; color:var(--muted);">Quick guidance for the main school dashboard actions.</p>
+        </div>
+        <button class="secondary-btn" type="button" onclick="closeHelpModal()"><ion-icon name="close-outline"></ion-icon></button>
+      </div>
+      <div class="help-list">
+        <div class="help-item"><strong>Start a new school session</strong><span>Use Start New Session to begin a fresh academic cycle for the school.</span></div>
+        <div class="help-item"><strong>Add school members</strong><span>Use the student and teacher sections to add records, assign classes, and keep the school profile current.</span></div>
+        <div class="help-item"><strong>Review teacher scores</strong><span>Open the score review area to check submissions and decide which results should be published.</span></div>
+        <div class="help-item"><strong>Share school updates</strong><span>Create announcements and notifications from the school dashboard to keep teachers and students informed.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="logoutModal" aria-hidden="true">
   <div class="modal small">
     <div class="modal-content">
@@ -2115,6 +2135,10 @@
 
       <div class="topbar-actions">
         <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()"><ion-icon name="menu-outline"></ion-icon></button>
+        <button class="help-btn" type="button" onclick="openHelpModal()" aria-label="Open help guide">
+          <ion-icon name="help-circle-outline"></ion-icon>
+          <span>Help</span>
+        </button>
         <button class="notification-btn" id="notificationButton" onclick="openNotificationsModal()" type="button" aria-label="View notifications">
           <ion-icon name="notifications-outline"></ion-icon>
           <span class="notification-badge" id="notificationBadge"></span>
@@ -2905,6 +2929,22 @@ window.addEventListener("load", () => {
     document.querySelector(".layout").classList.add("closed");
   }
 });
+
+function openHelpModal() {
+  const modal = document.getElementById("helpModal");
+  if (modal) {
+    modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
+  }
+}
+
+function closeHelpModal() {
+  const modal = document.getElementById("helpModal");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+  }
+}
 
 function showLogoutModal() {
   const modal = document.getElementById("logoutModal");

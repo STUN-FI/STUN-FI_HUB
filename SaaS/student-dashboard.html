@@ -809,6 +809,31 @@
     .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
     .modal-actions button { min-width: 140px; }
 
+    .help-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .help-modal .modal { max-width: 700px; }
+    .help-list { display: grid; gap: 10px; margin-top: 10px; }
+    .help-item {
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--card-2);
+      display: grid;
+      gap: 4px;
+    }
+    .help-item strong { color: var(--text); }
+    .help-item span { color: var(--muted); line-height: 1.6; }
+
     /* Small modal variation */
     .modal.small { max-width: 420px; }
 
@@ -918,6 +943,26 @@
       </div>
     </div>
 
+    <div class="modal-overlay" id="helpModal" aria-hidden="true">
+      <div class="modal help-modal">
+        <div class="modal-content">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
+            <div>
+              <h3>Need help?</h3>
+              <p style="margin:4px 0 0; color:var(--muted);">Quick steps for the main student dashboard actions.</p>
+            </div>
+            <button class="secondary-btn" type="button" onclick="closeHelpModal()"><ion-icon name="close-outline"></ion-icon></button>
+          </div>
+          <div class="help-list">
+            <div class="help-item"><strong>Check your results</strong><span>Use Result Access from the top bar to open the latest published result for your selected session and term.</span></div>
+            <div class="help-item"><strong>Review your timetable</strong><span>Switch the session and term at the top of the page, then use the class routine section to see your weekly lessons.</span></div>
+            <div class="help-item"><strong>Stay updated</strong><span>Use the bell icon to open school notifications and keep up with announcements from your school.</span></div>
+            <div class="help-item"><strong>Update your profile</strong><span>Open Update Profile to review your personal details and make sure your account information is current.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal-overlay" id="logoutModal" aria-hidden="true">
       <div class="modal small">
         <div class="modal-content">
@@ -941,6 +986,10 @@
           <button class="menu-btn" type="button" onclick="toggleSidebar()">
             <ion-icon name="menu-outline"></ion-icon>
             <span>Menu</span>
+          </button>
+          <button class="help-btn" type="button" onclick="openHelpModal()" aria-label="Open help guide">
+            <ion-icon name="help-circle-outline"></ion-icon>
+            <span>Help</span>
           </button>
           <button class="notification-btn" type="button" onclick="openStudentNotificationsModal()" aria-label="View notifications">
             <ion-icon name="notifications-outline"></ion-icon>
@@ -1778,6 +1827,22 @@
         logoutButton.addEventListener('click', showLogoutModal);
       }
       loadLiveDashboardData();
+    }
+
+    function openHelpModal() {
+      const modal = document.getElementById('helpModal');
+      if (modal) {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+
+    function closeHelpModal() {
+      const modal = document.getElementById('helpModal');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+      }
     }
 
     function showLogoutModal() {

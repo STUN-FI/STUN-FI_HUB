@@ -885,6 +885,26 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="helpModal" aria-hidden="true">
+    <div class="modal help-modal">
+      <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
+          <div>
+            <h3>Need help?</h3>
+            <p style="margin:4px 0 0; color:var(--muted);">Quick steps for the most common teacher dashboard actions.</p>
+          </div>
+          <button class="secondary-btn" type="button" onclick="closeHelpModal()"><ion-icon name="close-outline"></ion-icon></button>
+        </div>
+        <div class="help-list">
+          <div class="help-item"><strong>Select the right class</strong><span>Use the assignment dropdown to choose the class and arm assigned to you before entering scores.</span></div>
+          <div class="help-item"><strong>Save your work</strong><span>Use Save often while entering marks so you do not lose draft scores if the page refreshes.</span></div>
+          <div class="help-item"><strong>Submit scores</strong><span>When the records are ready, click Submit Scores so the school admin can review them and publish results.</span></div>
+          <div class="help-item"><strong>Review school updates</strong><span>Open the notifications button to view announcements and messages from the school.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="layout">
     <aside class="sidebar" id="sidebar">
       <div class="brand">
@@ -932,6 +952,10 @@
         <div class="topbar-actions">
           <div class="school-pill" id="teacherSchoolPill">School: --</div>
           <button class="sidebar-toggle" onclick="toggleSidebar()"><ion-icon name="menu-outline"></ion-icon></button>
+          <button class="help-btn" type="button" onclick="openHelpModal()" aria-label="Open help guide">
+            <ion-icon name="help-circle-outline"></ion-icon>
+            <span>Help</span>
+          </button>
           <button class="notification-btn" id="teacherNotificationButton" onclick="openTeacherNotificationsModal()" type="button" aria-label="View notifications">
             <ion-icon name="notifications-outline"></ion-icon>
             <span class="notification-badge" id="teacherNotificationBadge"></span>
@@ -1207,6 +1231,22 @@
     function updateThemeButton() {
       const btn = document.getElementById("themeToggle");
       btn.innerHTML = document.body.classList.contains("dark") ? '<ion-icon name="sunny-outline"></ion-icon> Light Mode' : '<ion-icon name="moon-outline"></ion-icon> Dark Mode';
+    }
+
+    function openHelpModal() {
+      const modal = document.getElementById('helpModal');
+      if (modal) {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+
+    function closeHelpModal() {
+      const modal = document.getElementById('helpModal');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+      }
     }
 
     function showLogoutModal() {
