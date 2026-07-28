@@ -3116,6 +3116,8 @@ app.post("/add-teacher-assignment", async (req, res) => {
     const subject = (req.body.subject || "").trim();
     const className = (req.body.className || req.body.class || "").trim();
     const arm = (req.body.arm || "").trim();
+    const session = (req.body.session || "2025/2026").trim();
+    const term = (req.body.term || "1st Term").trim();
 
     if (!teacherId || !subject || !className) {
       return res.status(400).json({
@@ -3149,9 +3151,43 @@ app.post("/add-teacher-assignment", async (req, res) => {
 
     await teacher.save();
 
+    const students = await Student.find({
+      schoolId: teacher.schoolId,
+      className,
+      arm,
+      status: { $ne: "withdrawn" }
+    }).select("studentId");
+
+    if (students.length) {
+      await Promise.all(students.map((student) =>
+        SubjectEnrollment.updateOne(
+          {
+            studentId: student.studentId,
+            schoolId: teacher.schoolId,
+            subject,
+            session,
+            term
+          },
+          {
+            $setOnInsert: {
+              studentId: student.studentId,
+              schoolId: teacher.schoolId,
+              subject,
+              className,
+              arm,
+              session,
+              term
+            }
+          },
+          { upsert: true }
+        )
+      ));
+    }
+
     res.json({
       message: "Teacher assignment added successfully",
-      teacher
+      teacher,
+      enrolledStudents: students.length
     });
   } catch (error) {
     console.log(error);

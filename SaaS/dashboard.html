@@ -2808,6 +2808,9 @@ async function addAssignment() {
   }
 
   try {
+    const selectedSession = document.getElementById("mainSessionSelect")?.value || "2025/2026";
+    const selectedTerm = document.getElementById("mainTermSelect")?.value || "1st Term";
+
     const promises = subjects.map((subject) =>
       fetch(window.API_BASE + "/add-teacher-assignment", {
         method: "POST",
@@ -2816,7 +2819,9 @@ async function addAssignment() {
           teacherId: currentAssignTeacherId,
           subject,
           className,
-          arm
+          arm,
+          session: selectedSession,
+          term: selectedTerm
         })
       }).then(async (res) => ({ ok: res.ok, status: res.status, body: await res.json().catch(() => ({})), subject }))
     );
